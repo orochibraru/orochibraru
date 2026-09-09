@@ -1,0 +1,13 @@
+{
+  "name": "orochibraru.com",
+  "private": true,
+  "scripts": {
+    "dev": "bun ./*.html",
+    "build": "bun build ./*.html --outdir=dist",
+    "start": "bun ./dist/*.html"
+  },
+  "devDependencies": {
+    "bun-plugin-tailwind": "^0.1.2",
+    "tailwindcss": "^4.3.3"
+  }
+}

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Penombre — free self-hosted cloud storage you actually own</title>
+<meta name="description" content="Penombre is a free, open-source self-hosted drive: upload, organise and share files from your own server. SvelteKit UI, SQLite by default, one Docker container, REST API, no subscription.">
+<link rel="canonical" href="https://orochibraru.com/penombre">
+<meta name="theme-color" content="#060709">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="orochibraru">
+<meta property="og:url" content="https://orochibraru.com/penombre">
+<meta property="og:title" content="Penombre — free self-hosted cloud storage you actually own">
+<meta property="og:description" content="Penombre is a free, open-source self-hosted drive: upload, organise and share files from your own server. SvelteKit UI, SQLite by default, one Docker container, REST API, no subscription.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Penombre",
+"applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Docker",
+"description":"Penombre is a free, open-source self-hosted drive: upload, organise and share files from your own server. SvelteKit UI, SQLite by default, one Docker container, REST API, no subscription.","url":"https://orochibraru.com/penombre",
+"codeRepository":"https://github.com/orochibraru/penombre",
+"author":{"@type":"Person","name":"orochibraru","url":"https://github.com/orochibraru"},
+"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
+</head>
+<body>
+<header>
+  <nav class="nav">
+    <a class="brand" href="/">orochi<span>braru</span></a>
+    <div class="nav-links">
+      <a href="/#projects">Projects</a>
+      <a href="/#free">Why free</a>
+      <a href="https://github.com/orochibraru/penombre" rel="noopener">Source</a>
+    </div>
+  </nav>
+</header>
+<main>
+<article>
+<div class="ph">
+  <a class="back" href="/#projects">← All projects</a>
+  <span class="tag" style="margin-left:14px">Storage · MIT</span>
+  <h1>Penombre</h1>
+  <p class="lede">A self-hosted drive. All the convenience of cloud storage, on hardware you
+  own, with a bill of exactly zero.</p>
+  <div class="meta">
+    <a class="btn primary" href="https://github.com/orochibraru/penombre" rel="noopener">Source on GitHub</a>
+    <a class="btn" href="https://penombre.space/docs" rel="noopener">Docs</a>
+    <a class="btn" href="https://hub.docker.com/r/orochibraru/penombre" rel="noopener">Docker Hub</a>
+  </div>
+</div>
+
+<section>
+  <h2>What it is</h2>
+  <p>Penombre is a file storage and synchronisation platform for people who want their files
+  back. Drop it on a box, mount a volume, and you get a modern web drive: uploads, folders,
+  automatic categories for images, documents and music, recoverable soft-trash, recent files,
+  and OAuth logins — without renting the disk from anyone.</p>
+  <p>It runs on <strong>SQLite out of the box</strong>: one container, one volume, no database
+  server to run alongside it. PostgreSQL stays supported the day you outgrow that.</p>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Features</h2><div class="rule"></div></div>
+  <div class="feats">
+    <div class="feat"><h3>Modern web UI</h3><p>SvelteKit 5, TailwindCSS 4 and shadcn-svelte. Responsive, fast, keyboard-friendly.</p></div>
+    <div class="feat"><h3>Real auth</h3><p>Better Auth: session cookies, OAuth providers and API keys for scripts.</p></div>
+    <div class="feat"><h3>Smart categories</h3><p>Files sort themselves into images, documents, music and more as they land.</p></div>
+    <div class="feat"><h3>Soft trash</h3><p>Deletion is recoverable, because everyone deletes the wrong folder eventually.</p></div>
+    <div class="feat"><h3>REST API</h3><p>OpenAPI-documented <code>/api/v1</code> endpoints with API-key auth, generated from Zod contracts.</p></div>
+    <div class="feat"><h3>Simple mode</h3><p>Run it as a bare shared file browser: mount a volume, share the login, browse together.</p></div>
+    <div class="feat"><h3>No database server</h3><p>SQLite with Drizzle by default. Point <code>DATABASE_URL</code> at Postgres if you'd rather.</p></div>
+    <div class="feat"><h3>Docker-first</h3><p>One compose file up and you're storing files. Local filesystem storage at <code>STORAGE_PATH</code>.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Run it</h2>
+<pre><span class="c"># clone, then</span>
+docker compose up --build
+
+<span class="c"># http://localhost:3000</span></pre>
+  <p>Full environment variable reference lives in
+  <a href="https://penombre.space/docs/env" rel="noopener">the docs</a>.</p>
+</section>
+
+<section>
+  <h2>How it's built</h2>
+  <ul>
+    <li><strong>Frontend</strong> — SvelteKit with Svelte 5, TailwindCSS 4, shadcn-svelte</li>
+    <li><strong>Backend</strong> — SvelteKit <code>+server.ts</code> routes with Zod-validated contracts that also emit the OpenAPI spec</li>
+    <li><strong>Database</strong> — SQLite with Drizzle ORM, PostgreSQL optional, chosen from the <code>DATABASE_URL</code> scheme</li>
+    <li><strong>Storage</strong> — plain local filesystem, so your files stay files</li>
+    <li><strong>Auth</strong> — Better Auth</li>
+  </ul>
+  <p>MIT licensed. Free, and staying that way — <a href="/#free">here's why</a>.</p>
+</section>
+</article>
+</main>
+<footer>
+  <span>© orochibraru — built for homelabs, priced at zero.</span>
+  <div class="foot-links">
+    <a href="/">Home</a>
+    <a href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
+    <a href="/sitemap.xml">Sitemap</a>
+  </div>
+</footer>
+</body>
+</html>

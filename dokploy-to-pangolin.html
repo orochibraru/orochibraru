@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dokploy-to-pangolin — auto-provision Pangolin routes from Dokploy deploys, free</title>
+<meta name="description" content="A free, open-source webhook bridge that registers new Dokploy applications with Pangolin automatically: creates the resource and target so every deploy is routed without hand-editing anything.">
+<link rel="canonical" href="https://orochibraru.com/dokploy-to-pangolin">
+<meta name="theme-color" content="#060709">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="orochibraru">
+<meta property="og:url" content="https://orochibraru.com/dokploy-to-pangolin">
+<meta property="og:title" content="dokploy-to-pangolin — auto-provision Pangolin routes from Dokploy deploys, free">
+<meta property="og:description" content="A free, open-source webhook bridge that registers new Dokploy applications with Pangolin automatically: creates the resource and target so every deploy is routed without hand-editing anything.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"dokploy-to-pangolin",
+"applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Docker",
+"description":"A free, open-source webhook bridge that registers new Dokploy applications with Pangolin automatically: creates the resource and target so every deploy is routed without hand-editing anything.","url":"https://orochibraru.com/dokploy-to-pangolin",
+"codeRepository":"https://github.com/orochibraru/dokploy-to-pangolin",
+"author":{"@type":"Person","name":"orochibraru","url":"https://github.com/orochibraru"},
+"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
+</head>
+<body>
+<header>
+  <nav class="nav">
+    <a class="brand" href="/">orochi<span>braru</span></a>
+    <div class="nav-links">
+      <a href="/#projects">Projects</a>
+      <a href="/#free">Why free</a>
+      <a href="https://github.com/orochibraru/dokploy-to-pangolin" rel="noopener">Source</a>
+    </div>
+  </nav>
+</header>
+<main>
+<article>
+<div class="ph">
+  <a class="back" href="/#projects">← All projects</a>
+  <span class="tag" style="margin-left:14px">Networking · Bun + Hono</span>
+  <h1>dokploy-to-pangolin</h1>
+  <p class="lede">A webhook service that registers new Dokploy applications with Pangolin
+  automatically — creating the resource and the target so a fresh deploy is routed the moment it
+  exists. Stop hand-writing a route for every app.</p>
+  <div class="meta">
+    <a class="btn primary" href="https://github.com/orochibraru/dokploy-to-pangolin" rel="noopener">Source on GitHub</a>
+    <a class="btn" href="https://hub.docker.com/r/orochibraru/dokploy-to-pangolin" rel="noopener">Docker Hub</a>
+  </div>
+</div>
+
+<section>
+  <h2>What happens</h2>
+<pre>┌──────────┐         ┌─────────────────┐         ┌──────────┐
+│ Dokploy  │────────▶│  This service   │────────▶│ Pangolin │
+│          │ webhook │                 │   API   │          │
+└──────────┘         └─────────────────┘         └──────────┘</pre>
+  <p>It receives the build notification from Dokploy, checks whether the domain already exists in
+  Pangolin, creates the resource if it doesn't, configures a resource target pointing at your main
+  site, and routing starts working. That's the entire job.</p>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Features</h2><div class="rule"></div></div>
+  <div class="feats">
+    <div class="feat"><h3>Automatic resources</h3><p>New domain deployed, new Pangolin resource created. No console visit.</p></div>
+    <div class="feat"><h3>Duplicate-safe</h3><p>Intelligent domain matching, so redeploys don't pile up duplicate resources.</p></div>
+    <div class="feat"><h3>Authenticated webhooks</h3><p>Shared secret token on the incoming hook, validated before anything is created.</p></div>
+    <div class="feat"><h3>Fast and small</h3><p>Bun + Hono, full TypeScript, graceful SIGINT/SIGTERM shutdown, 90%+ test coverage.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Run it</h2>
+<pre>docker run -p 3000:3000 \
+  -e WEBHOOK_SECRET=your-secret \
+  -e PANGOLIN_API_KEY=your-key \
+  orochibraru/dokploy-to-pangolin</pre>
+  <p>It has to be reachable by Dokploy to receive webhooks. Deploying it <em>through</em> Dokploy
+  and Pangolin works fine; running it separately just means making sure the configured URL resolves.
+  Full environment reference is in the <a href="https://github.com/orochibraru/dokploy-to-pangolin" rel="noopener">README</a>.</p>
+</section>
+</article>
+</main>
+<footer>
+  <span>© orochibraru — built for homelabs, priced at zero.</span>
+  <div class="foot-links">
+    <a href="/">Home</a>
+    <a href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
+    <a href="/sitemap.xml">Sitemap</a>
+  </div>
+</footer>
+</body>
+</html>

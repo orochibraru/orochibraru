@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baba — free homelab server monitoring with Discord and Telegram alerts</title>
+<meta name="description" content="Baba is a free, open-source homelab monitor. It watches CPU, load, memory, disk, temperature and GPU, sends Discord or Telegram alerts, and tells you when things recover. Single binary or Docker.">
+<link rel="canonical" href="https://orochibraru.com/baba">
+<meta name="theme-color" content="#060709">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="orochibraru">
+<meta property="og:url" content="https://orochibraru.com/baba">
+<meta property="og:title" content="Baba — free homelab server monitoring with Discord and Telegram alerts">
+<meta property="og:description" content="Baba is a free, open-source homelab monitor. It watches CPU, load, memory, disk, temperature and GPU, sends Discord or Telegram alerts, and tells you when things recover. Single binary or Docker.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Baba",
+"applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Docker",
+"description":"Baba is a free, open-source homelab monitor. It watches CPU, load, memory, disk, temperature and GPU, sends Discord or Telegram alerts, and tells you when things recover. Single binary or Docker.","url":"https://orochibraru.com/baba",
+"codeRepository":"https://github.com/orochibraru/baba",
+"author":{"@type":"Person","name":"orochibraru","url":"https://github.com/orochibraru"},
+"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
+</head>
+<body>
+<header>
+  <nav class="nav">
+    <a class="brand" href="/">orochi<span>braru</span></a>
+    <div class="nav-links">
+      <a href="/#projects">Projects</a>
+      <a href="/#free">Why free</a>
+      <a href="https://github.com/orochibraru/baba" rel="noopener">Source</a>
+    </div>
+  </nav>
+</header>
+<main>
+<article>
+<div class="ph">
+  <a class="back" href="/#projects">← All projects</a>
+  <span class="tag" style="margin-left:14px">Monitoring · Single binary</span>
+  <h1>Baba</h1>
+  <p class="lede">Named after the lookout pirate in <em>Astérix</em> — always watching the horizon
+  for trouble. A lightweight homelab monitor that pings you on Discord or Telegram when something
+  goes wrong, and again when it's fixed.</p>
+  <div class="meta">
+    <a class="btn primary" href="https://github.com/orochibraru/baba" rel="noopener">Source on GitHub</a>
+    <a class="btn" href="https://github.com/orochibraru/baba/releases" rel="noopener">Releases</a>
+  </div>
+</div>
+
+<section>
+  <h2>What it watches</h2>
+  <p>CPU usage, system load, memory, disk, CPU and GPU temperature, and GPU utilisation. When a
+  threshold breaks it opens an incident and tells you; when the metric comes back it tells you
+  that too. Everything lands in a local SQLite database so you keep the history.</p>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Features</h2><div class="rule"></div></div>
+  <div class="feats">
+    <div class="feat"><h3>Discord &amp; Telegram</h3><p>Multiple notifiers supported, use one or both.</p></div>
+    <div class="feat"><h3>Deduplication</h3><p>An incident opens only on the Nth consecutive breach. No per-cycle spam at 4am.</p></div>
+    <div class="feat"><h3>Recovery alerts</h3><p>You get told when the metric returns to normal, not just when it broke.</p></div>
+    <div class="feat"><h3>Reminders</h3><p>Re-alerts on a configurable interval while an incident stays open.</p></div>
+    <div class="feat"><h3>Incident history</h3><p>Full history in a local SQLite database — no cloud, no account, no retention tier.</p></div>
+    <div class="feat"><h3>Runs as a service</h3><p><code>baba install</code> registers it with systemd on Linux or launchd on macOS.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Install</h2>
+<pre><span class="c"># Linux / macOS</span>
+curl -fsSL https://github.com/orochibraru/baba/releases/latest/download/install.sh | sh
+
+baba setup    <span class="c"># interactive wizard: notifier credentials + thresholds</span>
+baba install  <span class="c"># register as a background service</span></pre>
+  <p>Or run it in the foreground with <code>baba start</code>, or in Docker with the
+  <a href="https://github.com/orochibraru/baba" rel="noopener">example compose file</a>.
+  Binaries for every platform are on the releases page.</p>
+</section>
+
+<section>
+  <h2>Honest status</h2>
+  <p>The version number is past 1.x but it's still beta. It won't hurt your system, but I won't
+  call it reliable until there's long-term data to prove it. That warning is in the README too —
+  I'd rather say it twice than oversell a free tool.</p>
+</section>
+</article>
+</main>
+<footer>
+  <span>© orochibraru — built for homelabs, priced at zero.</span>
+  <div class="foot-links">
+    <a href="/">Home</a>
+    <a href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
+    <a href="/sitemap.xml">Sitemap</a>
+  </div>
+</footer>
+</body>
+</html>
