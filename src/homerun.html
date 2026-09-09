@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homerun — a free single-host PaaS, a Cloud Run alternative for your homelab</title>
+<meta name="description" content="Homerun is a free, self-hosted single-user PaaS: deploy Docker images or git repos from a form, get TLS routing via Traefik. A Dokploy and Coolify alternative with nothing paywalled.">
+<link rel="canonical" href="https://orochibraru.com/homerun">
+<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
+<meta property="og:site_name" content="orochibraru">
+<meta property="og:url" content="https://orochibraru.com/homerun">
+<meta property="og:title" content="Homerun — a free single-host PaaS, a Cloud Run alternative for your homelab">
+<meta property="og:description" content="Homerun is a free, self-hosted single-user PaaS: deploy Docker images or git repos from a form, get TLS routing via Traefik. A Dokploy and Coolify alternative with nothing paywalled.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
+<link rel="stylesheet" href="./style.css">
+<script>try{var s=localStorage.getItem("theme");document.documentElement.dataset.theme=s||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")}catch(e){}</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Homerun",
+"applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Docker",
+"description":"Homerun is a free, self-hosted single-user PaaS: deploy Docker images or git repos from a form, get TLS routing via Traefik. A Dokploy and Coolify alternative with nothing paywalled.","url":"https://orochibraru.com/homerun",
+"codeRepository":"https://github.com/orochibraru/homerun",
+"author":{"@type":"Person","name":"orochibraru","url":"https://github.com/orochibraru"},
+"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
+</head>
+<body>
+<header class="mx-auto max-w-[1140px] px-6">
+  <nav class="flex items-center justify-between gap-4 py-7">
+    <a class="text-[15px] font-bold tracking-[-.02em]" href="/">orochi<span class="text-acid">braru</span></a>
+    <div class="flex items-center gap-5 text-[13px] text-dim">
+      <a class="hover:text-acid" href="/#projects">Projects</a>
+      <a class="hover:text-acid" href="/#free">Why free</a>
+      <a class="hover:text-acid" href="https://github.com/orochibraru/homerun" rel="noopener">Source</a>
+      <button id="theme-toggle" type="button" aria-label="Toggle light and dark mode"
+        class="grid size-8 place-items-center border border-edge transition hover:border-acid hover:text-acid">
+        <svg viewBox="0 0 24 24" class="size-4 transition-transform duration-300" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+</header>
+<main class="mx-auto max-w-[1140px] px-6">
+<article class="prose">
+<div class="pt-10 pb-5">
+  <a class="text-xs uppercase tracking-[.1em] text-dim hover:text-acid" href="/#projects">&larr; All projects</a>
+  <span class="tag ml-3.5">Deploys &middot; Self-hosted PaaS</span>
+  <h1 class="mt-[18px] text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">Homerun</h1>
+  <p class="mt-6 max-w-[66ch] text-[1.15rem] text-dim">A single-host PaaS for your own hardware. Point it at an image or a git repo, fill in the form, hit deploy. Traefik puts it on <code>slug.yourdomain.com</code> with TLS. No Kubernetes. No control plane. No pricing page.</p>
+  <div class="mt-[26px] flex flex-wrap gap-2.5"><a class="btn btn-primary" href="https://github.com/orochibraru/homerun" rel="noopener">Source on GitHub</a>
+   <a class="btn" href="https://github.com/orochibraru/homerun/blob/main/docs/faq-and-limitations.md" rel="noopener">FAQ &amp; limitations</a></div>
+</div>
+<section class="mb-[90px]">
+  <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Why it exists</h2>
+  <p>Coolify carries a lot of tech debt and a matching pile of bugs. Dokploy started moving features
+  homelabbers relied on behind an enterprise plan. Both are fine projects; neither is what I wanted
+  running on my one box at home.</p>
+  <p class="mt-5">So Homerun is deliberately small: <strong>one host, the local Docker socket, one user.</strong>
+  No multi-node orchestration to babysit, no cluster to explain to yourself at 3am. Everything it does,
+  it does for free.</p>
+</section>
+
+<section class="mb-[90px]">
+  <div class="mb-7 flex items-baseline gap-4">
+    <h2 class="text-2xl font-bold tracking-[-.02em]">Features</h2>
+    <div class="h-px flex-1 bg-line"></div>
+  </div>
+  <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Image or git deploys</h3><p>Any Docker image, or build from a git repo&rsquo;s Dockerfile &mdash; including your self-hosted Gitea. Env vars, CPU/memory limits, restart policy, private registry auth.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Live deploy progress</h3><p>Pull, build, create and start streamed to the browser in real time, and it resumes correctly if you reload mid-deploy.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Deployment history</h3><p>Every attempt recorded with status, image digest and its full log.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Projects</h3><p>Group services on one Docker network so they reach each other by slug &mdash; <code>http://api:8080</code>.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Templates</h3><p>One-click Redis, Postgres, MySQL, MongoDB, Adminer, Uptime Kuma, n8n and Vaultwarden &mdash; or save your own config as a template.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Compose import</h3><p>Paste a <code>docker-compose.yaml</code> and get services, volumes and dependency order, with a preview of whatever doesn&rsquo;t map.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Smart service links</h3><p>Point a new service at an existing Postgres, MySQL, Redis, Mongo or RabbitMQ and the connection URL fills itself in.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Logs &amp; web terminal</h3><p>Tail stdout/stderr or open an interactive shell into a running container, from the browser.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Domains &amp; SSL</h3><p>A second hostname per service, plus bring-your-own cert and key for domains outside Traefik&rsquo;s ACME coverage.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Build servers</h3><p>Build on another Docker daemon over <code>tcp://</code> or <code>ssh://</code>, or via the lightweight Homerun Agent.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Swarm mode</h3><p>Opt in to Docker Swarm for real replica scaling and load balancing, instead of the default single-container model.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Storage volumes</h3><p>Define bind-mounts or Docker-managed volumes once, mount them into as many services as you like.</p></div>
+  </div>
+</section>
+
+<section class="mb-[90px]">
+  <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Status</h2>
+  <p>Actively developed and running on real hardware, but still finding its shape. What&rsquo;s solid and
+  what isn&rsquo;t is written down honestly in
+  <a href="https://github.com/orochibraru/homerun/blob/main/docs/faq-and-limitations.md" rel="noopener">the FAQ and limitations doc</a>
+  &mdash; read it before you point production at it.</p>
+</section>
+</article>
+</main>
+<footer class="mx-auto flex max-w-[1140px] flex-wrap justify-between gap-4 border-t border-line px-6 pt-8 pb-15 text-[12.5px] text-dim">
+  <span>&copy; orochibraru &mdash; built for homelabs, priced at zero.</span>
+  <div class="flex flex-wrap gap-[18px]">
+    <a class="hover:text-acid" href="/">Home</a>
+    <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
+    <a class="hover:text-acid" href="/sitemap.xml">Sitemap</a>
+  </div>
+</footer>
+<script>document.getElementById("theme-toggle").onclick=function(){var d=document.documentElement,t=d.dataset.theme==="dark"?"light":"dark";d.dataset.theme=t;try{localStorage.setItem("theme",t)}catch(e){}};</script>
+</body>
+</html>

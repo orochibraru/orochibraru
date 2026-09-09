@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baba — free homelab server monitoring with Discord and Telegram alerts</title>
+<meta name="description" content="Baba is a free, open-source homelab monitor. It watches CPU, load, memory, disk, temperature and GPU, sends Discord or Telegram alerts, and tells you when things recover. Single binary or Docker.">
+<link rel="canonical" href="https://orochibraru.com/baba">
+<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
+<meta property="og:site_name" content="orochibraru">
+<meta property="og:url" content="https://orochibraru.com/baba">
+<meta property="og:title" content="Baba — free homelab server monitoring with Discord and Telegram alerts">
+<meta property="og:description" content="Baba is a free, open-source homelab monitor. It watches CPU, load, memory, disk, temperature and GPU, sends Discord or Telegram alerts, and tells you when things recover. Single binary or Docker.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
+<link rel="stylesheet" href="./style.css">
+<script>try{var s=localStorage.getItem("theme");document.documentElement.dataset.theme=s||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")}catch(e){}</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Baba",
+"applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Docker",
+"description":"Baba is a free, open-source homelab monitor. It watches CPU, load, memory, disk, temperature and GPU, sends Discord or Telegram alerts, and tells you when things recover. Single binary or Docker.","url":"https://orochibraru.com/baba",
+"codeRepository":"https://github.com/orochibraru/baba",
+"author":{"@type":"Person","name":"orochibraru","url":"https://github.com/orochibraru"},
+"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
+</head>
+<body>
+<header class="mx-auto max-w-[1140px] px-6">
+  <nav class="flex items-center justify-between gap-4 py-7">
+    <a class="text-[15px] font-bold tracking-[-.02em]" href="/">orochi<span class="text-acid">braru</span></a>
+    <div class="flex items-center gap-5 text-[13px] text-dim">
+      <a class="hover:text-acid" href="/#projects">Projects</a>
+      <a class="hover:text-acid" href="/#free">Why free</a>
+      <a class="hover:text-acid" href="https://github.com/orochibraru/baba" rel="noopener">Source</a>
+      <button id="theme-toggle" type="button" aria-label="Toggle light and dark mode"
+        class="grid size-8 place-items-center border border-edge transition hover:border-acid hover:text-acid">
+        <svg viewBox="0 0 24 24" class="size-4 transition-transform duration-300" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+</header>
+<main class="mx-auto max-w-[1140px] px-6">
+<article class="prose">
+<div class="pt-10 pb-5">
+  <a class="text-xs uppercase tracking-[.1em] text-dim hover:text-acid" href="/#projects">&larr; All projects</a>
+  <span class="tag ml-3.5">Monitoring &middot; Single binary</span>
+  <h1 class="mt-[18px] text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">Baba</h1>
+  <p class="mt-6 max-w-[66ch] text-[1.15rem] text-dim">Named after the lookout pirate in <em>Ast&eacute;rix</em> &mdash; always watching the horizon for trouble. A lightweight homelab monitor that pings you on Discord or Telegram when something goes wrong, and again when it&rsquo;s fixed.</p>
+  <div class="mt-[26px] flex flex-wrap gap-2.5"><a class="btn btn-primary" href="https://github.com/orochibraru/baba" rel="noopener">Source on GitHub</a>
+   <a class="btn" href="https://github.com/orochibraru/baba/releases" rel="noopener">Releases</a></div>
+</div>
+<section class="mb-[90px]">
+  <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">What it watches</h2>
+  <p>CPU usage, system load, memory, disk, CPU and GPU temperature, and GPU utilisation. When a
+  threshold breaks it opens an incident and tells you; when the metric comes back it tells you that
+  too. Everything lands in a local SQLite database so you keep the history.</p>
+</section>
+
+<section class="mb-[90px]">
+  <div class="mb-7 flex items-baseline gap-4">
+    <h2 class="text-2xl font-bold tracking-[-.02em]">Features</h2>
+    <div class="h-px flex-1 bg-line"></div>
+  </div>
+  <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Discord &amp; Telegram</h3><p>Multiple notifiers supported, use one or both.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Deduplication</h3><p>An incident opens only on the Nth consecutive breach. No per-cycle spam at 4am.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Recovery alerts</h3><p>You get told when the metric returns to normal, not just when it broke.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Reminders</h3><p>Re-alerts on a configurable interval while an incident stays open.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Incident history</h3><p>Full history in a local SQLite database &mdash; no cloud, no account, no retention tier.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Runs as a service</h3><p><code>baba install</code> registers it with systemd on Linux or launchd on macOS.</p></div>
+  </div>
+</section>
+
+<section class="mb-[90px]">
+  <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Install</h2>
+<pre><span class="c"># Linux / macOS</span>
+curl -fsSL https://github.com/orochibraru/baba/releases/latest/download/install.sh | sh
+
+baba setup    <span class="c"># interactive wizard: notifier credentials + thresholds</span>
+baba install  <span class="c"># register as a background service</span></pre>
+  <p class="mt-5">Or run it in the foreground with <code>baba start</code>, or in Docker with the
+  <a href="https://github.com/orochibraru/baba" rel="noopener">example compose file</a>.
+  Binaries for every platform are on the releases page.</p>
+</section>
+
+<section class="mb-[90px]">
+  <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Honest status</h2>
+  <p>The version number is past 1.x but it&rsquo;s still beta. It won&rsquo;t hurt your system, but I won&rsquo;t call it
+  reliable until there&rsquo;s long-term data to prove it. That warning is in the README too &mdash; I&rsquo;d rather
+  say it twice than oversell a free tool.</p>
+</section>
+</article>
+</main>
+<footer class="mx-auto flex max-w-[1140px] flex-wrap justify-between gap-4 border-t border-line px-6 pt-8 pb-15 text-[12.5px] text-dim">
+  <span>&copy; orochibraru &mdash; built for homelabs, priced at zero.</span>
+  <div class="flex flex-wrap gap-[18px]">
+    <a class="hover:text-acid" href="/">Home</a>
+    <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
+    <a class="hover:text-acid" href="/sitemap.xml">Sitemap</a>
+  </div>
+</footer>
+<script>document.getElementById("theme-toggle").onclick=function(){var d=document.documentElement,t=d.dataset.theme==="dark"?"light":"dark";d.dataset.theme=t;try{localStorage.setItem("theme",t)}catch(e){}};</script>
+</body>
+</html>

@@ -1,4 +1,5 @@
+node_modules
+dist
 Dockerfile
 .dockerignore
-node_modules
-bun.lock
+.git

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 — nothing deployed here</title>
+<meta name="description" content="This route does not resolve.">
+<link rel="canonical" href="https://orochibraru.com/404">
+<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
+<meta property="og:site_name" content="orochibraru">
+<meta property="og:url" content="https://orochibraru.com/404">
+<meta property="og:title" content="404 — nothing deployed here">
+<meta property="og:description" content="This route does not resolve.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
+<link rel="stylesheet" href="./style.css">
+<script>try{var s=localStorage.getItem("theme");document.documentElement.dataset.theme=s||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")}catch(e){}</script>
+<meta name="robots" content="noindex">
+</head>
+<body>
+<header class="mx-auto max-w-[1140px] px-6">
+  <nav class="flex items-center justify-between gap-4 py-7">
+    <a class="text-[15px] font-bold tracking-[-.02em]" href="/">orochi<span class="text-acid">braru</span></a>
+    <div class="flex items-center gap-5 text-[13px] text-dim">
+      <a class="hover:text-acid" href="/#projects">Projects</a>
+      <a class="hover:text-acid" href="/#free">Why free</a>
+      <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
+      <button id="theme-toggle" type="button" aria-label="Toggle light and dark mode"
+        class="grid size-8 place-items-center border border-edge transition hover:border-acid hover:text-acid">
+        <svg viewBox="0 0 24 24" class="size-4 transition-transform duration-300" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+</header>
+<main class="mx-auto max-w-[1140px] px-6">
+  <div class="pt-15 pb-[90px]">
+    <span class="tag">404 &middot; container not found</span>
+    <h1 class="mt-[26px] text-[clamp(2.6rem,9vw,5rem)]/[.92] font-extrabold tracking-[-.045em]">
+      Nothing <span class="bg-gradient-to-r from-acid via-cyan to-plasma bg-clip-text text-transparent">deployed</span> here.
+    </h1>
+    <p class="mt-7 max-w-[62ch] text-[1.05rem] text-dim">This route doesn&rsquo;t resolve. The projects, however, do.</p>
+    <div class="mt-9 flex flex-wrap gap-3">
+      <a class="btn btn-primary" href="/#projects">Back to the projects</a>
+    </div>
+  </div>
+</main>
+<footer class="mx-auto flex max-w-[1140px] flex-wrap justify-between gap-4 border-t border-line px-6 pt-8 pb-15 text-[12.5px] text-dim">
+  <span>&copy; orochibraru &mdash; built for homelabs, priced at zero.</span>
+  <div class="flex flex-wrap gap-[18px]">
+    <a class="hover:text-acid" href="/">Home</a>
+    <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
+    <a class="hover:text-acid" href="/sitemap.xml">Sitemap</a>
+  </div>
+</footer>
+<script>document.getElementById("theme-toggle").onclick=function(){var d=document.documentElement,t=d.dataset.theme==="dark"?"light":"dark";d.dataset.theme=t;try{localStorage.setItem("theme",t)}catch(e){}};</script>
+</body>
+</html>

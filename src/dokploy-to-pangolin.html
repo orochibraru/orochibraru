@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dokploy-to-pangolin — auto-provision Pangolin routes from Dokploy deploys, free</title>
+<meta name="description" content="A free, open-source webhook bridge that registers new Dokploy applications with Pangolin automatically: creates the resource and target so every deploy is routed without hand-editing anything.">
+<link rel="canonical" href="https://orochibraru.com/dokploy-to-pangolin">
+<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
+<meta property="og:site_name" content="orochibraru">
+<meta property="og:url" content="https://orochibraru.com/dokploy-to-pangolin">
+<meta property="og:title" content="dokploy-to-pangolin — auto-provision Pangolin routes from Dokploy deploys, free">
+<meta property="og:description" content="A free, open-source webhook bridge that registers new Dokploy applications with Pangolin automatically: creates the resource and target so every deploy is routed without hand-editing anything.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
+<link rel="stylesheet" href="./style.css">
+<script>try{var s=localStorage.getItem("theme");document.documentElement.dataset.theme=s||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")}catch(e){}</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"dokploy-to-pangolin",
+"applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Docker",
+"description":"A free, open-source webhook bridge that registers new Dokploy applications with Pangolin automatically: creates the resource and target so every deploy is routed without hand-editing anything.","url":"https://orochibraru.com/dokploy-to-pangolin",
+"codeRepository":"https://github.com/orochibraru/dokploy-to-pangolin",
+"author":{"@type":"Person","name":"orochibraru","url":"https://github.com/orochibraru"},
+"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
+</head>
+<body>
+<header class="mx-auto max-w-[1140px] px-6">
+  <nav class="flex items-center justify-between gap-4 py-7">
+    <a class="text-[15px] font-bold tracking-[-.02em]" href="/">orochi<span class="text-acid">braru</span></a>
+    <div class="flex items-center gap-5 text-[13px] text-dim">
+      <a class="hover:text-acid" href="/#projects">Projects</a>
+      <a class="hover:text-acid" href="/#free">Why free</a>
+      <a class="hover:text-acid" href="https://github.com/orochibraru/dokploy-to-pangolin" rel="noopener">Source</a>
+      <button id="theme-toggle" type="button" aria-label="Toggle light and dark mode"
+        class="grid size-8 place-items-center border border-edge transition hover:border-acid hover:text-acid">
+        <svg viewBox="0 0 24 24" class="size-4 transition-transform duration-300" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+</header>
+<main class="mx-auto max-w-[1140px] px-6">
+<article class="prose">
+<div class="pt-10 pb-5">
+  <a class="text-xs uppercase tracking-[.1em] text-dim hover:text-acid" href="/#projects">&larr; All projects</a>
+  <span class="tag ml-3.5">Networking &middot; Bun + Hono</span>
+  <h1 class="mt-[18px] text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">dokploy-to-pangolin</h1>
+  <p class="mt-6 max-w-[66ch] text-[1.15rem] text-dim">A webhook service that registers new Dokploy applications with Pangolin automatically &mdash; creating the resource and the target so a fresh deploy is routed the moment it exists. Stop hand-writing a route for every app.</p>
+  <div class="mt-[26px] flex flex-wrap gap-2.5"><a class="btn btn-primary" href="https://github.com/orochibraru/dokploy-to-pangolin" rel="noopener">Source on GitHub</a>
+   <a class="btn" href="https://hub.docker.com/r/orochibraru/dokploy-to-pangolin" rel="noopener">Docker Hub</a></div>
+</div>
+<section class="mb-[90px]">
+  <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">What happens</h2>
+<pre>&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;         &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;         &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474; Dokploy  &#9474;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9654;&#9474;  This service   &#9474;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9654;&#9474; Pangolin &#9474;
+&#9474;          &#9474; webhook &#9474;                 &#9474;   API   &#9474;          &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;         &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;         &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</pre>
+  <p class="mt-5">It receives the build notification from Dokploy, checks whether the domain already exists in
+  Pangolin, creates the resource if it doesn&rsquo;t, configures a resource target pointing at your main site,
+  and routing starts working. That&rsquo;s the entire job.</p>
+</section>
+
+<section class="mb-[90px]">
+  <div class="mb-7 flex items-baseline gap-4">
+    <h2 class="text-2xl font-bold tracking-[-.02em]">Features</h2>
+    <div class="h-px flex-1 bg-line"></div>
+  </div>
+  <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Automatic resources</h3><p>New domain deployed, new Pangolin resource created. No console visit.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Duplicate-safe</h3><p>Intelligent domain matching, so redeploys don&rsquo;t pile up duplicate resources.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Authenticated webhooks</h3><p>Shared secret token on the incoming hook, validated before anything is created.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Fast and small</h3><p>Bun + Hono, full TypeScript, graceful SIGINT/SIGTERM shutdown, 90%+ test coverage.</p></div>
+  </div>
+</section>
+
+<section class="mb-[90px]">
+  <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Run it</h2>
+<pre>docker run -p 3000:3000 \
+  -e WEBHOOK_SECRET=your-secret \
+  -e PANGOLIN_API_KEY=your-key \
+  orochibraru/dokploy-to-pangolin</pre>
+  <p class="mt-5">It has to be reachable by Dokploy to receive webhooks. Deploying it <em>through</em> Dokploy
+  and Pangolin works fine; running it separately just means making sure the configured URL resolves.
+  Full environment reference is in the
+  <a href="https://github.com/orochibraru/dokploy-to-pangolin" rel="noopener">README</a>.</p>
+</section>
+</article>
+</main>
+<footer class="mx-auto flex max-w-[1140px] flex-wrap justify-between gap-4 border-t border-line px-6 pt-8 pb-15 text-[12.5px] text-dim">
+  <span>&copy; orochibraru &mdash; built for homelabs, priced at zero.</span>
+  <div class="flex flex-wrap gap-[18px]">
+    <a class="hover:text-acid" href="/">Home</a>
+    <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
+    <a class="hover:text-acid" href="/sitemap.xml">Sitemap</a>
+  </div>
+</footer>
+<script>document.getElementById("theme-toggle").onclick=function(){var d=document.documentElement,t=d.dataset.theme==="dark"?"light":"dark";d.dataset.theme=t;try{localStorage.setItem("theme",t)}catch(e){}};</script>
+</body>
+</html>

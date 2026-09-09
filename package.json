@@ -2,12 +2,18 @@
   "name": "orochibraru.com",
   "private": true,
   "scripts": {
-    "dev": "bun ./*.html",
-    "build": "bun build ./*.html --outdir=dist",
-    "start": "bun ./dist/*.html"
+    "dev": "bun ./src/*.html",
+    "build": "bun run build.ts",
+    "lint": "tailwint",
+    "lint:fix": "tailwint --fix src/**/*.html",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@tailwindcss/language-server": "^0.16.0",
+    "@types/bun": "^1.4.2",
     "bun-plugin-tailwind": "^0.1.2",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "tailwint": "^1.1.15",
+    "typescript": "^7.0.2"
   }
 }

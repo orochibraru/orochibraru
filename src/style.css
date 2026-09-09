@@ -93,7 +93,7 @@
 @layer components {
   /* the five atoms that repeat on every page */
   .btn {
-    @apply inline-block border border-edge px-[22px] py-3 text-[13px] uppercase tracking-[.04em]
+    @apply inline-block border border-edge px-5.5 py-3 text-[13px] uppercase tracking-[.04em]
            transition duration-150 hover:border-acid hover:text-acid;
   }
   .btn-primary {
@@ -101,7 +101,7 @@
            hover:text-onneon hover:brightness-110;
   }
   .tag {
-    @apply inline-flex items-center gap-2 rounded-full border border-edge px-3 py-[5px]
+    @apply inline-flex items-center gap-2 rounded-full border border-edge px-3 py-1.25
            text-[11px] uppercase tracking-[.18em] text-dim;
   }
   .tag::before {
@@ -109,30 +109,33 @@
     box-shadow: 0 0 10px var(--color-neon);
   }
   .chip {
-    @apply rounded-[3px] border border-edge px-[9px] py-[3px] text-[10.5px]
+    @apply rounded-[3px] border border-edge px-2.25 py-0.75 text-[10.5px]
            uppercase tracking-[.08em] text-dim;
   }
   .card {
-    @apply relative block bg-surface px-7 pt-[30px] pb-[26px] transition-colors
-           hover:bg-fg/[.04];
+    @apply relative block bg-surface px-7 pt-7.5 pb-6.5 transition-colors
+           hover:bg-fg/4;
   }
   .card::after {
     content: "→";
-    @apply absolute top-[26px] right-[26px] text-edge transition;
+    @apply absolute top-6.5 right-6.5 text-edge transition;
   }
   .card:hover::after { @apply text-acid translate-x-1; }
-  .feat { @apply bg-surface px-[26px] py-6; }
+  .feat { @apply bg-surface px-6.5 py-6; }
   .feat h3::before { content: "// "; @apply text-acid; }
+  .card:hover h3 { @apply text-acid; }
 
   /* body copy inside project pages: classing every <p> and <li> buys nothing */
   .prose p { @apply max-w-[72ch] text-dim; }
-  .prose ul { @apply max-w-[72ch] list-disc pl-[18px] text-dim; }
+  .prose ul { @apply max-w-[72ch] list-disc pl-4.5 text-dim; }
   .prose li { @apply mb-2 marker:text-acid; }
   .prose strong, .prose b { @apply text-fg; }
   .prose a:not(.btn):not(.chip) { @apply text-cyan border-b border-edge hover:border-cyan; }
   .prose code { @apply text-cyan; }
   .prose pre {
-    @apply overflow-x-auto border border-line bg-surface px-[22px] py-5 text-[.875rem]/[1.7];
+    @apply overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
   }
   .prose pre .c { @apply text-dim; }
+  /* feature tiles opt out of prose paragraph sizing */
+  .feat p { @apply m-0 max-w-none text-[.9rem]; }
 }
