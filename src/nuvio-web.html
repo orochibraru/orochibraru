@@ -91,6 +91,39 @@
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Auto-play next</h3><p>Rolls into the next episode with an end-of-episode panel.</p></div>
   </div>
 </section>
+<section class="mb-[90px]">
+  <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Run it</h2>
+<p class="mb-3 text-xs uppercase tracking-widest text-dim">Docker run</p>
+<pre>docker run -p 3000:3000 -e ORIGIN=http://localhost:3000 \
+  orochibraru/nuvio-web:latest</pre>
+<p class="mt-8 mb-3 text-xs uppercase tracking-widest text-dim">Docker Compose</p>
+<pre>services:
+  nuvio:
+    image: orochibraru/nuvio-web:latest
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      <span class="c"># the URL you actually browse to</span>
+      ORIGIN: http://localhost:3000
+    healthcheck:
+      test: ["CMD", "/app/dist/healthcheck"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 5s</pre>
+  <p class="mt-5">Then open <code>http://localhost:3000</code>, sign in with your Nuvio account, pick a profile,
+  and add an addon from Settings if the account has none yet.</p>
+  <p class="mt-5"><strong>No database and no volume.</strong> Every piece of state, the account, profiles, addons,
+  library and settings, lives on your Nuvio account, so the container is disposable.
+  <code>/app/dist/healthcheck</code> is a self-contained binary suitable for <code>HEALTHCHECK</code> and for
+  orchestrator probes. Images are published for <code>linux/amd64</code> and <code>linux/arm64</code>.</p>
+  <p class="mt-5">Behind a reverse proxy, set <code>PROTOCOL_HEADER=x-forwarded-proto</code> and
+  <code>HOST_HEADER=x-forwarded-host</code> so it knows the URL the browser actually used. Serving over HTTPS on
+  the default port needs neither. Putting it on the public internet is on you: HTTPS and whatever access control
+  you would give any other self-hosted app.</p>
+</section>
+
 </article>
 </main>
 <footer class="mx-auto flex max-w-page flex-wrap justify-between gap-4 border-t border-line px-6 pt-8 pb-15 text-[12.5px] text-dim">

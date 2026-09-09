@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Homerun: a free single-host PaaS, a Cloud Run alternative for your homelab</title>
-<meta name="description" content="Homerun is a free, self-hosted single-user PaaS: deploy Docker images or git repos from a form, get TLS routing via Traefik. A Dokploy and Coolify alternative with nothing paywalled.">
+<meta name="description" content="Homerun is a free, self-hosted single-host PaaS: deploy Docker images or git repos from a form, get TLS routing via Traefik. A Dokploy and Coolify alternative with nothing paywalled.">
 <link rel="canonical" href="https://orochibraru.com/homerun">
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
 <meta property="og:site_name" content="orochibraru">
 <meta property="og:url" content="https://orochibraru.com/homerun">
 <meta property="og:title" content="Homerun: a free single-host PaaS, a Cloud Run alternative for your homelab">
-<meta property="og:description" content="Homerun is a free, self-hosted single-user PaaS: deploy Docker images or git repos from a form, get TLS routing via Traefik. A Dokploy and Coolify alternative with nothing paywalled.">
+<meta property="og:description" content="Homerun is a free, self-hosted single-host PaaS: deploy Docker images or git repos from a form, get TLS routing via Traefik. A Dokploy and Coolify alternative with nothing paywalled.">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
 <link rel="alternate" type="application/rss+xml" title="orochibraru" href="/feed.xml">
@@ -20,7 +20,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Homerun",
 "applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Docker",
-"description":"Homerun is a free, self-hosted single-user PaaS: deploy Docker images or git repos from a form, get TLS routing via Traefik. A Dokploy and Coolify alternative with nothing paywalled.","url":"https://orochibraru.com/homerun",
+"description":"Homerun is a free, self-hosted single-host PaaS: deploy Docker images or git repos from a form, get TLS routing via Traefik. A Dokploy and Coolify alternative with nothing paywalled.","url":"https://orochibraru.com/homerun",
 "codeRepository":"https://github.com/orochibraru/homerun",
 "sameAs":["https://homerun.orochibraru.com"],
 "author":{"@type":"Person","name":"orochibraru","url":"https://github.com/orochibraru"},
@@ -56,7 +56,7 @@
   <div class="mt-[26px] flex flex-wrap gap-2.5"><a class="btn btn-primary" href="https://homerun.orochibraru.com" rel="noopener">homerun.orochibraru.com</a>
    <a class="btn" href="https://homerun.orochibraru.com/docs" rel="noopener">Docs</a>
    <a class="btn" href="https://github.com/orochibraru/homerun" rel="noopener">Source on GitHub</a>
-   <a class="btn" href="https://github.com/orochibraru/homerun/blob/main/docs/faq-and-limitations.md" rel="noopener">FAQ &amp; limitations</a></div>
+   <a class="btn" href="https://homerun.orochibraru.com/docs/faq-and-limitations" rel="noopener">FAQ &amp; limitations</a></div>
 </div>
 <section class="mb-[90px]">
   <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Why it exists</h2>
@@ -86,14 +86,47 @@
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Build servers</h3><p>Build on another Docker daemon over <code>tcp://</code> or <code>ssh://</code>, or via the lightweight Homerun Agent.</p></div>
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Swarm mode</h3><p>Opt in to Docker Swarm for real replica scaling and load balancing, instead of the default single-container model.</p></div>
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Storage volumes</h3><p>Define bind-mounts or Docker-managed volumes once, mount them into as many services as you like.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Scheduled jobs &amp; S3 backups</h3><p>Cron-style auto-redeploy per service, standalone cron jobs with their own run history, and scheduled volume backups to any S3-compatible endpoint.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">REST API, OpenAPI &amp; a CLI</h3><p>Everything the UI does is a typed JSON API at <code>/api/v1</code>, with live Swagger UI and a <code>homerun</code> CLI built against the generated types.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Users, roles &amp; invites</h3><p>Admin and developer roles, email or direct-create invites, and optional OAuth/OIDC login.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Per-service auth gate</h3><p>Optionally require a Homerun login to reach a deployed service. Every container is labelled <code>homerun.managed=true</code>, so it never touches anything it didn&rsquo;t create.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">DNS automation</h3><p>Optional Cloudflare or self-hosted Pangolin integration manages a deployed service&rsquo;s DNS record for you.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Docker cleanup</h3><p>Admin-only host-wide <code>docker system df</code> and prune from the dashboard, with a preview before anything is removed.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Search, filters &amp; bulk actions</h3><p>Server-side search, filters and paging on every list page, plus multi-select start/stop/restart/delete with a typed confirmation before anything destructive runs.</p></div>
   </div>
+</section>
+
+<section class="mb-[90px]">
+  <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Run it</h2>
+<p class="mb-3 text-xs uppercase tracking-widest text-dim">One-liner, fresh Linux server</p>
+<pre>curl -fsSL https://raw.githubusercontent.com/orochibraru/homerun/main/packages/installer/bootstrap.sh \
+  | sudo bash -s -- --mode=full --domain=homerun.example.com</pre>
+  <p class="mt-5">That installs Docker Engine, sets up a dedicated <strong>rootless</strong> Docker user so nothing
+  it deploys runs as root, writes a compose file, and brings up Traefik, Postgres and the app from published images.
+  Pass <code>--dry-run</code> first on a box that matters. Use <code>--mode=agent</code> if this host is only going
+  to be a remote build server for another instance.</p>
+<p class="mt-8 mb-3 text-xs uppercase tracking-widest text-dim">Docker Compose</p>
+<pre><span class="c"># already have Docker set up your way? just take the stack</span>
+curl -fsSLO https://raw.githubusercontent.com/orochibraru/homerun/main/compose.prod.yaml
+curl -fsSLO https://raw.githubusercontent.com/orochibraru/homerun/main/.env.example
+curl -fsSL https://raw.githubusercontent.com/orochibraru/homerun/main/homerun.example.yaml -o homerun.yaml
+
+mv .env.example .env    <span class="c"># set AUTH_SECRET at minimum</span>
+docker network create homerun
+docker compose -f compose.prod.yaml up -d</pre>
+  <p class="mt-5"><code>compose.prod.yaml</code> is self-contained and pulls Traefik, Postgres and the app from
+  published images. No installer, no rootless setup, no source checkout. Set <code>ORIGIN</code> to the address you
+  will actually reach the dashboard at: it is never <code>localhost</code>, or the first sign-up fails with an
+  invalid origin from any browser that is not on the box.</p>
+  <p class="mt-5">Both paths are covered properly in the
+  <a href="https://homerun.orochibraru.com/docs/getting-started" rel="noopener">getting started guide</a>.</p>
 </section>
 
 <section class="mb-[90px]">
   <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Status</h2>
   <p>Actively developed and running on real hardware, but still finding its shape. What&rsquo;s solid and
   what isn&rsquo;t is written down honestly in
-  <a href="https://github.com/orochibraru/homerun/blob/main/docs/faq-and-limitations.md" rel="noopener">the FAQ and limitations doc</a>.
+  <a href="https://homerun.orochibraru.com/docs/faq-and-limitations" rel="noopener">the FAQ and limitations doc</a>.
   Read it before you point production at it.</p>
 </section>
 </article>

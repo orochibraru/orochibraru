@@ -81,18 +81,45 @@
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">REST API</h3><p>OpenAPI-documented <code>/api/v1</code> endpoints with API-key auth, generated from Zod contracts.</p></div>
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Simple mode</h3><p>Run it as a bare shared file browser: mount a volume, share the login, browse together.</p></div>
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">No database server</h3><p>SQLite with Drizzle by default. Point <code>DATABASE_URL</code> at Postgres if you&rsquo;d rather.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Docker-first</h3><p>One compose file up and you&rsquo;re storing files. Local filesystem storage at <code>STORAGE_PATH</code>.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Docker-first</h3><p>One <code>docker run</code> off the published <code>orochibraru/penombre</code> image and you&rsquo;re storing files. Local filesystem storage at <code>STORAGE_PATH</code>.</p></div>
   </div>
 </section>
 
 <section class="mb-22.5">
   <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Run it</h2>
-<pre><span class="c"># clone, then</span>
-docker compose up --build
+<p class="mb-3 text-xs uppercase tracking-widest text-dim">Docker run</p>
+<pre>docker run -d --name penombre \
+  -p 3000:3000 \
+  -v penombre_data:/data \
+  -e ADMIN_EMAIL=you@example.com \
+  -e ADMIN_PASSWORD=change-me \
+  -e AUTH_SECRET=$(openssl rand -hex 32) \
+  -e ORIGIN=https://drive.example.com \
+  orochibraru/penombre:latest</pre>
+<p class="mt-8 mb-3 text-xs uppercase tracking-widest text-dim">Docker Compose</p>
+<pre>services:
+  penombre:
+    image: orochibraru/penombre:latest
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - penombre_data:/data
+    environment:
+      ADMIN_EMAIL: you@example.com
+      ADMIN_PASSWORD: change-me
+      AUTH_SECRET: a-long-random-string
+      ORIGIN: https://drive.example.com
 
-<span class="c"># http://localhost:3000</span></pre>
-  <p class="mt-5">Full environment variable reference lives in
-  <a href="https://penombre.orochibraru.com/docs/env" rel="noopener">the docs</a>.</p>
+volumes:
+  penombre_data:</pre>
+  <p class="mt-5">Either way it comes up on <code>http://localhost:3000</code>. One volume holds the lot: the
+  SQLite database under <code>/data/db</code>, your files under <code>/data/storage</code>. Those four variables
+  are the only ones required on a first run.</p>
+  <p class="mt-5">The <a href="https://penombre.orochibraru.com/docs/getting-started" rel="noopener">getting started
+  guide</a> walks through it properly, and
+  <a href="https://penombre.orochibraru.com/docs/env" rel="noopener">the env reference</a> covers everything else:
+  OAuth providers, SMTP, Redis, Postgres, simple mode.</p>
 </section>
 
 <section class="mb-22.5">
