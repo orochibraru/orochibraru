@@ -8,6 +8,8 @@
 @theme {
   --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
+  --container-page: 80rem;   /* the one page-width knob: max-w-page */
+
   --color-bg: #f4f5f7;
   --color-surface: #ffffff;
   --color-line: #e3e6eb;
@@ -126,8 +128,8 @@
   .card:hover h3 { @apply text-acid; }
 
   /* body copy inside project pages: classing every <p> and <li> buys nothing */
-  .prose p { @apply max-w-[72ch] text-dim; }
-  .prose ul { @apply max-w-[72ch] list-disc pl-4.5 text-dim; }
+  .prose p { @apply max-w-[80ch] text-dim; }
+  .prose ul { @apply max-w-[80ch] list-disc pl-4.5 text-dim; }
   .prose li { @apply mb-2 marker:text-acid; }
   .prose strong, .prose b { @apply text-fg; }
   .prose a:not(.btn):not(.chip) { @apply text-cyan border-b border-edge hover:border-cyan; }
