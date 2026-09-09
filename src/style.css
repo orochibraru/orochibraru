@@ -150,7 +150,7 @@
   .md a { @apply border-b border-edge text-cyan hover:border-cyan; }
   .md strong { @apply font-semibold text-fg; }
   .md code { @apply text-cyan; }
-  .md pre { @apply mb-5 max-w-[80ch] overflow-x-auto border border-line bg-surface px-[22px] py-5 text-[.875rem]/[1.7]; }
+  .md pre { @apply mb-5 max-w-[80ch] overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7]; }
   .md pre code { @apply text-fg; }
   .md hr { @apply my-10 border-line; }
   .md img { @apply my-6 border border-line; }

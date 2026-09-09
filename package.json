@@ -5,7 +5,7 @@
     "dev": "bun run build.ts && bun ./src/*.html ./src/blog/*.html",
     "build": "bun run build.ts",
     "lint": "tailwint",
-    "lint:fix": "tailwint --fix src/**/*.html",
+    "lint:fix": "tailwint --fix",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
