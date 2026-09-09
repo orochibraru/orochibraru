@@ -138,6 +138,23 @@
     @apply overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
   }
   .prose pre .c { @apply text-dim; }
+  /* rendered Markdown from src/posts/*.md: no classes on the tags, so style them here */
+  .md p { @apply mb-5 max-w-[80ch] text-dim; }
+  .md h2 { @apply mt-12 mb-4 text-2xl font-bold tracking-[-.02em] text-fg; }
+  .md h3 { @apply mt-8 mb-3 text-lg font-bold tracking-[-.01em] text-fg; }
+  .md ul { @apply mb-5 max-w-[80ch] list-disc pl-4.5 text-dim; }
+  .md ol { @apply mb-5 max-w-[80ch] list-decimal pl-4.5 text-dim; }
+  .md li { @apply mb-2 marker:text-acid; }
+  .md blockquote { @apply mb-5 max-w-[80ch] border-l-2 border-acid pl-5 text-dim italic; }
+  .md blockquote p { @apply mb-0; }
+  .md a { @apply border-b border-edge text-cyan hover:border-cyan; }
+  .md strong { @apply font-semibold text-fg; }
+  .md code { @apply text-cyan; }
+  .md pre { @apply mb-5 max-w-[80ch] overflow-x-auto border border-line bg-surface px-[22px] py-5 text-[.875rem]/[1.7]; }
+  .md pre code { @apply text-fg; }
+  .md hr { @apply my-10 border-line; }
+  .md img { @apply my-6 border border-line; }
+
   /* feature tiles opt out of prose paragraph sizing */
   .feat p { @apply m-0 max-w-none text-[.9rem]; }
 }

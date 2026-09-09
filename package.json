@@ -2,7 +2,7 @@
   "name": "orochibraru.com",
   "private": true,
   "scripts": {
-    "dev": "bun ./src/*.html",
+    "dev": "bun run build.ts && bun ./src/*.html ./src/blog/*.html",
     "build": "bun run build.ts",
     "lint": "tailwint",
     "lint:fix": "tailwint --fix src/**/*.html",
