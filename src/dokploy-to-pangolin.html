@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>dokploy-to-pangolin — auto-provision Pangolin routes from Dokploy deploys, free</title>
+<title>dokploy-to-pangolin: auto-provision Pangolin routes from Dokploy deploys, free</title>
 <meta name="description" content="A free, open-source webhook bridge that registers new Dokploy applications with Pangolin automatically: creates the resource and target so every deploy is routed without hand-editing anything.">
 <link rel="canonical" href="https://orochibraru.com/dokploy-to-pangolin">
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
 <meta property="og:site_name" content="orochibraru">
 <meta property="og:url" content="https://orochibraru.com/dokploy-to-pangolin">
-<meta property="og:title" content="dokploy-to-pangolin — auto-provision Pangolin routes from Dokploy deploys, free">
+<meta property="og:title" content="dokploy-to-pangolin: auto-provision Pangolin routes from Dokploy deploys, free">
 <meta property="og:description" content="A free, open-source webhook bridge that registers new Dokploy applications with Pangolin automatically: creates the resource and target so every deploy is routed without hand-editing anything.">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
@@ -27,11 +27,11 @@
 </head>
 <body>
 <header class="mx-auto max-w-[1140px] px-6">
-  <nav class="flex items-center justify-between gap-4 py-7">
+  <nav class="flex flex-wrap items-center justify-between gap-4 py-7">
     <a class="text-[15px] font-bold tracking-[-.02em]" href="/">orochi<span class="text-acid">braru</span></a>
-    <div class="flex items-center gap-5 text-[13px] text-dim">
+    <div class="flex items-center gap-4 text-[13px] whitespace-nowrap text-dim sm:gap-5">
       <a class="hover:text-acid" href="/#projects">Projects</a>
-      <a class="hover:text-acid" href="/#free">Why free</a>
+      <a class="hover:text-acid" href="/about">About</a>
       <a class="hover:text-acid" href="https://github.com/orochibraru/dokploy-to-pangolin" rel="noopener">Source</a>
       <button id="theme-toggle" type="button" aria-label="Toggle light and dark mode"
         class="grid size-8 place-items-center border border-edge transition hover:border-acid hover:text-acid">
@@ -49,7 +49,7 @@
   <a class="text-xs uppercase tracking-[.1em] text-dim hover:text-acid" href="/#projects">&larr; All projects</a>
   <span class="tag ml-3.5">Networking &middot; Bun + Hono</span>
   <h1 class="mt-[18px] text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">dokploy-to-pangolin</h1>
-  <p class="mt-6 max-w-[66ch] text-[1.15rem] text-dim">A webhook service that registers new Dokploy applications with Pangolin automatically &mdash; creating the resource and the target so a fresh deploy is routed the moment it exists. Stop hand-writing a route for every app.</p>
+  <p class="mt-6 max-w-[66ch] text-[1.15rem] text-dim">A webhook service that registers new Dokploy applications with Pangolin automatically, creating the resource and the target so a fresh deploy is routed the moment it exists. Stop hand-writing a route for every app.</p>
   <div class="mt-[26px] flex flex-wrap gap-2.5"><a class="btn btn-primary" href="https://github.com/orochibraru/dokploy-to-pangolin" rel="noopener">Source on GitHub</a>
    <a class="btn" href="https://hub.docker.com/r/orochibraru/dokploy-to-pangolin" rel="noopener">Docker Hub</a></div>
 </div>
@@ -91,7 +91,7 @@
 </article>
 </main>
 <footer class="mx-auto flex max-w-[1140px] flex-wrap justify-between gap-4 border-t border-line px-6 pt-8 pb-15 text-[12.5px] text-dim">
-  <span>&copy; orochibraru &mdash; built for homelabs, priced at zero.</span>
+  <span>&copy; orochibraru. Built for homelabs, priced at zero.</span>
   <div class="flex flex-wrap gap-[18px]">
     <a class="hover:text-acid" href="/">Home</a>
     <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>

@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>orochibraru — free, self-hosted software for your homelab</title>
+<title>orochibraru: free, self-hosted software for your homelab</title>
 <meta name="description" content="Free and open-source homelab software: self-hosted drive, a Cloud Run alternative, server alerting, a Nuvio web client, a Bun SvelteKit adapter and Dokploy→Pangolin routing. No subscriptions, no seats, no paywalls.">
 <link rel="canonical" href="https://orochibraru.com/">
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
 <meta property="og:site_name" content="orochibraru">
 <meta property="og:url" content="https://orochibraru.com/">
-<meta property="og:title" content="orochibraru — free, self-hosted software for your homelab">
+<meta property="og:title" content="orochibraru: free, self-hosted software for your homelab">
 <meta property="og:description" content="Free and open-source homelab software: self-hosted drive, a Cloud Run alternative, server alerting, a Nuvio web client, a Bun SvelteKit adapter and Dokploy→Pangolin routing. No subscriptions, no seats, no paywalls.">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
@@ -23,11 +23,11 @@
 </head>
 <body>
 <header class="mx-auto max-w-285 px-6">
-  <nav class="flex items-center justify-between gap-4 py-7">
+  <nav class="flex flex-wrap items-center justify-between gap-4 py-7">
     <a class="text-[15px] font-bold tracking-[-.02em]" href="/">orochi<span class="text-acid">braru</span></a>
-    <div class="flex items-center gap-5 text-[13px] text-dim">
+    <div class="flex items-center gap-4 text-[13px] whitespace-nowrap text-dim sm:gap-5">
       <a class="hover:text-acid" href="/#projects">Projects</a>
-      <a class="hover:text-acid" href="/#free">Why free</a>
+      <a class="hover:text-acid" href="/about">About</a>
       <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
       <button id="theme-toggle" type="button" aria-label="Toggle light and dark mode"
         class="grid size-8 place-items-center border border-edge transition hover:border-acid hover:text-acid">
@@ -43,8 +43,8 @@
   <div class="pt-15 pb-[90px]">
     <span class="tag">6 projects &middot; self-hosted &middot; MIT &amp; AGPL</span>
     <h1 class="mt-[26px] text-[clamp(2.6rem,9vw,6.2rem)]/[.92] font-extrabold tracking-[-.045em] text-balance">
-      Software for the<br>machine
-      <span class="bg-gradient-to-r from-acid via-cyan to-plasma bg-clip-text text-transparent">under your desk.</span>
+      Software that<br>never grew<br>
+      <span class="bg-gradient-to-r from-acid via-cyan to-plasma bg-clip-text text-transparent">a pricing page.</span>
     </h1>
     <p class="mt-7 max-w-[62ch] text-[1.05rem] text-dim">
       I run my own hardware. So I write the tools I need for it: storage, deploys,
@@ -71,7 +71,7 @@
       <a class="card" href="/penombre">
         <span class="text-[11px] uppercase tracking-[.18em] text-plasma">Storage</span>
         <h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">Penombre</h3>
-        <p class="mb-[18px] text-[.92rem] text-dim">A self-hosted drive. Upload, sync, share, trash, recover. SQLite by default &mdash; one container, one volume, no database server to babysit.</p>
+        <p class="mb-[18px] text-[.92rem] text-dim">A self-hosted drive. Upload, sync, share, trash, recover. SQLite by default: one container, one volume, no database server to babysit.</p>
         <div class="flex flex-wrap gap-1.5">
           <span class="chip">SvelteKit</span>
           <span class="chip">SQLite</span>
@@ -82,7 +82,7 @@
       <a class="card" href="/homerun">
         <span class="text-[11px] uppercase tracking-[.18em] text-plasma">Deploys</span>
         <h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">Homerun</h3>
-        <p class="mb-[18px] text-[.92rem] text-dim">A single-host PaaS. Point it at an image or a git repo, fill a form, hit deploy &mdash; Traefik routes it with TLS. No Kubernetes anywhere near it.</p>
+        <p class="mb-[18px] text-[.92rem] text-dim">A single-host PaaS. Point it at an image or a git repo, fill a form, hit deploy, and Traefik routes it with TLS. No Kubernetes anywhere near it.</p>
         <div class="flex flex-wrap gap-1.5">
           <span class="chip">Docker</span>
           <span class="chip">Traefik</span>
@@ -93,7 +93,7 @@
       <a class="card" href="/baba">
         <span class="text-[11px] uppercase tracking-[.18em] text-plasma">Monitoring</span>
         <h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">Baba</h3>
-        <p class="mb-[18px] text-[.92rem] text-dim">The lookout. Watches CPU, load, memory, disk, temps and GPU, then pings Discord or Telegram when something breaks &mdash; and again when it heals.</p>
+        <p class="mb-[18px] text-[.92rem] text-dim">The lookout. Watches CPU, load, memory, disk, temps and GPU, then pings Discord or Telegram when something breaks, and again when it heals.</p>
         <div class="flex flex-wrap gap-1.5">
           <span class="chip">Single binary</span>
           <span class="chip">Discord</span>
@@ -104,7 +104,7 @@
       <a class="card" href="/nuvio-web">
         <span class="text-[11px] uppercase tracking-[.18em] text-plasma">Media</span>
         <h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">Nuvio Web</h3>
-        <p class="mb-[18px] text-[.92rem] text-dim">An unofficial web client for Nuvio. Your profiles, addons, library and watch progress in a browser &mdash; with a player that streams, casts, or hands off.</p>
+        <p class="mb-[18px] text-[.92rem] text-dim">An unofficial web client for Nuvio. Your profiles, addons, library and watch progress in a browser, with a player that streams, casts, or hands off.</p>
         <div class="flex flex-wrap gap-1.5">
           <span class="chip">Web player</span>
           <span class="chip">HLS</span>
@@ -149,12 +149,13 @@
       enterprise plan. No telemetry phoning home.</b>
       Clone it, run it on the box in your closet, fork it if I stop caring. That&rsquo;s the whole deal.</p>
       <p class="mt-5 max-w-[70ch] text-dim">If something&rsquo;s broken, open an issue. If you fix it, open a PR.
-      If you never talk to me again and just run it forever &mdash; perfect, that&rsquo;s the point.</p>
+      If you never talk to me again and just run it forever. Perfect, that&rsquo;s the point.</p>
+      <a class="btn mt-8" href="/about">The long version &rarr;</a>
     </div>
   </section>
 </main>
 <footer class="mx-auto flex max-w-[1140px] flex-wrap justify-between gap-4 border-t border-line px-6 pt-8 pb-15 text-[12.5px] text-dim">
-  <span>&copy; orochibraru &mdash; built for homelabs, priced at zero.</span>
+  <span>&copy; orochibraru. Built for homelabs, priced at zero.</span>
   <div class="flex flex-wrap gap-[18px]">
     <a class="hover:text-acid" href="/">Home</a>
     <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>

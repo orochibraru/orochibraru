@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Penombre — free self-hosted cloud storage you actually own</title>
+<title>Penombre: free self-hosted cloud storage you actually own</title>
 <meta name="description" content="Penombre is a free, open-source self-hosted drive: upload, organise and share files from your own server. SvelteKit UI, SQLite by default, one Docker container, REST API, no subscription.">
 <link rel="canonical" href="https://orochibraru.com/penombre">
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
 <meta property="og:site_name" content="orochibraru">
 <meta property="og:url" content="https://orochibraru.com/penombre">
-<meta property="og:title" content="Penombre — free self-hosted cloud storage you actually own">
+<meta property="og:title" content="Penombre: free self-hosted cloud storage you actually own">
 <meta property="og:description" content="Penombre is a free, open-source self-hosted drive: upload, organise and share files from your own server. SvelteKit UI, SQLite by default, one Docker container, REST API, no subscription.">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
@@ -27,11 +27,11 @@
 </head>
 <body>
 <header class="mx-auto max-w-285 px-6">
-  <nav class="flex items-center justify-between gap-4 py-7">
+  <nav class="flex flex-wrap items-center justify-between gap-4 py-7">
     <a class="text-[15px] font-bold tracking-[-.02em]" href="/">orochi<span class="text-acid">braru</span></a>
-    <div class="flex items-center gap-5 text-[13px] text-dim">
+    <div class="flex items-center gap-4 text-[13px] whitespace-nowrap text-dim sm:gap-5">
       <a class="hover:text-acid" href="/#projects">Projects</a>
-      <a class="hover:text-acid" href="/#free">Why free</a>
+      <a class="hover:text-acid" href="/about">About</a>
       <a class="hover:text-acid" href="https://github.com/orochibraru/penombre" rel="noopener">Source</a>
       <button id="theme-toggle" type="button" aria-label="Toggle light and dark mode"
         class="grid size-8 place-items-center border border-edge transition hover:border-acid hover:text-acid">
@@ -59,7 +59,7 @@
   <p>Penombre is a file storage and synchronisation platform for people who want their files back.
   Drop it on a box, mount a volume, and you get a modern web drive: uploads, folders, automatic
   categories for images, documents and music, recoverable soft-trash, recent files, and OAuth
-  logins &mdash; without renting the disk from anyone.</p>
+  logins, without renting the disk from anyone.</p>
   <p class="mt-5">It runs on <strong>SQLite out of the box</strong>: one container, one volume, no database
   server to run alongside it. PostgreSQL stays supported the day you outgrow that.</p>
 </section>
@@ -94,18 +94,18 @@ docker compose up --build
 <section class="mb-22.5">
   <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">How it&rsquo;s built</h2>
   <ul>
-    <li><strong>Frontend</strong> &mdash; SvelteKit with Svelte 5, TailwindCSS 4, shadcn-svelte</li>
-    <li><strong>Backend</strong> &mdash; SvelteKit <code>+server.ts</code> routes with Zod-validated contracts that also emit the OpenAPI spec</li>
-    <li><strong>Database</strong> &mdash; SQLite with Drizzle ORM, PostgreSQL optional, chosen from the <code>DATABASE_URL</code> scheme</li>
-    <li><strong>Storage</strong> &mdash; plain local filesystem, so your files stay files</li>
-    <li><strong>Auth</strong> &mdash; Better Auth</li>
+    <li><strong>Frontend</strong>: SvelteKit with Svelte 5, TailwindCSS 4, shadcn-svelte</li>
+    <li><strong>Backend</strong>: SvelteKit <code>+server.ts</code> routes with Zod-validated contracts that also emit the OpenAPI spec</li>
+    <li><strong>Database</strong>: SQLite with Drizzle ORM, PostgreSQL optional, chosen from the <code>DATABASE_URL</code> scheme</li>
+    <li><strong>Storage</strong>: plain local filesystem, so your files stay files</li>
+    <li><strong>Auth</strong>: Better Auth</li>
   </ul>
-  <p class="mt-5">MIT licensed. Free, and staying that way &mdash; <a href="/#free">here&rsquo;s why</a>.</p>
+  <p class="mt-5">MIT licensed. Free, and staying that way. <a href="/#free">Here&rsquo;s why</a>.</p>
 </section>
 </article>
 </main>
 <footer class="mx-auto flex max-w-285 flex-wrap justify-between gap-4 border-t border-line px-6 pt-8 pb-15 text-[12.5px] text-dim">
-  <span>&copy; orochibraru &mdash; built for homelabs, priced at zero.</span>
+  <span>&copy; orochibraru. Built for homelabs, priced at zero.</span>
   <div class="flex flex-wrap gap-4.5">
     <a class="hover:text-acid" href="/">Home</a>
     <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>

@@ -7,6 +7,7 @@ await rm("dist", { recursive: true, force: true });
 
 const result = await Bun.build({
   entrypoints: [...new Glob("src/*.html").scanSync(".")],
+  root: "src",
   outdir: "dist",
   minify: true,
   plugins: [tailwind],
