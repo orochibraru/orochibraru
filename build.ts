@@ -7,6 +7,8 @@ import tailwind from "bun-plugin-tailwind";
 import htmlIncludes from "./plugins/html-includes";
 import { rm, cp, mkdir } from "node:fs/promises";
 import { Glob } from "bun";
+import { PROJECTS, docsUrl, type Project } from "./projects";
+import { loadGuides, type Guide } from "./guides";
 
 const SITE = "https://orochibraru.com";
 
@@ -20,6 +22,10 @@ type Post = {
 };
 
 const esc = (s: string) => Bun.escapeHTML(s);
+
+/** Truncate on a word, not mid-syllable, and say so when something was cut. */
+const clip = (text: string, max: number) =>
+  text.length <= max ? text : `${text.slice(0, text.lastIndexOf(" ", max)).replace(/[,;:.]$/, "")}…`;
 
 const readable = (iso: string) =>
   new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", {
@@ -61,12 +67,13 @@ async function loadPosts(): Promise<Post[]> {
 /** The shared page shell. Mirrors the hand-written pages in src/. */
 function shell(o: {
   path: string; title: string; description: string;
+  css?: string; js?: string; source?: { url: string; label: string };
   head?: string; main: string;
 }) {
   return `<!doctype html>
 <html lang="en">
 <head>
-<!--#include head.html css="../style.css" -->
+<!--#include head.html css="${o.css ?? "../style.css"}" -->
 <title>${esc(o.title)}</title>
 <meta name="description" content="${esc(o.description)}">
 <link rel="canonical" href="${SITE}${o.path}">
@@ -76,9 +83,9 @@ function shell(o: {
 ${o.head ?? ""}
 </head>
 <body>
-<!--#include header.html -->
+<!--#include header.html ${o.source ? `source="${o.source.url}" sourceLabel="${o.source.label}"` : ""} -->
 ${o.main}
-<!--#include footer.html -->
+<!--#include footer.html js="${o.js ?? "../search.js"}" -->
 </body>
 </html>
 `;
@@ -169,6 +176,110 @@ ${items}
 </channel>
 </rss>
 `;
+}
+
+// ------------------------------------------------------ the project guides
+//
+// Each project's docs/*.md is vendored under src/docs/ by `bun run docs` and
+// published here at /<project>/docs/<slug>, which is the path its own docs site
+// used, one segment deeper. The pages are generated into src/<project>/docs/ so
+// the bundler treats them like every other page.
+
+/** The sidebar: every guide in this project, in reading order. */
+function guideNav(guides: Guide[], current?: string) {
+  const links = guides.map((g) => {
+    const here = g.slug === current;
+    return `<a class="${here ? "text-acid" : "hover:text-acid"}"${here ? ' aria-current="page"' : ""} href="${g.url}">${esc(g.title)}</a>`;
+  }).join("\n      ");
+
+  return `<nav class="flex gap-4.5 overflow-x-auto pb-3 text-[.92rem] whitespace-nowrap text-dim lg:flex-col lg:gap-2 lg:overflow-visible lg:pb-0 lg:whitespace-normal">
+      ${links}
+    </nav>`;
+}
+
+const guideAside = (project: Project, guides: Guide[], current?: string) =>
+  `<aside class="min-w-0 lg:sticky lg:top-9 lg:self-start">
+    <a class="text-xs tracking-widest text-dim uppercase hover:text-acid" href="/${project.key}">&larr; ${esc(project.name)}</a>
+    <p class="mt-3 mb-4 text-[11px] tracking-[.18em] text-plasma uppercase">Documentation</p>
+    ${guideNav(guides, current)}
+  </aside>`;
+
+function guidePage(guide: Guide, siblings: Guide[]) {
+  const at = siblings.indexOf(guide);
+  const previous = siblings[at - 1];
+  const next = siblings[at + 1];
+
+  const step = (g: Guide | undefined, label: string) => g
+    ? `<a class="card" href="${g.url}"><span class="text-[11px] tracking-[.18em] text-dim uppercase">${label}</span>
+        <h2 class="mt-2.5 text-[1.15rem] font-bold tracking-[-.02em] transition-colors">${esc(g.title)}</h2></a>`
+    : '<div class="hidden bg-surface sm:block"></div>';
+
+  return shell({
+    path: guide.url,
+    css: "../../style.css",
+    js: "../../search.js",
+    title: `${guide.title} | ${guide.project.name} docs`,
+    description: clip(guide.intro, 180) || `${guide.project.name} documentation.`,
+    source: { url: guide.project.repo, label: "Source" },
+    head: `<script type="application/ld+json">
+${JSON.stringify({
+  "@context": "https://schema.org", "@type": "TechArticle",
+  headline: guide.title, description: clip(guide.intro, 180),
+  url: `${SITE}${guide.url}`,
+  isPartOf: { "@type": "TechArticle", name: `${guide.project.name} documentation`, url: `${SITE}${docsUrl(guide.project)}` },
+  author: { "@type": "Person", name: "orochibraru", url: `${SITE}/about` },
+})}
+</script>`,
+    main: `<main class="mx-auto max-w-page px-6">
+  <div class="grid gap-x-12 gap-y-9 pt-10 pb-22.5 lg:grid-cols-[15rem_minmax(0,1fr)]">
+    ${guideAside(guide.project, siblings, guide.slug)}
+    <article class="min-w-0">
+      <h1 class="mb-7 text-[clamp(2rem,5vw,3rem)]/[1.05] font-extrabold tracking-[-.04em]">${esc(guide.title)}</h1>
+      <div class="md">${guide.html}</div>
+      <div class="mt-14 grid gap-px border border-line bg-line sm:grid-cols-2">
+        ${step(previous, "&larr; Previous")}
+        ${step(next, "Next &rarr;")}
+      </div>
+      <p class="mt-7 text-[12.5px] text-dim">This guide lives in the project repo:
+      <a class="border-b border-edge hover:border-cyan" href="${guide.project.repo}/blob/${guide.project.branch}/docs/${guide.slug}.md" rel="noopener">edit it there</a>,
+      and this page follows within a day.</p>
+    </article>
+  </div>
+</main>`,
+  });
+}
+
+function guideIndexPage(project: Project, guides: Guide[]) {
+  const rows = guides.map((g) => `      <a class="card" href="${g.url}">
+        <h2 class="mb-2 text-[1.2rem] font-bold tracking-[-.02em] transition-colors">${esc(g.title)}</h2>
+        <p class="text-[.92rem] text-dim">${esc(clip(g.intro, 150))}</p>
+      </a>`).join("\n");
+
+  const filler = guides.length % 2 ? '\n      <div class="hidden bg-surface sm:block"></div>' : "";
+
+  return shell({
+    path: docsUrl(project),
+    css: "../../style.css",
+    js: "../../search.js",
+    title: `${project.name} documentation`,
+    description: `Every guide for ${project.name}: ${project.blurb}`,
+    source: { url: project.repo, label: "Source" },
+    main: `<main class="mx-auto max-w-page px-6">
+  <div class="pt-10 pb-14">
+    <a class="text-xs tracking-widest text-dim uppercase hover:text-acid" href="/${project.key}">&larr; ${esc(project.name)}</a>
+    <h1 class="mt-4.5 text-[clamp(2.2rem,6vw,3.6rem)]/[1.02] font-extrabold tracking-[-.04em]">${esc(project.name)} docs</h1>
+    <p class="mt-6 max-w-[72ch] text-[1.05rem] text-dim">${esc(project.blurb)}</p>
+    <p class="mt-4 max-w-[72ch] text-dim">${guides.length} guides, kept in step with
+    <a class="border-b border-edge text-cyan hover:border-cyan" href="${project.repo}/tree/${project.branch}/docs" rel="noopener">the Markdown in the repo</a>,
+    which stays the source of truth.</p>
+  </div>
+  <section class="mb-22.5">
+    <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+${rows}${filler}
+    </div>
+  </section>
+</main>`,
+  });
 }
 
 // --------------------------------------------- pages, Markdown, llms.txt
@@ -304,7 +415,11 @@ ${group("Start here")}
 ## Blog
 
 ${group("Blog")}
+${PROJECTS.map((project) => `
+## ${project.name} documentation
 
+${group(`${project.name} docs`)}
+`).join("")}
 ## Optional
 
 - [RSS feed](${SITE}/feed.xml): new posts, as they are written.
@@ -318,10 +433,12 @@ const llmsFull = (docs: Doc[]) =>
   `Generated ${new Date().toISOString().slice(0, 10)}. Index: ${SITE}/llms.txt\n\n` +
   docs.map((d) => `---\n\n${twin(d)}`).join("\n\n") + "\n";
 
-function sitemap(posts: Post[]) {
+function sitemap(posts: Post[], guides: Guide[]) {
   const today = new Date().toISOString().slice(0, 10);
   const rows = [
     ...PAGES.map((p) => [p.path, today, p.pri] as const),
+    ...PROJECTS.map((project) => [docsUrl(project), today, "0.7"] as const),
+    ...guides.map((g) => [g.url, today, "0.6"] as const),
     ...posts.map((p) => [`/blog/${p.slug}`, p.date, "0.6"] as const),
   ].map(([path, mod, pri]) =>
     `  <url><loc>${SITE}${path}</loc><lastmod>${mod}</lastmod><priority>${pri}</priority></url>`,
@@ -337,11 +454,22 @@ ${rows}
 // ---------------------------------------------------------------- build
 
 const posts = await loadPosts();
+const guides = await loadGuides();
 
 await rm("src/blog", { recursive: true, force: true });
 await mkdir("src/blog", { recursive: true });
 await Bun.write("src/blog/index.html", indexPage(posts));
 for (const p of posts) await Bun.write(`src/blog/${p.slug}.html`, postPage(p));
+
+for (const project of PROJECTS) {
+  const siblings = guides.filter((g) => g.project.key === project.key);
+  await rm(`src/${project.key}/docs`, { recursive: true, force: true });
+  await mkdir(`src/${project.key}/docs`, { recursive: true });
+  await Bun.write(`src/${project.key}/docs/index.html`, guideIndexPage(project, siblings));
+  for (const guide of siblings) {
+    await Bun.write(`src/${project.key}/docs/${guide.slug}.html`, guidePage(guide, siblings));
+  }
+}
 
 await rm("dist", { recursive: true, force: true });
 
@@ -395,6 +523,24 @@ for (const page of PAGES) {
     title: titleOf(html), description: descriptionOf(html), body: markdown(html),
   });
 }
+for (const project of PROJECTS) {
+  const siblings = guides.filter((g) => g.project.key === project.key);
+  docs.push({
+    path: docsUrl(project), group: `${project.name} docs`,
+    title: `${project.name} documentation`, description: project.blurb,
+    body: `# ${project.name} documentation\n\n${project.blurb}\n\n`
+      + `The Markdown in [the project repo](${project.repo}/tree/${project.branch}/docs) is the source of truth;\n`
+      + `these pages are generated from it.\n\n`
+      + siblings.map((g) => `- [${g.title}](${SITE}${mdPath(g.url)}): ${clip(g.intro, 160)}`).join("\n")
+      + "\n",
+  });
+}
+for (const guide of guides) {
+  docs.push({
+    path: guide.url, group: `${guide.project.name} docs`,
+    title: guide.title, description: clip(guide.intro, 180), body: guide.markdown,
+  });
+}
 for (const p of posts) {
   docs.push({
     path: `/blog/${p.slug}`, group: "Blog", title: p.title, description: p.description,
@@ -402,6 +548,24 @@ for (const p of posts) {
   });
 }
 for (const d of docs) await Bun.write(`dist${mdPath(d.path)}`, twin(d));
+// One flat index for the ⌘K dialog: a guide contributes a row per heading, so
+// a result lands on the section that answers the question, not the page top.
+const searchIndex = [
+  ...guides.flatMap((guide) => guide.sections.map((section) => ({
+    u: `${guide.url}${section.id ? `#${section.id}` : ""}`,
+    t: section.heading,
+    g: section.id ? guide.title : `${guide.project.name} docs`,
+    p: guide.project.name,
+    x: section.text,
+  }))),
+  ...PAGES.map((page) => {
+    const doc = docs.find((d) => d.path === page.path)!;
+    return { u: page.path, t: doc.title.replace(/[:|].*$/, "").trim(), g: "orochibraru", p: "", x: doc.description };
+  }),
+  ...posts.map((post) => ({ u: `/blog/${post.slug}`, t: post.title, g: "Blog", p: "", x: post.description })),
+];
+await Bun.write("dist/search.json", JSON.stringify(searchIndex));
+
 await Bun.write("dist/llms.txt", llmsIndex(docs));
 await Bun.write("dist/llms-full.txt", llmsFull(docs));
 
@@ -409,11 +573,13 @@ await cp("src/robots.txt", "dist/robots.txt");
 // The pages reference these through the bundler, which hashes them. The Markdown
 // twins are written from the sources instead, so they link the unhashed path:
 // ship that too, or every image in a .md twin is a 404.
-await cp("src/screenshots", "dist/screenshots", { recursive: true });
 await cp("src/avatar.jpg", "dist/avatar.jpg");
-await Bun.write("dist/sitemap.xml", sitemap(posts));
+for (const project of PROJECTS) {
+  await cp(`src/docs/${project.key}/images`, `dist/${project.key}/docs/images`, { recursive: true });
+}
+await Bun.write("dist/sitemap.xml", sitemap(posts, guides));
 await Bun.write("dist/feed.xml", feed(posts));
 
 console.log(
-  `built ${result.outputs.length} files, ${posts.length} post(s) and ${docs.length} Markdown twin(s) -> dist/`,
+  `built ${result.outputs.length} files, ${posts.length} post(s), ${guides.length} guide(s) and ${docs.length} Markdown twin(s) -> dist/`,
 );

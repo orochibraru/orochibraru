@@ -1,3 +1,17 @@
+<dialog id="search" aria-label="Search"
+  class="m-0 mx-auto mt-[12vh] w-[min(38rem,calc(100vw-2rem))] border border-edge bg-surface p-0 text-fg backdrop:bg-black/50">
+  <div class="flex items-center gap-3 border-b border-line px-4 py-3">
+    <svg viewBox="0 0 24 24" class="size-4 shrink-0 text-dim" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+    </svg>
+    <input type="search" autocomplete="off" placeholder="Search the guides"
+      class="w-full bg-transparent py-1 text-[.95rem] outline-none placeholder:text-dim">
+    <kbd class="hidden text-[11px] text-edge sm:block">esc</kbd>
+  </div>
+  <ul class="max-h-[52vh] divide-y divide-line overflow-y-auto"></ul>
+  <p class="px-4 py-8 text-center text-[.9rem] text-dim" hidden></p>
+</dialog>
+<script type="module" src="{{js|./search.js}}"></script>
 <footer class="mx-auto flex max-w-page flex-wrap justify-between gap-4 border-t border-line px-6 pt-8 pb-15 text-[12.5px] text-dim">
   <span>&copy; orochibraru. Built for homelabs, priced at zero.</span>
   <div class="flex flex-wrap gap-4.5">

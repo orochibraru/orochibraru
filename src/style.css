@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
-/* Blog pages are generated into src/blog/, which .gitignore excludes — and
-   Tailwind's automatic source detection skips anything git ignores. Name it
-   explicitly or the classes only those pages use never make it into the CSS. */
+/* Blog pages and the project guides are generated into src/, which .gitignore
+   excludes — and Tailwind's automatic source detection skips anything git
+   ignores. Name them explicitly or the classes only those pages use never make
+   it into the CSS, which is a silently unstyled page. */
 @source "./blog";
+@source "./*/docs";
 
 /* ---------------------------------------------------------------
    Design tokens. Light is the base; dark is applied either by the
@@ -165,6 +167,17 @@
   .shot img { @apply block w-full border border-line; }
   .shot figcaption { @apply mt-4 text-[.9rem]/[1.6] text-dim; }
   .shot figcaption b { @apply block text-fg; }
+
+  /* guides: tables, deeper headings and the odd nested list the blog never had */
+  .md h4 { @apply mt-6 mb-2 text-[.95rem] font-bold tracking-[-.01em] text-fg; }
+  .md-table { @apply mb-5 overflow-x-auto border border-line; }
+  .md-table table { @apply w-full border-collapse text-[.85rem]/[1.55] whitespace-nowrap; }
+  .md-table th { @apply border-b border-edge bg-surface px-3.5 py-2.5 text-left font-bold; }
+  .md-table td { @apply border-b border-line px-3.5 py-2.5 align-top text-dim; }
+  .md-table tr:last-child td { @apply border-b-0; }
+  .md-table code { @apply whitespace-nowrap; }
+  .md li > ul, .md li > ol { @apply mt-2 mb-0; }
+  .md h2 + h3 { @apply mt-6; }
 
   /* feature tiles opt out of prose paragraph sizing */
   .feat p { @apply m-0 max-w-none text-[.9rem]; }

@@ -15,12 +15,12 @@
 "applicationCategory":"DeveloperApplication","applicationSubCategory":"Platform as a Service",
 "operatingSystem":"Linux, Docker",
 "description":"Homerun is a free, self-hosted single-host PaaS and a Dokploy, Coolify, Dokku and Cloud Run alternative: deploy Docker images or git repos from a form, get TLS routing via Traefik. Nothing paywalled.","url":"https://orochibraru.com/homerun",
-"softwareHelp":"https://homerun.orochibraru.com/docs",
+"softwareHelp":"https://orochibraru.com/homerun/docs",
 "isAccessibleForFree":true,
 "keywords":"Dokploy alternative, Coolify alternative, Dokku alternative, CapRover alternative, Cloud Run alternative, AWS alternative, Heroku alternative, self-hosted PaaS, homelab deploys",
 "featureList":["Deploy any Docker image or build from a git repository Dockerfile","Live streamed deploy progress that survives a page reload","Deployment history with logs and image digests","Projects grouping services on a shared Docker network","One-click templates for Redis, Postgres, MySQL, MongoDB and more","docker-compose.yaml import","Automatic connection URLs between linked services","Container logs and an in-browser web terminal","Traefik TLS routing, custom domains and bring-your-own certificates","Remote build servers over TCP, SSH or the Homerun Agent","Optional Docker Swarm mode for replica scaling","Scheduled jobs, auto-redeploy and S3 volume backups","REST API with OpenAPI and a CLI","Users, roles, invites and OAuth/OIDC login","Cloudflare and Pangolin DNS automation"],
 "codeRepository":"https://github.com/orochibraru/homerun",
-"sameAs":["https://homerun.orochibraru.com"],
+"sameAs":["https://hub.docker.com/r/orochibraru/homerun"],
 "author":{"@type":"Person","name":"orochibraru","url":"https://github.com/orochibraru"},
 "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
 </script>
@@ -34,10 +34,9 @@
   <span class="tag ml-3.5">Deploys &middot; Self-hosted PaaS</span>
   <h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">Homerun</h1>
   <p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">A single-host PaaS for your own hardware. Point it at an image or a git repo, fill in the form, hit deploy. Traefik puts it on <code>slug.yourdomain.com</code> with TLS. No Kubernetes. No control plane. No pricing page.</p>
-  <div class="mt-6.5 flex flex-wrap gap-2.5"><a class="btn btn-primary" href="https://homerun.orochibraru.com" rel="noopener">homerun.orochibraru.com</a>
-   <a class="btn" href="https://homerun.orochibraru.com/docs" rel="noopener">Docs</a>
+  <div class="mt-6.5 flex flex-wrap gap-2.5"><a class="btn btn-primary" href="/homerun/docs">Read the docs</a>
    <a class="btn" href="https://github.com/orochibraru/homerun" rel="noopener">Source on GitHub</a>
-   <a class="btn" href="https://homerun.orochibraru.com/docs/faq-and-limitations" rel="noopener">FAQ &amp; limitations</a></div>
+   <a class="btn" href="/homerun/docs/faq-and-limitations" rel="noopener">FAQ &amp; limitations</a></div>
 </div>
 <section class="mb-22.5">
   <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Why it exists</h2>
@@ -127,14 +126,14 @@ docker compose -f compose.prod.yaml up -d</pre>
   will actually reach the dashboard at: it is never <code>localhost</code>, or the first sign-up fails with an
   invalid origin from any browser that is not on the box.</p>
   <p class="mt-5">Both paths are covered properly in the
-  <a href="https://homerun.orochibraru.com/docs/getting-started" rel="noopener">getting started guide</a>.</p>
+  <a href="/homerun/docs/getting-started" rel="noopener">getting started guide</a>.</p>
 </section>
 
 <section class="mb-22.5">
   <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Status</h2>
   <p>Actively developed and running on real hardware, but still finding its shape. What&rsquo;s solid and
   what isn&rsquo;t is written down honestly in
-  <a href="https://homerun.orochibraru.com/docs/faq-and-limitations" rel="noopener">the FAQ and limitations doc</a>.
+  <a href="/homerun/docs/faq-and-limitations" rel="noopener">the FAQ and limitations doc</a>.
   Read it before you point production at it.</p>
 </section>
 </article>

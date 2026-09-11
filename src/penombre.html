@@ -10,11 +10,11 @@
 <meta property="og:url" content="https://orochibraru.com/penombre">
 <meta property="og:title" content="Penombre: a free self-hosted Nextcloud and Google Drive alternative">
 <meta property="og:description" content="Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, documents, a waveform music player. One Docker container, SQLite by default, no subscription.">
-<meta property="og:image" content="https://penombre.orochibraru.com/docs-images/hero-dark.png">
+<meta property="og:image" content="https://orochibraru.com/penombre/docs/images/hero-dark.webp">
 <meta property="og:image:width" content="1440">
 <meta property="og:image:height" content="900">
 <meta property="og:image:alt" content="The Penombre drive in grid view">
-<meta name="twitter:image" content="https://penombre.orochibraru.com/docs-images/hero-dark.png">
+<meta name="twitter:image" content="https://orochibraru.com/penombre/docs/images/hero-dark.webp">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Penombre",
 "alternateName":"Penombre self-hosted drive",
@@ -22,14 +22,14 @@
 "operatingSystem":"Linux, macOS, Docker",
 "description":"Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, documents, a waveform music player. One Docker container, SQLite by default, no subscription.",
 "url":"https://orochibraru.com/penombre",
-"screenshot":"https://penombre.orochibraru.com/docs-images/hero-dark.png",
-"softwareHelp":"https://penombre.orochibraru.com/docs",
+"screenshot":"https://orochibraru.com/penombre/docs/images/hero-dark.webp",
+"softwareHelp":"https://orochibraru.com/penombre/docs",
 "license":"https://opensource.org/licenses/MIT",
 "isAccessibleForFree":true,
 "keywords":"Nextcloud alternative, Google Drive alternative, ownCloud alternative, Seafile alternative, iCloud alternative, Dropbox alternative, OneDrive alternative, self-hosted cloud storage, open source drive, homelab",
 "featureList":["Grid and list file browsing with generated thumbnails","In-place previews for images, video, audio, PDFs and source code","Notes on any file, pinned to a moment in a track or video","Waveform music player","Documents, spreadsheets and presentations stored as HTML, CSV and Markdown","Share links with password, expiry and sign-in requirements","Per-user sharing with view, edit and full-access permissions","Automatic categories for images, video, music, documents, code, archives and 3D objects","Mounted volumes for NAS shares and existing directory trees","Resumable uploads that survive a page reload","Soft trash with restore","Admin panel with instance statistics, user management and an audit log","OpenAPI-documented REST API with API-key auth","SQLite by default, PostgreSQL optional"],
 "codeRepository":"https://github.com/orochibraru/penombre",
-"sameAs":["https://penombre.orochibraru.com","https://hub.docker.com/r/orochibraru/penombre"],
+"sameAs":["https://hub.docker.com/r/orochibraru/penombre"],
 "author":{"@type":"Person","name":"orochibraru","url":"https://github.com/orochibraru"},
 "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
 </script>
@@ -43,9 +43,8 @@
   <span class="tag ml-3.5">Storage &middot; MIT</span>
   <h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">Penombre</h1>
   <p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">A self-hosted drive. All the convenience of cloud storage, on hardware you own, with a bill of exactly zero.</p>
-  <div class="mt-6.5 flex flex-wrap gap-2.5"><a class="btn btn-primary" href="https://penombre.orochibraru.com" rel="noopener">penombre.orochibraru.com</a>
+  <div class="mt-6.5 flex flex-wrap gap-2.5"><a class="btn btn-primary" href="/penombre/docs">Read the docs</a>
    <a class="btn" href="#showcase">Screenshots</a>
-   <a class="btn" href="https://penombre.orochibraru.com/docs" rel="noopener">Docs</a>
    <a class="btn" href="https://github.com/orochibraru/penombre" rel="noopener">Source on GitHub</a>
    <a class="btn" href="https://hub.docker.com/r/orochibraru/penombre" rel="noopener">Docker Hub</a></div>
 </div>
@@ -73,49 +72,49 @@
   <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
     <figure class="shot">
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./screenshots/hero-dark.webp">
-        <img src="./screenshots/hero.webp" width="1200" height="750" loading="lazy" decoding="async" alt="The Penombre drive in grid view, showing generated thumbnails">
+        <source media="(prefers-color-scheme: dark)" srcset="./docs/penombre/images/hero-dark.webp">
+        <img src="./docs/penombre/images/hero.webp" width="1200" height="750" loading="lazy" decoding="async" alt="The Penombre drive in grid view, showing generated thumbnails">
       </picture>
       <figcaption><b>The drive</b> Grid view, with thumbnails generated at upload time: video frames, PDF first pages, and waveforms drawn from peak data so they follow your accent colour.</figcaption>
     </figure>
     <figure class="shot">
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./screenshots/preview-dark.webp">
-        <img src="./screenshots/preview.webp" width="1200" height="750" loading="lazy" decoding="async" alt="A file preview open beside its notes thread">
+        <source media="(prefers-color-scheme: dark)" srcset="./docs/penombre/images/preview-dark.webp">
+        <img src="./docs/penombre/images/preview.webp" width="1200" height="750" loading="lazy" decoding="async" alt="A file preview open beside its notes thread">
       </picture>
       <figcaption><b>Previews and notes</b> Files open in place. Images, video, PDFs and highlighted source sit beside a notes thread; on a track or a video a note pins to a moment, and clicking the timestamp moves the playhead there.</figcaption>
     </figure>
     <figure class="shot">
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./screenshots/music-dark.webp">
-        <img src="./screenshots/music.webp" width="1200" height="750" loading="lazy" decoding="async" alt="The Penombre music player with a waveform progress bar">
+        <source media="(prefers-color-scheme: dark)" srcset="./docs/penombre/images/music-dark.webp">
+        <img src="./docs/penombre/images/music.webp" width="1200" height="750" loading="lazy" decoding="async" alt="The Penombre music player with a waveform progress bar">
       </picture>
       <figcaption><b>Music</b> Audio plays in a persistent bottom player whose progress bar is the waveform itself, filling with the accent colour as the track runs. Click anywhere on it to seek.</figcaption>
     </figure>
     <figure class="shot">
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./screenshots/categories-dark.webp">
-        <img src="./screenshots/categories.webp" width="1200" height="750" loading="lazy" decoding="async" alt="The images category view">
+        <source media="(prefers-color-scheme: dark)" srcset="./docs/penombre/images/categories-dark.webp">
+        <img src="./docs/penombre/images/categories.webp" width="1200" height="750" loading="lazy" decoding="async" alt="The images category view">
       </picture>
       <figcaption><b>Categories</b> Files sort themselves as they land: images, video, music, documents, code, archives and 3D objects, with no tagging to do.</figcaption>
     </figure>
     <figure class="shot">
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./screenshots/settings-appearance-dark.webp">
-        <img src="./screenshots/settings-appearance.webp" width="1200" height="750" loading="lazy" decoding="async" alt="Appearance settings, showing typeface, corner and accent options">
+        <source media="(prefers-color-scheme: dark)" srcset="./docs/penombre/images/settings-appearance-dark.webp">
+        <img src="./docs/penombre/images/settings-appearance.webp" width="1200" height="750" loading="lazy" decoding="async" alt="Appearance settings, showing typeface, corner and accent options">
       </picture>
       <figcaption><b>Appearance</b> Three attributes on <code>&lt;html&gt;</code> &mdash; typeface, corners and accent &mdash; re-theme the whole app, including the aurora behind it.</figcaption>
     </figure>
     <figure class="shot">
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./screenshots/admin-dark.webp">
-        <img src="./screenshots/admin.webp" width="1200" height="750" loading="lazy" decoding="async" alt="The Penombre admin dashboard">
+        <source media="(prefers-color-scheme: dark)" srcset="./docs/penombre/images/admin-dark.webp">
+        <img src="./docs/penombre/images/admin.webp" width="1200" height="750" loading="lazy" decoding="async" alt="The Penombre admin dashboard">
       </picture>
       <figcaption><b>Administration</b> Instance statistics, per-user storage, user management, and an audit log that deliberately records no file names.</figcaption>
     </figure>
   </div>
   <p class="mt-7">Recent, shared, trash and the rest are in the
-  <a href="https://penombre.orochibraru.com/docs/showcase" rel="noopener">full showcase</a>, all of it generated
+  <a href="/penombre/docs/showcase" rel="noopener">full showcase</a>, all of it generated
   the same way.</p>
 </section>
 
@@ -155,11 +154,11 @@
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Nextcloud alternative</h3><p>Nextcloud is a groupware suite that also stores files: PHP, a database server, an app store, calendars, chat, and a cron job you will eventually debug. Penombre is the drive and nothing else, in one container. If you want the calendar and the chat, keep Nextcloud.</p></div>
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Seafile &amp; ownCloud alternative</h3><p>Seafile&rsquo;s block storage is fast, but your files stop being files: the tree on disk is chunks and a database. Penombre keeps a plain directory under <code>STORAGE_PATH</code>, so a backup is <code>rsync</code> and an escape hatch is <code>cp -r</code>.</p></div>
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Google Drive alternative</h3><p>The same shape &mdash; grid, previews, share links, documents, sheets and slides &mdash; on a disk you own, with nothing reading your files to improve anything. Google Docs is more capable than Penombre&rsquo;s editors; Google is also not going to hand you the directory.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Dropbox alternative</h3><p>Dropbox is sync first. Penombre has no sync client and isn&rsquo;t growing one: point <a href="https://penombre.orochibraru.com/docs/storage" rel="noopener">Syncthing</a> at the same directory the container mounts and you get the same result, free, with a web drive on top.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Dropbox alternative</h3><p>Dropbox is sync first. Penombre has no sync client and isn&rsquo;t growing one: point <a href="/penombre/docs/storage" rel="noopener">Syncthing</a> at the same directory the container mounts and you get the same result, free, with a web drive on top.</p></div>
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">iCloud Drive alternative</h3><p>iCloud stops at the edge of the Apple fence and bills monthly for the privilege. Penombre runs on the box in your closet, opens in any browser on any OS, and costs the price of the disk you already bought.</p></div>
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">OneDrive, Box &amp; pCloud alternative</h3><p>Per-seat pricing, quota upsells, and an account that can be suspended with your files inside it. Here the quota is the filesystem and the only way to lose access is to unplug the machine yourself.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">File Browser &amp; Filestash alternative</h3><p>Both are excellent thin browsers over a directory. Penombre does that too &mdash; it&rsquo;s called <a href="https://penombre.orochibraru.com/docs/simple-mode" rel="noopener">simple mode</a> &mdash; and adds accounts, sharing, notes, thumbnails and an admin panel when you want them.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Synology Drive &amp; FileRun alternative</h3><p>One wants you to buy the NAS, the other wants a licence key. Penombre is MIT, runs on whatever Linux box you have, and will happily mount the NAS share you already own as a <a href="https://penombre.orochibraru.com/docs/volumes" rel="noopener">volume</a>.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">File Browser &amp; Filestash alternative</h3><p>Both are excellent thin browsers over a directory. Penombre does that too &mdash; it&rsquo;s called <a href="/penombre/docs/simple-mode" rel="noopener">simple mode</a> &mdash; and adds accounts, sharing, notes, thumbnails and an admin panel when you want them.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Synology Drive &amp; FileRun alternative</h3><p>One wants you to buy the NAS, the other wants a licence key. Penombre is MIT, runs on whatever Linux box you have, and will happily mount the NAS share you already own as a <a href="/penombre/docs/volumes" rel="noopener">volume</a>.</p></div>
   </div>
   <p class="mt-7 text-[.85rem]">Since we&rsquo;re being honest about search: people get here looking for a
   <em>Nextcloud alternative</em>, <em>Google Drive alternative</em>, <em>ownCloud alternative</em>,
@@ -201,9 +200,9 @@ volumes:
   <p class="mt-5">Either way it comes up on <code>http://localhost:3000</code>. One volume holds the lot: the
   SQLite database under <code>/data/db</code>, your files under <code>/data/storage</code>. Those four variables
   are the only ones required on a first run.</p>
-  <p class="mt-5">The <a href="https://penombre.orochibraru.com/docs/getting-started" rel="noopener">getting started
+  <p class="mt-5">The <a href="/penombre/docs/getting-started" rel="noopener">getting started
   guide</a> walks through it properly, and
-  <a href="https://penombre.orochibraru.com/docs/env" rel="noopener">the env reference</a> covers everything else:
+  <a href="/penombre/docs/env" rel="noopener">the env reference</a> covers everything else:
   OAuth providers, SMTP, Redis, Postgres, mounted volumes, simple mode.</p>
 </section>
 

@@ -1,0 +1,59 @@
+# Storage & backups
+
+## Storage volumes
+
+A **storage volume** (`/storage`) is a named source you define once, then mount
+into one or more services from each service's Volumes tab:
+
+- **Bind mount**, an absolute path on the host filesystem.
+- **Docker-managed volume**, a named Docker volume, created/managed by Docker
+  itself.
+
+Docker's own bind-vs-named-volume syntax is what tells the two apart under the
+hood; you just pick a kind and a source when creating one. A volume becomes
+"shared" simply by being mounted into more than one service, there's no separate
+"shared volume" concept to configure.
+
+`/storage` has a search box, Kind and Backups filters, a list/card view toggle,
+and a pager once you have more than a page's worth, same toolkit as the
+[services list](services.md#the-services-list), searched/paginated server-side
+the same way.
+
+## S3-compatible backups
+
+Configured per-volume on `storage/[volumeId]`, off by default. Homerun tars the
+volume's contents and uploads it as `<prefix/>volumeName-<timestamp>.tar.gz` to
+any S3-compatible endpoint, AWS S3, MinIO, R2, Backblaze B2, etc., via a
+hand-rolled Signature V4 client (path-style addressing, single-request PUT, no
+multipart).
+
+**Both volume kinds are backed up.** A bind mount's contents are tarred straight
+off the host filesystem. A Docker-managed volume's contents aren't visible
+there, so Homerun mounts it read-only into a short-lived `alpine` helper
+container that tars it to stdout instead, that container is removed as soon as
+it exits, and a failure to read the volume fails the run with the helper's own
+stderr attached.
+
+Set a cron schedule alongside the S3 destination to back up automatically; the
+scheduler mirrors the [scheduled-redeploy](services.md#scheduled-redeploy) shape
+(a 60-second tick, a due-check, a guard against double-firing in the same
+minute).
+
+Backups, scheduled or from a "Run now" button, are queued and run in the
+background (see [the job queue](services.md#the-job-queue)), so the button
+returns straight away and the run shows up in the history on `/backups` once it
+starts. A failed backup is retried once. `/backups` itself has a search box
+(matches volume name), an Outcome filter (success/failed/running), and a pager
+over that history, so a long-running instance with hundreds of past runs can
+still page all the way back through them instead of only ever seeing the newest
+handful.
+
+**There's no restore flow yet**, uploads only. Retrieve a backup from your S3
+destination directly (`aws s3 cp`, `rclone`, your provider's console) and unpack
+it into the bind-mount path (or into a named volume, through a helper container
+of your own) by hand.
+
+## Next steps
+
+- [Services: Volumes tab](services.md#volumes)
+- [Build servers & the Homerun Agent](remote-hosts-and-agent.md)

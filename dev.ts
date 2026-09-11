@@ -18,9 +18,12 @@ const server = Bun.spawn(["bun", ...new Glob("dist/**/*.html").scanSync(".")], {
   stderr: "inherit",
 });
 
+// What the build writes back into src/: watching these would rebuild forever.
+const GENERATED = /^(blog|[^/]+\/docs)(\/|$)/;
+
 let queued: ReturnType<typeof setTimeout> | undefined;
 watch("src", { recursive: true }, (_event, file) => {
-  if (typeof file === "string" && file.startsWith("blog")) return; // the build wrote that
+  if (typeof file === "string" && GENERATED.test(file)) return;
   clearTimeout(queued);
   queued = setTimeout(build, 50);
 });

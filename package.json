@@ -9,7 +9,7 @@
     "lint:fix": "tailwint --fix",
     "typecheck": "tsc --noEmit",
     "audit": "bun run lighthouse.ts",
-    "screenshots": "bun run screenshots.ts"
+    "docs": "bun run docs.ts"
   },
   "devDependencies": {
     "@tailwindcss/language-server": "^0.16.0",
