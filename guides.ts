@@ -8,7 +8,7 @@ import { readFileSync } from "node:fs";
 import { Glob } from "bun";
 import { PROJECTS, docsDir, docsUrl, type Project } from "./projects";
 
-export type Section = { id: string; heading: string; text: string };
+export type Section = { id: string; heading: string; text: string; level: number };
 
 export type Guide = {
   project: Project;
@@ -114,7 +114,7 @@ function dimensions(file: string): { width: number; height: number } | null {
 
 /** Split the body by heading: one search result should land on a section. */
 function sections(body: string, title: string): Section[] {
-  const found: Section[] = [{ id: "", heading: title, text: "" }];
+  const found: Section[] = [{ id: "", heading: title, text: "", level: 1 }];
   let fenced = false;
 
   for (const line of body.split("\n")) {
@@ -124,9 +124,11 @@ function sections(body: string, title: string): Section[] {
     }
     if (fenced) continue;
 
-    const heading = line.match(/^#{2,4}\s+(.+?)\s*$/);
+    const heading = line.match(/^(#{2,4})\s+(.+?)\s*$/);
     if (heading) {
-      found.push({ id: slugify(heading[1]!), heading: plain(heading[1]!), text: "" });
+      found.push({
+        id: slugify(heading[2]!), heading: plain(heading[2]!), text: "", level: heading[1]!.length,
+      });
       continue;
     }
     if (/^\s*\|/.test(line)) continue; // table rows read as noise out of context

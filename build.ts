@@ -67,7 +67,7 @@ async function loadPosts(): Promise<Post[]> {
 /** The shared page shell. Mirrors the hand-written pages in src/. */
 function shell(o: {
   path: string; title: string; description: string;
-  css?: string; js?: string; source?: { url: string; label: string };
+  css?: string; js?: string; width?: string; source?: { url: string; label: string };
   head?: string; main: string;
 }) {
   return `<!doctype html>
@@ -83,9 +83,9 @@ function shell(o: {
 ${o.head ?? ""}
 </head>
 <body>
-<!--#include header.html ${o.source ? `source="${o.source.url}" sourceLabel="${o.source.label}"` : ""} -->
+<!--#include header.html width="${o.width ?? "max-w-page"}" ${o.source ? `source="${o.source.url}" sourceLabel="${o.source.label}"` : ""} -->
 ${o.main}
-<!--#include footer.html js="${o.js ?? "../search.js"}" -->
+<!--#include footer.html width="${o.width ?? "max-w-page"}" js="${o.js ?? "../search.js"}" -->
 </body>
 </html>
 `;
@@ -178,6 +178,14 @@ ${items}
 `;
 }
 
+/**
+ * Guides get a wider frame than the marketing pages: a compose file or a curl
+ * one-liner is worth reading without a horizontal scrollbar, and on an ultrawide
+ * the alternative is a narrow column adrift in the middle of the screen. Prose
+ * keeps its own measure, so only code, tables and the nav use the extra room.
+ */
+const DOCS_WIDTH = "max-w-[110rem]";
+
 // ------------------------------------------------------ the project guides
 //
 // Each project's docs/*.md is vendored under src/docs/ by `bun run docs` and
@@ -195,6 +203,27 @@ function guideNav(guides: Guide[], current?: string) {
   return `<nav class="flex gap-4.5 overflow-x-auto pb-3 text-[.92rem] whitespace-nowrap text-dim lg:flex-col lg:gap-2 lg:overflow-visible lg:pb-0 lg:whitespace-normal">
       ${links}
     </nav>`;
+}
+
+/**
+ * A page's own headings, down the right-hand side. It only appears at 2xl,
+ * where the alternative is that much empty margin, and it is what makes the
+ * wider layout read as three columns rather than stretched prose.
+ */
+function guideContents(guide: Guide) {
+  const entries = guide.sections.filter((section) => section.id && section.level <= 3);
+  if (entries.length < 2) return '<div class="hidden 2xl:block"></div>';
+
+  const links = entries.map((section) => `<li${section.level === 3 ? ' class="pl-3.5"' : ""}>
+        <a class="hover:text-acid" href="#${section.id}">${esc(section.heading)}</a>
+      </li>`).join("\n      ");
+
+  return `<nav class="hidden text-[.85rem]/[1.5] text-dim 2xl:sticky 2xl:top-9 2xl:block 2xl:self-start">
+    <p class="mb-3.5 text-[11px] tracking-[.18em] text-plasma uppercase">On this page</p>
+    <ul class="flex flex-col gap-2.5 border-l border-line pl-4">
+      ${links}
+    </ul>
+  </nav>`;
 }
 
 const guideAside = (project: Project, guides: Guide[], current?: string) =>
@@ -218,6 +247,7 @@ function guidePage(guide: Guide, siblings: Guide[]) {
     path: guide.url,
     css: "../../style.css",
     js: "../../search.js",
+    width: DOCS_WIDTH,
     title: `${guide.title} | ${guide.project.name} docs`,
     description: clip(guide.intro, 180) || `${guide.project.name} documentation.`,
     source: { url: guide.project.repo, label: "Source" },
@@ -230,10 +260,10 @@ ${JSON.stringify({
   author: { "@type": "Person", name: "orochibraru", url: `${SITE}/about` },
 })}
 </script>`,
-    main: `<main class="mx-auto max-w-page px-6">
-  <div class="grid gap-x-12 gap-y-9 pt-10 pb-22.5 lg:grid-cols-[15rem_minmax(0,1fr)]">
+    main: `<main class="mx-auto ${DOCS_WIDTH} px-6">
+  <div class="grid gap-x-12 gap-y-9 pt-10 pb-22.5 lg:grid-cols-[15rem_minmax(0,1fr)] 2xl:grid-cols-[15rem_minmax(0,1fr)_14rem]">
     ${guideAside(guide.project, siblings, guide.slug)}
-    <article class="min-w-0">
+    <article class="docs min-w-0">
       <h1 class="mb-7 text-[clamp(2rem,5vw,3rem)]/[1.05] font-extrabold tracking-[-.04em]">${esc(guide.title)}</h1>
       <div class="md">${guide.html}</div>
       <div class="mt-14 grid gap-px border border-line bg-line sm:grid-cols-2">
@@ -244,6 +274,7 @@ ${JSON.stringify({
       <a class="border-b border-edge hover:border-cyan" href="${guide.project.repo}/blob/${guide.project.branch}/docs/${guide.slug}.md" rel="noopener">edit it there</a>,
       and this page follows within a day.</p>
     </article>
+    ${guideContents(guide)}
   </div>
 </main>`,
   });
@@ -261,10 +292,11 @@ function guideIndexPage(project: Project, guides: Guide[]) {
     path: docsUrl(project),
     css: "../../style.css",
     js: "../../search.js",
+    width: DOCS_WIDTH,
     title: `${project.name} documentation`,
     description: `Every guide for ${project.name}: ${project.blurb}`,
     source: { url: project.repo, label: "Source" },
-    main: `<main class="mx-auto max-w-page px-6">
+    main: `<main class="mx-auto ${DOCS_WIDTH} px-6">
   <div class="pt-10 pb-14">
     <a class="text-xs tracking-widest text-dim uppercase hover:text-acid" href="/${project.key}">&larr; ${esc(project.name)}</a>
     <h1 class="mt-4.5 text-[clamp(2.2rem,6vw,3.6rem)]/[1.02] font-extrabold tracking-[-.04em]">${esc(project.name)} docs</h1>

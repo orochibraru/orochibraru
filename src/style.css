@@ -15,7 +15,7 @@
 @theme {
   --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
-  --container-page: 80rem;   /* the one page-width knob: max-w-page */
+  --container-page: 96rem;   /* the one page-width knob: max-w-page */
 
   --color-bg: #f4f5f7;
   --color-surface: #ffffff;
@@ -167,6 +167,16 @@
   .shot img { @apply block w-full border border-line; }
   .shot figcaption { @apply mt-4 text-[.9rem]/[1.6] text-dim; }
   .shot figcaption b { @apply block text-fg; }
+
+  /* On a guide the reading measure applies to prose only: a compose file or a
+     wide table should use the column it has rather than scroll inside 80ch. */
+  .docs .md pre, .docs .md img, .docs .md blockquote { @apply max-w-none; }
+
+  /* the theme button shows which mode you are in; no attribute means system */
+  .theme-icon { @apply hidden; }
+  :root:not([data-theme]) .theme-system,
+  :root[data-theme="light"] .theme-light,
+  :root[data-theme="dark"] .theme-dark { @apply block; }
 
   /* guides: tables, deeper headings and the odd nested list the blog never had */
   .md h4 { @apply mt-6 mb-2 text-[.95rem] font-bold tracking-[-.01em] text-fg; }
