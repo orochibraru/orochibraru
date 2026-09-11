@@ -7,13 +7,16 @@
     "build": "bun run build.ts",
     "lint": "tailwint",
     "lint:fix": "tailwint --fix",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "audit": "bun run lighthouse.ts",
+    "screenshots": "bun run screenshots.ts"
   },
   "devDependencies": {
     "@tailwindcss/language-server": "^0.16.0",
     "@types/bun": "^1.4.2",
     "bun-plugin-tailwind": "^0.1.2",
     "htmlhint": "^1.9.2",
+    "lighthouse": "^13.4.1",
     "tailwindcss": "^4.3.3",
     "tailwint": "^1.1.15",
     "typescript": "^7.0.2"

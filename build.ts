@@ -406,6 +406,11 @@ await Bun.write("dist/llms.txt", llmsIndex(docs));
 await Bun.write("dist/llms-full.txt", llmsFull(docs));
 
 await cp("src/robots.txt", "dist/robots.txt");
+// The pages reference these through the bundler, which hashes them. The Markdown
+// twins are written from the sources instead, so they link the unhashed path:
+// ship that too, or every image in a .md twin is a 404.
+await cp("src/screenshots", "dist/screenshots", { recursive: true });
+await cp("src/avatar.jpg", "dist/avatar.jpg");
 await Bun.write("dist/sitemap.xml", sitemap(posts));
 await Bun.write("dist/feed.xml", feed(posts));
 
