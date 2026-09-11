@@ -1,15 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--#include head.html -->
 <title>Penombre: a free self-hosted Nextcloud and Google Drive alternative</title>
 <meta name="description" content="Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, documents, a waveform music player. One Docker container, SQLite by default, no subscription.">
 <meta name="keywords" content="Nextcloud alternative, Google Drive alternative, ownCloud alternative, Seafile alternative, iCloud alternative, iCloud Drive alternative, Dropbox alternative, OneDrive alternative, Box alternative, pCloud alternative, MEGA alternative, Synology Drive alternative, FileRun alternative, File Browser alternative, Filestash alternative, Proton Drive alternative, self-hosted cloud storage, self-hosted drive, open source file manager, homelab file server, Docker file storage, SQLite file storage">
 <link rel="canonical" href="https://orochibraru.com/penombre">
-<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
-<meta property="og:site_name" content="orochibraru">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://orochibraru.com/penombre">
 <meta property="og:title" content="Penombre: a free self-hosted Nextcloud and Google Drive alternative">
@@ -18,12 +14,7 @@
 <meta property="og:image:width" content="1440">
 <meta property="og:image:height" content="900">
 <meta property="og:image:alt" content="The Penombre drive in grid view">
-<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://penombre.orochibraru.com/docs-images/hero-dark.png">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
-<link rel="alternate" type="application/rss+xml" title="orochibraru" href="/feed.xml">
-<link rel="stylesheet" href="./style.css">
-<script>try{var s=localStorage.getItem("theme");document.documentElement.dataset.theme=s||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")}catch(e){}</script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Penombre",
 "alternateName":"Penombre self-hosted drive",
@@ -44,24 +35,7 @@
 </script>
 </head>
 <body>
-<header class="mx-auto max-w-page px-6">
-  <nav class="flex flex-wrap items-center justify-between gap-4 py-7">
-    <a class="text-[15px] font-bold tracking-[-.02em]" href="/">orochi<span class="text-acid">braru</span></a>
-    <div class="flex items-center gap-4 text-[13px] whitespace-nowrap text-dim sm:gap-5">
-      <a class="hover:text-acid" href="/#projects">Projects</a>
-      <a class="hover:text-acid" href="/blog">Blog</a>
-      <a class="hover:text-acid" href="/about">About</a>
-      <a class="hover:text-acid" href="https://github.com/orochibraru/penombre" rel="noopener">Source</a>
-      <button id="theme-toggle" type="button" aria-label="Toggle light and dark mode"
-        class="grid size-8 place-items-center border border-edge transition hover:border-acid hover:text-acid">
-        <svg viewBox="0 0 24 24" class="size-4 transition-transform duration-300" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
-          <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>
-        </svg>
-      </button>
-    </div>
-  </nav>
-</header>
+<!--#include header.html source="https://github.com/orochibraru/penombre" sourceLabel="Source" -->
 <main class="mx-auto max-w-page px-6">
 <article class="prose">
 <div class="pt-10 pb-5">
@@ -247,16 +221,6 @@ volumes:
 </section>
 </article>
 </main>
-<footer class="mx-auto flex max-w-page flex-wrap justify-between gap-4 border-t border-line px-6 pt-8 pb-15 text-[12.5px] text-dim">
-  <span>&copy; orochibraru. Built for homelabs, priced at zero.</span>
-  <div class="flex flex-wrap gap-4.5">
-    <a class="hover:text-acid" href="/">Home</a>
-    <a class="hover:text-acid" href="/feed.xml">RSS</a>
-    <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
-    <a class="hover:text-acid" href="/sitemap.xml">Sitemap</a>
-    <a class="hover:text-acid" href="/llms.txt">llms.txt</a>
-  </div>
-</footer>
-<script>document.getElementById("theme-toggle").onclick=function(){var d=document.documentElement,t=d.dataset.theme==="dark"?"light":"dark";d.dataset.theme=t;try{localStorage.setItem("theme",t)}catch(e){}};</script>
+<!--#include footer.html -->
 </body>
 </html>

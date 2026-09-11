@@ -4,6 +4,7 @@
 // src/blog/ (generated, gitignored) *before* the bundle runs, so they get the same
 // hashed stylesheet and minification as every hand-written page.
 import tailwind from "bun-plugin-tailwind";
+import htmlIncludes from "./plugins/html-includes";
 import { rm, cp, mkdir } from "node:fs/promises";
 import { Glob } from "bun";
 
@@ -65,55 +66,19 @@ function shell(o: {
   return `<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--#include head.html css="../style.css" -->
 <title>${esc(o.title)}</title>
 <meta name="description" content="${esc(o.description)}">
 <link rel="canonical" href="${SITE}${o.path}">
-<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
-<meta property="og:site_name" content="orochibraru">
 <meta property="og:url" content="${SITE}${o.path}">
 <meta property="og:title" content="${esc(o.title)}">
 <meta property="og:description" content="${esc(o.description)}">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="alternate" type="application/rss+xml" title="orochibraru" href="/feed.xml">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
-<link rel="stylesheet" href="../style.css">
-<script>try{var s=localStorage.getItem("theme");document.documentElement.dataset.theme=s||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")}catch(e){}</script>
 ${o.head ?? ""}
 </head>
 <body>
-<header class="mx-auto max-w-page px-6">
-  <nav class="flex flex-wrap items-center justify-between gap-4 py-7">
-    <a class="text-[15px] font-bold tracking-[-.02em]" href="/">orochi<span class="text-acid">braru</span></a>
-    <div class="flex items-center gap-4 text-[13px] whitespace-nowrap text-dim sm:gap-5">
-      <a class="hover:text-acid" href="/#projects">Projects</a>
-      <a class="hover:text-acid" href="/blog">Blog</a>
-      <a class="hover:text-acid" href="/about">About</a>
-      <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
-      <button id="theme-toggle" type="button" aria-label="Toggle light and dark mode"
-        class="grid size-8 place-items-center border border-edge transition hover:border-acid hover:text-acid">
-        <svg viewBox="0 0 24 24" class="size-4 transition-transform duration-300" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
-          <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>
-        </svg>
-      </button>
-    </div>
-  </nav>
-</header>
+<!--#include header.html -->
 ${o.main}
-<footer class="mx-auto flex max-w-page flex-wrap justify-between gap-4 border-t border-line px-6 pt-8 pb-15 text-[12.5px] text-dim">
-  <span>&copy; orochibraru. Built for homelabs, priced at zero.</span>
-  <div class="flex flex-wrap gap-4.5">
-    <a class="hover:text-acid" href="/">Home</a>
-    <a class="hover:text-acid" href="/feed.xml">RSS</a>
-    <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
-    <a class="hover:text-acid" href="/sitemap.xml">Sitemap</a>
-    <a class="hover:text-acid" href="/llms.txt">llms.txt</a>
-  </div>
-</footer>
-<script>document.getElementById("theme-toggle").onclick=function(){var d=document.documentElement,t=d.dataset.theme==="dark"?"light":"dark";d.dataset.theme=t;try{localStorage.setItem("theme",t)}catch(e){}};</script>
+<!--#include footer.html -->
 </body>
 </html>
 `;
@@ -381,11 +346,11 @@ for (const p of posts) await Bun.write(`src/blog/${p.slug}.html`, postPage(p));
 await rm("dist", { recursive: true, force: true });
 
 const result = await Bun.build({
-  entrypoints: [...new Glob("src/**/*.html").scanSync(".")],
+  entrypoints: [...new Glob("src/**/*.html").scanSync(".")].filter((f) => !f.includes("/_")),
   root: "src",
   outdir: "dist",
   minify: true,
-  plugins: [tailwind],
+  plugins: [tailwind, htmlIncludes],
 });
 
 if (!result.success) {
@@ -409,16 +374,16 @@ function mdTwinOf(distHtml: string): string | null {
 }
 
 for (const html of new Glob("dist/**/*.html").scanSync(".")) {
-  const src = await Bun.file(html).text();
-  let out = src.replace(/<script[^>]*src="[^"]*\/?([^"/]+)"[^>]*><\/script>/g, (tag, file) =>
-    empty.has(file) ? "" : tag,
+  const original = await Bun.file(html).text();
+  let out = original.replace(/<script[^>]*\bsrc="([^"]+)"[^>]*><\/script>/g, (tag, url: string) =>
+    empty.has(url.split("/").pop()!) ? "" : tag,
   );
   const twinUrl = mdTwinOf(html);
   if (twinUrl) {
     out = out.replace("</head>",
       `<link rel="alternate" type="text/markdown" href="${twinUrl}">\n</head>`);
   }
-  if (out !== src) await Bun.write(html, out);
+  if (out !== original) await Bun.write(html, out);
 }
 
 // Markdown twins, then the two files that index them for language models.

@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Blog pages are generated into src/blog/, which .gitignore excludes — and
+   Tailwind's automatic source detection skips anything git ignores. Name it
+   explicitly or the classes only those pages use never make it into the CSS. */
+@source "./blog";
+
 /* ---------------------------------------------------------------
    Design tokens. Light is the base; dark is applied either by the
    OS preference or by an explicit data-theme on <html>.
