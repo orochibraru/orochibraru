@@ -1,0 +1,49 @@
+# Hooks for prek, a drop-in pre-commit runner:
+#   prek install           wire them into .git/hooks
+#   prek run --all-files   run them over the whole repo
+#
+# A hook that rewrites a file fails the commit on purpose. Re-stage and commit
+# again, so whatever it changed is something you actually looked at.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        # two trailing spaces are a line break in Markdown: leave posts alone
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+      - id: check-yaml
+      - id: check-json
+      - id: detect-private-key
+
+  - repo: local
+    hooks:
+      # Pages get htmlhint's stock rules. The fragments in src/_partials can't
+      # pass those — no doctype, no <title> — which is the point of a fragment,
+      # so they are linted separately against a ruleset with those two dropped.
+      - id: htmlhint
+        name: htmlhint (pages)
+        entry: bun run htmlhint
+        language: system
+        types: [html]
+        exclude: ^src/_partials/
+
+      - id: htmlhint-partials
+        name: htmlhint (fragments)
+        entry: bun run htmlhint --config src/_partials/.htmlhintrc
+        language: system
+        types: [html]
+        files: ^src/_partials/
+
+      # the project's own linter: Tailwind classes written the canonical way
+      - id: tailwint
+        name: tailwind classes
+        entry: bun run lint:fix
+        language: system
+        types_or: [html, css]
+        pass_filenames: false

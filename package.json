@@ -2,18 +2,18 @@
   "name": "orochibraru.com",
   "private": true,
   "scripts": {
+    "prepare": "prek install || 'prek' not installed.",
     "dev": "bun run dev.ts",
     "build": "bun run build.ts",
     "lint": "tailwint",
     "lint:fix": "tailwint --fix",
-    "typecheck": "tsc --noEmit",
-    "prepare": "husky"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@tailwindcss/language-server": "^0.16.0",
     "@types/bun": "^1.4.2",
     "bun-plugin-tailwind": "^0.1.2",
-    "husky": "^9.1.7",
+    "htmlhint": "^1.9.2",
     "tailwindcss": "^4.3.3",
     "tailwint": "^1.1.15",
     "typescript": "^7.0.2"
