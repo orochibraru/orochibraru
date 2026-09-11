@@ -5,7 +5,7 @@
 // hashed stylesheet and minification as every hand-written page.
 import tailwind from "bun-plugin-tailwind";
 import htmlIncludes from "./plugins/html-includes";
-import { rm, cp, mkdir } from "node:fs/promises";
+import { rm, cp, mkdir, stat } from "node:fs/promises";
 import { Glob } from "bun";
 import { PROJECTS, docsUrl, type Project } from "./projects";
 import { loadGuides, type Guide } from "./guides";
@@ -575,7 +575,12 @@ await cp("src/robots.txt", "dist/robots.txt");
 // ship that too, or every image in a .md twin is a 404.
 await cp("src/avatar.jpg", "dist/avatar.jpg");
 for (const project of PROJECTS) {
-  await cp(`src/docs/${project.key}/images`, `dist/${project.key}/docs/images`, { recursive: true });
+  // a project whose guides have no screenshots has no images/ directory at all:
+  // git doesn't carry empty ones, so a fresh clone hasn't got it either
+  const images = `src/docs/${project.key}/images`;
+  if (await stat(images).then(() => true, () => false)) {
+    await cp(images, `dist/${project.key}/docs/images`, { recursive: true });
+  }
 }
 await Bun.write("dist/sitemap.xml", sitemap(posts, guides));
 await Bun.write("dist/feed.xml", feed(posts));
