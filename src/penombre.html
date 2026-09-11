@@ -3,26 +3,42 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Penombre: free self-hosted cloud storage you actually own</title>
-<meta name="description" content="Penombre is a free, open-source self-hosted drive: upload, organise and share files from your own server. SvelteKit UI, SQLite by default, one Docker container, REST API, no subscription.">
+<title>Penombre: a free self-hosted Nextcloud and Google Drive alternative</title>
+<meta name="description" content="Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, documents, a waveform music player. One Docker container, SQLite by default, no subscription.">
+<meta name="keywords" content="Nextcloud alternative, Google Drive alternative, ownCloud alternative, Seafile alternative, iCloud alternative, iCloud Drive alternative, Dropbox alternative, OneDrive alternative, Box alternative, pCloud alternative, MEGA alternative, Synology Drive alternative, FileRun alternative, File Browser alternative, Filestash alternative, Proton Drive alternative, self-hosted cloud storage, self-hosted drive, open source file manager, homelab file server, Docker file storage, SQLite file storage">
 <link rel="canonical" href="https://orochibraru.com/penombre">
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
 <meta property="og:site_name" content="orochibraru">
+<meta property="og:type" content="website">
 <meta property="og:url" content="https://orochibraru.com/penombre">
-<meta property="og:title" content="Penombre: free self-hosted cloud storage you actually own">
-<meta property="og:description" content="Penombre is a free, open-source self-hosted drive: upload, organise and share files from your own server. SvelteKit UI, SQLite by default, one Docker container, REST API, no subscription.">
+<meta property="og:title" content="Penombre: a free self-hosted Nextcloud and Google Drive alternative">
+<meta property="og:description" content="Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, documents, a waveform music player. One Docker container, SQLite by default, no subscription.">
+<meta property="og:image" content="https://penombre.orochibraru.com/docs-images/hero-dark.png">
+<meta property="og:image:width" content="1440">
+<meta property="og:image:height" content="900">
+<meta property="og:image:alt" content="The Penombre drive in grid view">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://penombre.orochibraru.com/docs-images/hero-dark.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
 <link rel="alternate" type="application/rss+xml" title="orochibraru" href="/feed.xml">
 <link rel="stylesheet" href="./style.css">
 <script>try{var s=localStorage.getItem("theme");document.documentElement.dataset.theme=s||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")}catch(e){}</script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Penombre",
-"applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Docker",
-"description":"Penombre is a free, open-source self-hosted drive: upload, organise and share files from your own server. SvelteKit UI, SQLite by default, one Docker container, REST API, no subscription.","url":"https://orochibraru.com/penombre",
+"alternateName":"Penombre self-hosted drive",
+"applicationCategory":"BrowserApplication","applicationSubCategory":"File storage and sharing",
+"operatingSystem":"Linux, macOS, Docker",
+"description":"Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, documents, a waveform music player. One Docker container, SQLite by default, no subscription.",
+"url":"https://orochibraru.com/penombre",
+"screenshot":"https://penombre.orochibraru.com/docs-images/hero-dark.png",
+"softwareHelp":"https://penombre.orochibraru.com/docs",
+"license":"https://opensource.org/licenses/MIT",
+"isAccessibleForFree":true,
+"keywords":"Nextcloud alternative, Google Drive alternative, ownCloud alternative, Seafile alternative, iCloud alternative, Dropbox alternative, OneDrive alternative, self-hosted cloud storage, open source drive, homelab",
+"featureList":["Grid and list file browsing with generated thumbnails","In-place previews for images, video, audio, PDFs and source code","Notes on any file, pinned to a moment in a track or video","Waveform music player","Documents, spreadsheets and presentations stored as HTML, CSV and Markdown","Share links with password, expiry and sign-in requirements","Per-user sharing with view, edit and full-access permissions","Automatic categories for images, video, music, documents, code, archives and 3D objects","Mounted volumes for NAS shares and existing directory trees","Resumable uploads that survive a page reload","Soft trash with restore","Admin panel with instance statistics, user management and an audit log","OpenAPI-documented REST API with API-key auth","SQLite by default, PostgreSQL optional"],
 "codeRepository":"https://github.com/orochibraru/penombre",
-"sameAs":["https://penombre.orochibraru.com"],
+"sameAs":["https://penombre.orochibraru.com","https://hub.docker.com/r/orochibraru/penombre"],
 "author":{"@type":"Person","name":"orochibraru","url":"https://github.com/orochibraru"},
 "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
 </script>
@@ -54,18 +70,79 @@
   <h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">Penombre</h1>
   <p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">A self-hosted drive. All the convenience of cloud storage, on hardware you own, with a bill of exactly zero.</p>
   <div class="mt-6.5 flex flex-wrap gap-2.5"><a class="btn btn-primary" href="https://penombre.orochibraru.com" rel="noopener">penombre.orochibraru.com</a>
+   <a class="btn" href="#showcase">Screenshots</a>
    <a class="btn" href="https://penombre.orochibraru.com/docs" rel="noopener">Docs</a>
    <a class="btn" href="https://github.com/orochibraru/penombre" rel="noopener">Source on GitHub</a>
    <a class="btn" href="https://hub.docker.com/r/orochibraru/penombre" rel="noopener">Docker Hub</a></div>
 </div>
 <section class="mb-22.5">
   <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">What it is</h2>
-  <p>Penombre is a file storage and synchronisation platform for people who want their files back.
-  Drop it on a box, mount a volume, and you get a modern web drive: uploads, folders, automatic
-  categories for images, documents and music, recoverable soft-trash, recent files, and OAuth
-  logins, without renting the disk from anyone.</p>
+  <p>Penombre is a file storage and sharing platform for people who want their files back.
+  Drop it on a box, mount a volume, and you get a modern web drive: uploads that survive a reload,
+  generated thumbnails, previews that open in place, notes on any file, share links with an expiry,
+  automatic categories, recoverable soft-trash and OAuth logins, without renting the disk from anyone.</p>
   <p class="mt-5">It runs on <strong>SQLite out of the box</strong>: one container, one volume, no database
   server to run alongside it. PostgreSQL stays supported the day you outgrow that.</p>
+  <p class="mt-5">Your files stay files. Storage is a plain directory tree on disk, not a block store with
+  a database index, so <code>ls</code>, <code>rsync</code> and Syncthing all still work on it.</p>
+</section>
+
+<section id="showcase" class="mb-22.5">
+  <div class="mb-7 flex items-baseline gap-4">
+    <h2 class="text-2xl font-bold tracking-[-.02em]">Showcase</h2>
+    <div class="h-px flex-1 bg-line"></div>
+  </div>
+  <p class="mb-7">Every screenshot below comes out of the repo, not a design tool: Playwright drives a real
+  instance seeded with one file of each supported kind, and the run fails rather than publishing a screen
+  that stopped rendering. Light or dark follows your system, because appearance is a per-account setting
+  and both are the real thing.</p>
+  <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+    <figure class="shot">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://penombre.orochibraru.com/docs-images/hero-dark.png">
+        <img src="https://penombre.orochibraru.com/docs-images/hero.png" width="1440" height="900" loading="lazy" decoding="async" alt="The Penombre drive in grid view, showing generated thumbnails">
+      </picture>
+      <figcaption><b>The drive</b> Grid view, with thumbnails generated at upload time: video frames, PDF first pages, and waveforms drawn from peak data so they follow your accent colour.</figcaption>
+    </figure>
+    <figure class="shot">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://penombre.orochibraru.com/docs-images/preview-dark.png">
+        <img src="https://penombre.orochibraru.com/docs-images/preview.png" width="1440" height="900" loading="lazy" decoding="async" alt="A file preview open beside its notes thread">
+      </picture>
+      <figcaption><b>Previews and notes</b> Files open in place. Images, video, PDFs and highlighted source sit beside a notes thread; on a track or a video a note pins to a moment, and clicking the timestamp moves the playhead there.</figcaption>
+    </figure>
+    <figure class="shot">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://penombre.orochibraru.com/docs-images/music-dark.png">
+        <img src="https://penombre.orochibraru.com/docs-images/music.png" width="1440" height="900" loading="lazy" decoding="async" alt="The Penombre music player with a waveform progress bar">
+      </picture>
+      <figcaption><b>Music</b> Audio plays in a persistent bottom player whose progress bar is the waveform itself, filling with the accent colour as the track runs. Click anywhere on it to seek.</figcaption>
+    </figure>
+    <figure class="shot">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://penombre.orochibraru.com/docs-images/categories-dark.png">
+        <img src="https://penombre.orochibraru.com/docs-images/categories.png" width="1440" height="900" loading="lazy" decoding="async" alt="The images category view">
+      </picture>
+      <figcaption><b>Categories</b> Files sort themselves as they land: images, video, music, documents, code, archives and 3D objects, with no tagging to do.</figcaption>
+    </figure>
+    <figure class="shot">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://penombre.orochibraru.com/docs-images/settings-appearance-dark.png">
+        <img src="https://penombre.orochibraru.com/docs-images/settings-appearance.png" width="1440" height="900" loading="lazy" decoding="async" alt="Appearance settings, showing typeface, corner and accent options">
+      </picture>
+      <figcaption><b>Appearance</b> Three attributes on <code>&lt;html&gt;</code> &mdash; typeface, corners and accent &mdash; re-theme the whole app, including the aurora behind it.</figcaption>
+    </figure>
+    <figure class="shot">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://penombre.orochibraru.com/docs-images/admin-dark.png">
+        <img src="https://penombre.orochibraru.com/docs-images/admin.png" width="1440" height="900" loading="lazy" decoding="async" alt="The Penombre admin dashboard">
+      </picture>
+      <figcaption><b>Administration</b> Instance statistics, per-user storage, user management, and an audit log that deliberately records no file names.</figcaption>
+    </figure>
+  </div>
+  <p class="mt-7">Recent, shared, trash and the rest are in the
+  <a href="https://penombre.orochibraru.com/docs/showcase" rel="noopener">full showcase</a>, all of it generated
+  the same way.</p>
 </section>
 
 <section class="mb-22.5">
@@ -75,14 +152,48 @@
   </div>
   <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Modern web UI</h3><p>SvelteKit 5, TailwindCSS 4 and shadcn-svelte. Responsive, fast, keyboard-friendly.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Real auth</h3><p>Better Auth: session cookies, OAuth providers and API keys for scripts.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Smart categories</h3><p>Files sort themselves into images, documents, music and more as they land.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Previews in place</h3><p>Images, video, audio, PDFs and syntax-highlighted source open in a dialog, not a download prompt.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Notes on any file</h3><p>A thread beside the preview. On a track or a video a note pins to a timestamp you can click to jump back to.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">A real music player</h3><p>Persistent bottom player, waveform-as-progress-bar drawn from cached peak data, keeps playing while you browse.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Documents, sheets and decks</h3><p>Write them in the browser, stored as plain <code>.html</code>, <code>.csv</code> and <code>.md</code>. No proprietary container, no export step, and slides get a present mode.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Sharing, two ways</h3><p>Public links with optional password, expiry and sign-in requirement, or per-user grants at view, edit or full access.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Smart categories</h3><p>Images, video, music, documents, code, archives and 3D objects sort themselves as files land.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Uploads that survive a reload</h3><p>Transfers run in a Web Worker with the queue in IndexedDB, so a multi-gigabyte video keeps going and picks itself back up.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Mounted volumes</h3><p>Point <code>VOLUME_*_PATH</code> at a NAS share or an existing tree and it appears in the sidebar, browsable and searchable, optionally read-only.</p></div>
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Soft trash</h3><p>Deletion is recoverable, because everyone deletes the wrong folder eventually.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Yours to look at</h3><p>Typeface, corner radius and accent colour are per-account settings that re-theme the entire app, light or dark.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Admin panel</h3><p>Instance and per-user storage, invites, roles, bans, sign-up and security policy, and an audit log that records no file names.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Real auth</h3><p>Better Auth: session cookies, OAuth providers, passkeys, two-factor, and API keys for scripts.</p></div>
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">REST API</h3><p>OpenAPI-documented <code>/api/v1</code> endpoints with API-key auth, generated from Zod contracts.</p></div>
     <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Simple mode</h3><p>Run it as a bare shared file browser: mount a volume, share the login, browse together.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">No database server</h3><p>SQLite with Drizzle by default. Point <code>DATABASE_URL</code> at Postgres if you&rsquo;d rather.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Docker-first</h3><p>One <code>docker run</code> off the published <code>orochibraru/penombre</code> image and you&rsquo;re storing files. Local filesystem storage at <code>STORAGE_PATH</code>.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">One container, no database server</h3><p>SQLite with Drizzle by default off the published <code>orochibraru/penombre</code> image. Point <code>DATABASE_URL</code> at Postgres if you&rsquo;d rather.</p></div>
   </div>
+</section>
+
+<section id="alternatives" class="mb-22.5">
+  <div class="mb-7 flex items-baseline gap-4">
+    <h2 class="text-2xl font-bold tracking-[-.02em]">An alternative to what, exactly</h2>
+    <div class="h-px flex-1 bg-line"></div>
+  </div>
+  <p class="mb-7">Nobody wakes up wanting a self-hosted drive. They want out of something specific. So here is
+  where Penombre actually sits, including where it loses.</p>
+  <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Nextcloud alternative</h3><p>Nextcloud is a groupware suite that also stores files: PHP, a database server, an app store, calendars, chat, and a cron job you will eventually debug. Penombre is the drive and nothing else, in one container. If you want the calendar and the chat, keep Nextcloud.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Seafile &amp; ownCloud alternative</h3><p>Seafile&rsquo;s block storage is fast, but your files stop being files: the tree on disk is chunks and a database. Penombre keeps a plain directory under <code>STORAGE_PATH</code>, so a backup is <code>rsync</code> and an escape hatch is <code>cp -r</code>.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Google Drive alternative</h3><p>The same shape &mdash; grid, previews, share links, documents, sheets and slides &mdash; on a disk you own, with nothing reading your files to improve anything. Google Docs is more capable than Penombre&rsquo;s editors; Google is also not going to hand you the directory.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Dropbox alternative</h3><p>Dropbox is sync first. Penombre has no sync client and isn&rsquo;t growing one: point <a href="https://penombre.orochibraru.com/docs/storage" rel="noopener">Syncthing</a> at the same directory the container mounts and you get the same result, free, with a web drive on top.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">iCloud Drive alternative</h3><p>iCloud stops at the edge of the Apple fence and bills monthly for the privilege. Penombre runs on the box in your closet, opens in any browser on any OS, and costs the price of the disk you already bought.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">OneDrive, Box &amp; pCloud alternative</h3><p>Per-seat pricing, quota upsells, and an account that can be suspended with your files inside it. Here the quota is the filesystem and the only way to lose access is to unplug the machine yourself.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">File Browser &amp; Filestash alternative</h3><p>Both are excellent thin browsers over a directory. Penombre does that too &mdash; it&rsquo;s called <a href="https://penombre.orochibraru.com/docs/simple-mode" rel="noopener">simple mode</a> &mdash; and adds accounts, sharing, notes, thumbnails and an admin panel when you want them.</p></div>
+    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Synology Drive &amp; FileRun alternative</h3><p>One wants you to buy the NAS, the other wants a licence key. Penombre is MIT, runs on whatever Linux box you have, and will happily mount the NAS share you already own as a <a href="https://penombre.orochibraru.com/docs/volumes" rel="noopener">volume</a>.</p></div>
+  </div>
+  <p class="mt-7 text-[.85rem]">Since we&rsquo;re being honest about search: people get here looking for a
+  <em>Nextcloud alternative</em>, <em>Google Drive alternative</em>, <em>ownCloud alternative</em>,
+  <em>Seafile alternative</em>, <em>iCloud alternative</em>, <em>Dropbox alternative</em>,
+  <em>OneDrive alternative</em>, <em>Box alternative</em>, <em>pCloud alternative</em>,
+  <em>MEGA alternative</em>, <em>Proton Drive alternative</em>, <em>Synology Drive alternative</em>,
+  <em>FileRun alternative</em>, <em>Filestash alternative</em> or a <em>File Browser alternative</em>.
+  That is the list. It is a self-hosted drive, and it is free.</p>
 </section>
 
 <section class="mb-22.5">
@@ -119,7 +230,7 @@ volumes:
   <p class="mt-5">The <a href="https://penombre.orochibraru.com/docs/getting-started" rel="noopener">getting started
   guide</a> walks through it properly, and
   <a href="https://penombre.orochibraru.com/docs/env" rel="noopener">the env reference</a> covers everything else:
-  OAuth providers, SMTP, Redis, Postgres, simple mode.</p>
+  OAuth providers, SMTP, Redis, Postgres, mounted volumes, simple mode.</p>
 </section>
 
 <section class="mb-22.5">
@@ -130,6 +241,7 @@ volumes:
     <li><strong>Database</strong>: SQLite with Drizzle ORM, PostgreSQL optional, chosen from the <code>DATABASE_URL</code> scheme</li>
     <li><strong>Storage</strong>: plain local filesystem, so your files stay files</li>
     <li><strong>Auth</strong>: Better Auth</li>
+    <li><strong>Screenshots</strong>: Playwright, run against a seeded instance, published straight to the docs</li>
   </ul>
   <p class="mt-5">MIT licensed. Free, and staying that way. <a href="/#free">Here&rsquo;s why</a>.</p>
 </section>
@@ -142,6 +254,7 @@ volumes:
     <a class="hover:text-acid" href="/feed.xml">RSS</a>
     <a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener">GitHub</a>
     <a class="hover:text-acid" href="/sitemap.xml">Sitemap</a>
+    <a class="hover:text-acid" href="/llms.txt">llms.txt</a>
   </div>
 </footer>
 <script>document.getElementById("theme-toggle").onclick=function(){var d=document.documentElement,t=d.dataset.theme==="dark"?"light":"dark";d.dataset.theme=t;try{localStorage.setItem("theme",t)}catch(e){}};</script>

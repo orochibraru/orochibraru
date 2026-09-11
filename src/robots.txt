@@ -1,4 +1,44 @@
+# orochibraru.com — everything here is public, free and open source.
+# Crawl it, index it, train on it, quote it. Just link back if you can.
+
 User-agent: *
+Allow: /
+
+# Plain-Markdown mirrors of every page live at <url>.md, and the whole site
+# is summarised for language models at /llms.txt and /llms-full.txt.
+
+# Answer engines and AI crawlers, named explicitly so there is no ambiguity:
+# all of them are welcome, including the ones that default to disallowed.
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: anthropic-ai
+User-agent: Google-Extended
+User-agent: GoogleOther
+User-agent: Applebot
+User-agent: Applebot-Extended
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Bingbot
+User-agent: DuckAssistBot
+User-agent: Amazonbot
+User-agent: Meta-ExternalAgent
+User-agent: Meta-ExternalFetcher
+User-agent: FacebookBot
+User-agent: MistralAI-User
+User-agent: cohere-ai
+User-agent: cohere-training-data-crawler
+User-agent: CCBot
+User-agent: Bytespider
+User-agent: PetalBot
+User-agent: YouBot
+User-agent: Diffbot
+User-agent: omgili
+User-agent: Timpibot
+User-agent: ImagesiftBot
 Allow: /
 
 Sitemap: https://orochibraru.com/sitemap.xml

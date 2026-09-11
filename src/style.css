@@ -155,6 +155,12 @@
   .md hr { @apply my-10 border-line; }
   .md img { @apply my-6 border border-line; }
 
+  /* showcase screenshots: <picture> picks one file per figure, light or dark */
+  .shot { @apply m-0 bg-surface p-5; }
+  .shot img { @apply block w-full border border-line; }
+  .shot figcaption { @apply mt-4 text-[.9rem]/[1.6] text-dim; }
+  .shot figcaption b { @apply block text-fg; }
+
   /* feature tiles opt out of prose paragraph sizing */
   .feat p { @apply m-0 max-w-none text-[.9rem]; }
 }
