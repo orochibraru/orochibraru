@@ -9,6 +9,9 @@ import { rm, cp, mkdir, stat } from "node:fs/promises";
 import { Glob } from "bun";
 import { PROJECTS, docsUrl, type Project } from "./projects";
 import { loadGuides, type Guide } from "./guides";
+import { log, ms } from "./log";
+
+const out = log("build");
 
 const SITE = "https://orochibraru.com";
 
@@ -485,28 +488,45 @@ ${rows}
 
 // ---------------------------------------------------------------- build
 
-const posts = await loadPosts();
-const guides = await loadGuides();
+const posts = await out.time("read posts", loadPosts);
+out.info(`${posts.length} post(s) in src/posts`);
+for (const p of posts) out.detail(`post ${p.slug} (${p.date})`);
 
-await rm("src/blog", { recursive: true, force: true });
-await mkdir("src/blog", { recursive: true });
-await Bun.write("src/blog/index.html", indexPage(posts));
-for (const p of posts) await Bun.write(`src/blog/${p.slug}.html`, postPage(p));
-
+const guides = await out.time("read guides", loadGuides);
 for (const project of PROJECTS) {
-  const siblings = guides.filter((g) => g.project.key === project.key);
-  await rm(`src/${project.key}/docs`, { recursive: true, force: true });
-  await mkdir(`src/${project.key}/docs`, { recursive: true });
-  await Bun.write(`src/${project.key}/docs/index.html`, guideIndexPage(project, siblings));
-  for (const guide of siblings) {
-    await Bun.write(`src/${project.key}/docs/${guide.slug}.html`, guidePage(guide, siblings));
-  }
+  const mine = guides.filter((g) => g.project.key === project.key);
+  out.info(`${project.key}: ${mine.length} guide(s)`);
+  for (const guide of mine) out.detail(`guide ${guide.url}`);
 }
+if (!guides.length) {
+  out.warn("no guides found in src/docs — run `bun run docs` to vendor them");
+}
+
+await out.time("write generated pages into src", async () => {
+  await rm("src/blog", { recursive: true, force: true });
+  await mkdir("src/blog", { recursive: true });
+  await Bun.write("src/blog/index.html", indexPage(posts));
+  for (const p of posts) await Bun.write(`src/blog/${p.slug}.html`, postPage(p));
+
+  for (const project of PROJECTS) {
+    const siblings = guides.filter((g) => g.project.key === project.key);
+    await rm(`src/${project.key}/docs`, { recursive: true, force: true });
+    await mkdir(`src/${project.key}/docs`, { recursive: true });
+    await Bun.write(`src/${project.key}/docs/index.html`, guideIndexPage(project, siblings));
+    for (const guide of siblings) {
+      await Bun.write(`src/${project.key}/docs/${guide.slug}.html`, guidePage(guide, siblings));
+    }
+  }
+});
 
 await rm("dist", { recursive: true, force: true });
 
+const entrypoints = [...new Glob("src/**/*.html").scanSync(".")].filter((f) => !f.includes("/_"));
+out.step(`bundle ${entrypoints.length} page(s)`);
+const bundleStartedAt = performance.now();
+
 const result = await Bun.build({
-  entrypoints: [...new Glob("src/**/*.html").scanSync(".")].filter((f) => !f.includes("/_")),
+  entrypoints,
   root: "src",
   outdir: "dist",
   minify: true,
@@ -514,18 +534,24 @@ const result = await Bun.build({
 });
 
 if (!result.success) {
-  for (const log of result.logs) console.error(log);
+  out.fail(`bundle failed with ${result.logs.length} error(s)`);
+  for (const message of result.logs) console.error(message);
   process.exit(1);
 }
+out.ok(`bundle ${entrypoints.length} page(s) -> ${result.outputs.length} file(s) ${ms(performance.now() - bundleStartedAt)}`);
 
 // Bun emits one empty JS chunk per page (the inline scripts stay inline). Drop them
 // so every page isn't fetching a 0-byte module.
 const empty = new Set<string>();
-for (const js of new Glob("dist/**/*.js").scanSync(".")) {
-  if (Bun.file(js).size > 0) continue;
-  empty.add(js.split("/").pop()!);
-  await rm(js);
-}
+await out.time("prune empty js chunks", async () => {
+  for (const js of new Glob("dist/**/*.js").scanSync(".")) {
+    if (Bun.file(js).size > 0) continue;
+    empty.add(js.split("/").pop()!);
+    await rm(js);
+    out.detail(`pruned ${js}`);
+  }
+});
+out.info(`${empty.size} empty chunk(s) dropped`);
 /** dist/penombre.html -> /penombre.md. The 404 page gets no twin. */
 function mdTwinOf(distHtml: string): string | null {
   const rel = distHtml.replace(/^dist/, "").replace(/\.html$/, "");
@@ -533,18 +559,26 @@ function mdTwinOf(distHtml: string): string | null {
   return rel === "/index" ? "/index.md" : `${rel.replace(/\/index$/, "")}.md`;
 }
 
-for (const html of new Glob("dist/**/*.html").scanSync(".")) {
-  const original = await Bun.file(html).text();
-  let out = original.replace(/<script[^>]*\bsrc="([^"]+)"[^>]*><\/script>/g, (tag, url: string) =>
-    empty.has(url.split("/").pop()!) ? "" : tag,
-  );
-  const twinUrl = mdTwinOf(html);
-  if (twinUrl) {
-    out = out.replace("</head>",
-      `<link rel="alternate" type="text/markdown" href="${twinUrl}">\n</head>`);
+let rewritten = 0;
+await out.time("rewrite built html", async () => {
+  for (const html of new Glob("dist/**/*.html").scanSync(".")) {
+    const original = await Bun.file(html).text();
+    let page = original.replace(/<script[^>]*\bsrc="([^"]+)"[^>]*><\/script>/g, (tag, url: string) =>
+      empty.has(url.split("/").pop()!) ? "" : tag,
+    );
+    const twinUrl = mdTwinOf(html);
+    if (twinUrl) {
+      page = page.replace("</head>",
+        `<link rel="alternate" type="text/markdown" href="${twinUrl}">\n</head>`);
+    }
+    if (page !== original) {
+      await Bun.write(html, page);
+      rewritten += 1;
+      out.detail(`rewrote ${html}`);
+    }
   }
-  if (out !== original) await Bun.write(html, out);
-}
+});
+out.info(`${rewritten} page(s) rewritten`);
 
 // Markdown twins, then the two files that index them for language models.
 const docs: Doc[] = [];
@@ -579,7 +613,13 @@ for (const p of posts) {
     body: `# ${p.title}\n\n*${readable(p.date)}*\n\n${p.md}\n`,
   });
 }
-for (const d of docs) await Bun.write(`dist${mdPath(d.path)}`, twin(d));
+await out.time("write markdown twins", async () => {
+  for (const d of docs) {
+    await Bun.write(`dist${mdPath(d.path)}`, twin(d));
+    out.detail(`twin ${mdPath(d.path)}`);
+  }
+});
+out.info(`${docs.length} twin(s)`);
 // One flat index for the ⌘K dialog: a guide contributes a row per heading, so
 // a result lands on the section that answers the question, not the page top.
 const searchIndex = [
@@ -597,26 +637,41 @@ const searchIndex = [
   ...posts.map((post) => ({ u: `/blog/${post.slug}`, t: post.title, g: "Blog", p: "", x: post.description })),
 ];
 await Bun.write("dist/search.json", JSON.stringify(searchIndex));
+out.info(`search.json: ${searchIndex.length} row(s), ${Math.round(Bun.file("dist/search.json").size / 1024)}kB`);
 
-await Bun.write("dist/llms.txt", llmsIndex(docs));
-await Bun.write("dist/llms-full.txt", llmsFull(docs));
+await out.time("write llms.txt", async () => {
+  await Bun.write("dist/llms.txt", llmsIndex(docs));
+  await Bun.write("dist/llms-full.txt", llmsFull(docs));
+});
+out.info(`llms-full.txt: ${Math.round(Bun.file("dist/llms-full.txt").size / 1024)}kB`);
 
-await cp("src/robots.txt", "dist/robots.txt");
-// The pages reference these through the bundler, which hashes them. The Markdown
-// twins are written from the sources instead, so they link the unhashed path:
-// ship that too, or every image in a .md twin is a 404.
-await cp("src/avatar.jpg", "dist/avatar.jpg");
-for (const project of PROJECTS) {
-  // a project whose guides have no screenshots has no images/ directory at all:
-  // git doesn't carry empty ones, so a fresh clone hasn't got it either
-  const images = `src/docs/${project.key}/images`;
-  if (await stat(images).then(() => true, () => false)) {
-    await cp(images, `dist/${project.key}/docs/images`, { recursive: true });
+const copied: string[] = [];
+await out.time("copy static assets", async () => {
+  await cp("src/robots.txt", "dist/robots.txt");
+  // The pages reference these through the bundler, which hashes them. The Markdown
+  // twins are written from the sources instead, so they link the unhashed path:
+  // ship that too, or every image in a .md twin is a 404.
+  await cp("src/avatar.jpg", "dist/avatar.jpg");
+  for (const project of PROJECTS) {
+    // a project whose guides have no screenshots has no images/ directory at all:
+    // git doesn't carry empty ones, so a fresh clone hasn't got it either
+    const images = `src/docs/${project.key}/images`;
+    if (await stat(images).then(() => true, () => false)) {
+      await cp(images, `dist/${project.key}/docs/images`, { recursive: true });
+      const count = [...new Glob("*.webp").scanSync(images)].length;
+      copied.push(`${project.key}: ${count} screenshot(s)`);
+    } else {
+      copied.push(`${project.key}: no images/ directory`);
+    }
   }
-}
-await Bun.write("dist/sitemap.xml", sitemap(posts, guides));
-await Bun.write("dist/feed.xml", feed(posts));
+});
+for (const line of copied) out.info(line);
 
-console.log(
+await out.time("write sitemap and feed", async () => {
+  await Bun.write("dist/sitemap.xml", sitemap(posts, guides));
+  await Bun.write("dist/feed.xml", feed(posts));
+});
+
+out.done(
   `built ${result.outputs.length} files, ${posts.length} post(s), ${guides.length} guide(s) and ${docs.length} Markdown twin(s) -> dist/`,
 );

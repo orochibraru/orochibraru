@@ -15,6 +15,9 @@
 import type { BunPlugin } from "bun";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { log } from "../log";
+
+const out = log("html");
 
 const PARTIALS = "src/_partials";
 
@@ -58,10 +61,12 @@ export function expandIncludes(html: string, page = "page", depth = 0): string {
 export const htmlIncludes: BunPlugin = {
   name: "html-includes",
   setup(build) {
-    build.onLoad({ filter: /\.html$/ }, async ({ path }) => ({
-      contents: expandIncludes(await Bun.file(path).text(), path),
-      loader: "html",
-    }));
+    build.onLoad({ filter: /\.html$/ }, async ({ path }) => {
+      const source = await Bun.file(path).text();
+      const includes = source.match(INCLUDE)?.length ?? 0;
+      if (includes) out.detail(`${path}: expanding ${includes} include(s)`);
+      return { contents: expandIncludes(source, path), loader: "html" };
+    });
   },
 };
 

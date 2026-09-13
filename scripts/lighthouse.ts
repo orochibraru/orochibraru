@@ -6,6 +6,9 @@
 //
 // Exits non-zero if a category drops below its floor, so it can gate a deploy.
 import { Glob } from "bun";
+import { log, ms, dim } from "./log";
+
+const out = log("audit");
 
 const PORT = 4173;
 const FLOOR: Record<string, number> = {
@@ -15,7 +18,11 @@ const FLOOR: Record<string, number> = {
   seo: 1,
 };
 
-Bun.spawnSync(["bun", "run", "build.ts"], { stdout: "inherit", stderr: "inherit" });
+const rebuild = Bun.spawnSync(["bun", "run", "scripts/build.ts"], { stdout: "inherit", stderr: "inherit" });
+if (rebuild.exitCode !== 0) {
+  out.fail(`build failed (exit ${rebuild.exitCode}): nothing to audit`);
+  process.exit(1);
+}
 
 /** The routes nginx would serve, worked out from what the build produced. */
 const built = [...new Glob("dist/**/*.html").scanSync(".")]
@@ -28,6 +35,7 @@ const routes = asked.length ? asked : built;
 for (const route of routes) {
   if (!built.includes(route)) throw new Error(`no page at ${route}. Built: ${built.join(", ")}`);
 }
+if (asked.length) out.info(`auditing ${asked.length} of ${built.length} built page(s), as asked`);
 
 // Close enough to nginx.conf to audit the same thing production serves: clean
 // URLs, gzip, and a long immutable cache on the hashed assets. Without those
@@ -35,6 +43,7 @@ for (const route of routes) {
 // existed in this script.
 const CACHED = /\.(css|js|svg|png|jpg|webp|woff2)$/;
 
+out.step(`serving dist/ on http://localhost:${PORT}`);
 const server = Bun.serve({
   port: PORT,
   async fetch(request) {
@@ -66,8 +75,8 @@ async function audit(route: string): Promise<Report> {
     "--chrome-flags=--headless=new --no-sandbox --disable-gpu",
   ], { stdout: "pipe", stderr: "pipe" });
 
-  const [out] = await Promise.all([new Response(run.stdout).text(), run.exited]);
-  const json = out.slice(out.indexOf("{")); // lighthouse prints a banner first
+  const [stdout] = await Promise.all([new Response(run.stdout).text(), run.exited]);
+  const json = stdout.slice(stdout.indexOf("{")); // lighthouse prints a banner first
   if (!json) throw new Error(`${route}: lighthouse produced nothing\n${await new Response(run.stderr).text()}`);
 
   const report = JSON.parse(json) as Report & { runtimeError?: { message: string } };
@@ -82,11 +91,15 @@ let failed = false;
 const failures: string[] = [];
 const insights: string[] = []; // Lighthouse 13's advisory diagnostics, not pass/fail
 
+out.info(`each page is a full Chrome run: about 5s apiece, ${routes.length} to go`);
 console.log(`\nauditing ${routes.length} page(s)\n`);
 console.log(`${pad("page", 26)} ${["perf", "a11y", "best", "seo"].map((c) => c.padStart(4)).join(" ")}`);
 
+let done = 0;
 for (const route of routes) {
+  const at = performance.now();
   const report = await audit(route);
+  done += 1;
 
   const scores = CATEGORIES.map((id) => {
     const score = report.categories[id]?.score ?? null;
@@ -94,7 +107,7 @@ for (const route of routes) {
     if (score < (FLOOR[id] ?? 1)) failed = true;
     return `${Math.round(score * 100)}`.padStart(4);
   });
-  console.log(`${pad(route, 26)} ${scores.join(" ")}`);
+  console.log(`${pad(route, 26)} ${scores.join(" ")}  ${dim(`${done}/${routes.length}  ${ms(performance.now() - at)}`)}`);
 
   for (const [id, a] of Object.entries(report.audits)) {
     if (a.score === null || a.score >= 1) continue;
@@ -113,4 +126,8 @@ list("failed audits", failures);
 list("insights (advisory)", insights);
 
 server.stop(true);
+
+if (failed) out.fail(`${routes.length} page(s) audited — below the floor, see the failed audits above`);
+else out.done(`${routes.length} page(s) audited, all above the floor`);
+
 process.exit(failed ? 1 : 0);

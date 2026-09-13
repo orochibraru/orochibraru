@@ -7,6 +7,9 @@
 import { readFileSync } from "node:fs";
 import { Glob } from "bun";
 import { PROJECTS, docsDir, docsUrl, type Project } from "./projects";
+import { log } from "./log";
+
+const out = log("guides");
 
 export type Section = { id: string; heading: string; text: string; level: number };
 
@@ -93,6 +96,9 @@ function dimensions(file: string): { width: number; height: number } | null {
   try {
     bytes = readFileSync(file);
   } catch {
+    // No file means no width/height on the <img>, which means the page reflows
+    // as it loads and the audit marks it down. Usually a missed `bun run docs`.
+    out.warn(`${file} is missing: its <img> ships without dimensions`);
     return null;
   }
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -150,6 +156,7 @@ export async function loadGuides(): Promise<Guide[]> {
     const directory = docsDir(project);
     const files = [...new Glob("*.md").scanSync(directory)];
     const slugs = new Set(files.map((file) => file.replace(/\.md$/, "")));
+    if (!files.length) out.warn(`${directory} is empty: run \`bun run docs\` to vendor ${project.key}'s guides`);
 
     // order[] first, then anything upstream added that nobody has placed yet
     const ordered = [
@@ -158,6 +165,9 @@ export async function loadGuides(): Promise<Guide[]> {
     ];
 
     for (const slug of ordered) {
+      if (!project.order.includes(slug)) {
+        out.warn(`${project.key}/${slug} is not in its order[] — it sorts last in the sidebar`);
+      }
       const raw = await Bun.file(`${directory}/${slug}.md`).text();
 
       const heading = raw.match(/^#\s+(.+?)\s*$/m);
