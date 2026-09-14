@@ -3,8 +3,28 @@
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
 <meta property="og:site_name" content="orochibraru">
-<meta name="twitter:card" content="summary_large_image">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="{{ogType|website}}">
+<!-- A page with a real wide screenshot passes ogImage/ogImageWidth/ogImageHeight/
+     ogImageAlt and card="summary_large_image". Everything else falls back to the
+     avatar, which is square, so the small card is the honest one: claiming
+     summary_large_image without a 1.91:1 image renders a cropped mess. -->
+<meta property="og:image" content="{{ogImage|https://orochibraru.com/avatar.jpg}}">
+<meta property="og:image:width" content="{{ogImageWidth|320}}">
+<meta property="og:image:height" content="{{ogImageHeight|320}}">
+<meta property="og:image:alt" content="{{ogImageAlt|orochibraru}}">
+<meta name="twitter:card" content="{{card|summary}}">
+<meta name="twitter:image" content="{{ogImage|https://orochibraru.com/avatar.jpg}}">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>">
 <link rel="alternate" type="application/rss+xml" title="orochibraru" href="/feed.xml">
 <link rel="stylesheet" href="{{css|./style.css}}">
 <script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<!-- The author and the site, once, with stable @ids. Every other block on every
+     other page refers back to these instead of restating them, so search engines
+     merge one Person and one WebSite rather than 38 near-duplicates. -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"Person","@id":"https://orochibraru.com/#person","name":"orochibraru","url":"https://orochibraru.com/about","description":"Self-taught software engineer with ten years of experience, building free self-hosted tools for homelabs.","sameAs":["https://github.com/orochibraru","https://hub.docker.com/u/orochibraru"]},
+{"@type":"WebSite","@id":"https://orochibraru.com/#website","name":"orochibraru","url":"https://orochibraru.com/","description":"Free, open-source, self-hosted software for homelabs: a cloud drive, a single-host PaaS, a server monitor, a media web client, a SvelteKit adapter and a webhook bridge.","inLanguage":"en","publisher":{"@id":"https://orochibraru.com/#person"},"author":{"@id":"https://orochibraru.com/#person"}}
+]}
+</script>

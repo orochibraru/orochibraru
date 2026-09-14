@@ -26,6 +26,26 @@ type Post = {
 
 const esc = (s: string) => Bun.escapeHTML(s);
 
+// --------------------------------------------- structured data
+//
+// The Person and the WebSite are declared once, in src/_partials/head.html, with
+// stable @ids. Everything below refers back to those ids instead of restating the
+// author on all 38 pages, which is what lets a search engine treat them as one
+// entity rather than 38 that merely look alike.
+const PERSON = { "@id": `${SITE}/#person` };
+const WEBSITE = { "@id": `${SITE}/#website` };
+
+/** A trail of [name, path] pairs, Home first. Rendered under the URL in results. */
+const breadcrumbs = (trail: [string, string][]) => ({
+  "@context": "https://schema.org", "@type": "BreadcrumbList",
+  itemListElement: [["Home", "/"], ...trail].map(([name, path], i) => ({
+    "@type": "ListItem", position: i + 1, name, item: `${SITE}${path}`,
+  })),
+});
+
+const jsonld = (...nodes: unknown[]) =>
+  nodes.map((n) => `<script type="application/ld+json">\n${JSON.stringify(n)}\n</script>`).join("\n");
+
 /** Truncate on a word, not mid-syllable, and say so when something was cut. */
 const clip = (text: string, max: number) =>
   text.length <= max ? text : `${text.slice(0, text.lastIndexOf(" ", max)).replace(/[,;:.]$/, "")}…`;
@@ -70,13 +90,13 @@ async function loadPosts(): Promise<Post[]> {
 /** The shared page shell. Mirrors the hand-written pages in src/. */
 function shell(o: {
   path: string; title: string; description: string;
-  css?: string; js?: string; width?: string; source?: { url: string; label: string };
+  css?: string; js?: string; width?: string; ogType?: string; source?: { url: string; label: string };
   head?: string; main: string;
 }) {
   return `<!doctype html>
 <html lang="en">
 <head>
-<!--#include head.html css="${o.css ?? "../style.css"}" -->
+<!--#include head.html css="${o.css ?? "../style.css"}" ogType="${o.ogType ?? "website"}" -->
 <title>${esc(o.title)}</title>
 <meta name="description" content="${esc(o.description)}">
 <link rel="canonical" href="${SITE}${o.path}">
@@ -99,16 +119,18 @@ function postPage(p: Post) {
     path: `/blog/${p.slug}`,
     title: `${p.title} | orochibraru`,
     description: p.description,
-    head: `<meta property="og:type" content="article">
-<meta property="article:published_time" content="${p.date}">
-<script type="application/ld+json">
-${JSON.stringify({
+    ogType: "article",
+    head: `<meta property="article:published_time" content="${p.date}">
+${jsonld({
   "@context": "https://schema.org", "@type": "BlogPosting",
-  headline: p.title, description: p.description, datePublished: p.date,
+  headline: p.title, description: p.description,
+  datePublished: p.date, dateModified: p.date,
   url: `${SITE}/blog/${p.slug}`,
-  author: { "@type": "Person", name: "orochibraru", url: `${SITE}/about` },
-})}
-</script>`,
+  mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/blog/${p.slug}` },
+  isPartOf: { "@id": `${SITE}/blog#blog` },
+  inLanguage: "en",
+  author: PERSON, publisher: PERSON,
+}, breadcrumbs([["Blog", "/blog"], [p.title, `/blog/${p.slug}`]]))}`,
     main: `<main class="mx-auto max-w-page px-6">
 <article>
   <div class="pt-10 pb-8">
@@ -139,6 +161,18 @@ function indexPage(posts: Post[]) {
     title: "Blog: rants about software that grew a pricing page",
     description:
       "Notes and complaints about self-hosting, homelab software, and every tool that was good until it had a funding round.",
+    head: jsonld({
+      "@context": "https://schema.org", "@type": "Blog",
+      "@id": `${SITE}/blog#blog`,
+      name: "orochibraru", url: `${SITE}/blog`,
+      description:
+        "Notes and complaints about self-hosting, homelab software, and every tool that was good until it had a funding round.",
+      inLanguage: "en", isPartOf: WEBSITE, author: PERSON, publisher: PERSON,
+      blogPost: posts.map((p) => ({
+        "@type": "BlogPosting", headline: p.title, description: p.description,
+        datePublished: p.date, url: `${SITE}/blog/${p.slug}`, author: PERSON,
+      })),
+    }, breadcrumbs([["Blog", "/blog"]])),
     main: `<main class="mx-auto max-w-page px-6">
   <div class="pt-15 pb-14">
     <span class="tag">${posts.length} post${posts.length === 1 ? "" : "s"} &middot; <a class="hover:text-acid" href="/feed.xml">RSS</a></span>
@@ -254,15 +288,23 @@ function guidePage(guide: Guide, siblings: Guide[]) {
     title: `${guide.title} | ${guide.project.name} docs`,
     description: clip(guide.intro, 180) || `${guide.project.name} documentation.`,
     source: { url: guide.project.repo, label: "Source" },
-    head: `<script type="application/ld+json">
-${JSON.stringify({
+    ogType: "article",
+    head: `${jsonld({
   "@context": "https://schema.org", "@type": "TechArticle",
   headline: guide.title, description: clip(guide.intro, 180),
   url: `${SITE}${guide.url}`,
-  isPartOf: { "@type": "TechArticle", name: `${guide.project.name} documentation`, url: `${SITE}${docsUrl(guide.project)}` },
-  author: { "@type": "Person", name: "orochibraru", url: `${SITE}/about` },
-})}
-</script>`,
+  mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}${guide.url}` },
+  // The docs hub is a collection of guides, not a TechArticle that happens to
+  // contain them; @id matches the node guideIndexPage() emits.
+  isPartOf: { "@id": `${SITE}${docsUrl(guide.project)}#docs` },
+  about: { "@type": "SoftwareApplication", name: guide.project.name, url: `${SITE}/${guide.project.key}` },
+  inLanguage: "en",
+  author: PERSON, publisher: PERSON,
+}, breadcrumbs([
+  [guide.project.name, `/${guide.project.key}`],
+  ["Docs", docsUrl(guide.project)],
+  [guide.title, guide.url],
+]))}`,
     main: `<main class="mx-auto ${DOCS_WIDTH} px-6">
   <div class="grid gap-x-12 gap-y-9 pt-10 pb-22.5 lg:grid-cols-[15rem_minmax(0,1fr)] 2xl:grid-cols-[15rem_minmax(0,1fr)_14rem]">
     ${guideAside(guide.project, siblings, guide.slug)}
@@ -299,6 +341,18 @@ function guideIndexPage(project: Project, guides: Guide[]) {
     title: `${project.name} documentation`,
     description: `Every guide for ${project.name}: ${project.blurb}`,
     source: { url: project.repo, label: "Source" },
+    head: jsonld({
+      "@context": "https://schema.org", "@type": "CollectionPage",
+      "@id": `${SITE}${docsUrl(project)}#docs`,
+      name: `${project.name} documentation`, url: `${SITE}${docsUrl(project)}`,
+      description: `Every guide for ${project.name}: ${project.blurb}`,
+      inLanguage: "en", isPartOf: WEBSITE, author: PERSON, publisher: PERSON,
+      about: { "@type": "SoftwareApplication", name: project.name, url: `${SITE}/${project.key}` },
+      hasPart: guides.map((g) => ({
+        "@type": "TechArticle", headline: g.title,
+        description: clip(g.intro, 180), url: `${SITE}${g.url}`, author: PERSON,
+      })),
+    }, breadcrumbs([[project.name, `/${project.key}`], ["Docs", docsUrl(project)]])),
     main: `<main class="mx-auto ${DOCS_WIDTH} px-6">
   <div class="pt-10 pb-14">
     <a class="text-xs tracking-widest text-dim uppercase hover:text-acid" href="/${project.key}">&larr; ${esc(project.name)}</a>
