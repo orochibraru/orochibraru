@@ -6,8 +6,8 @@ name: Refresh docs
 # if something actually moved. Run it by hand from the Actions tab after a docs
 # change you don't want to wait a day for.
 on:
-  schedule:
-    - cron: "17 4 * * *" # daily, off the hour: those minutes are stampedes
+  repository_dispatch:
+    types: [docs-update]
   workflow_dispatch:
 
 permissions:
