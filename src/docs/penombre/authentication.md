@@ -52,14 +52,42 @@ reset link. If SMTP is disabled, the forgot-password flow is not available.
 ## OAuth
 
 Penombre supports any **OIDC-compliant** provider (Google, GitHub, Authentik,
-Pocket ID, etc.). Enable it with `ENABLE_OAUTH_SIGNIN=true` and configure one or
-more providers using environment variables.
+Pocket ID, etc.). A provider can be declared two ways: in the environment, or in
+**Admin → Settings → OAuth providers**. Both end up in the same list on the
+sign-in page.
+
+### From the admin UI
+
+**Admin → Settings → OAuth providers** → **Add a provider**. You give it an id,
+a display name, the client id and secret, and the discovery URL; the card shows
+the redirect URI to register with the provider, and a copy button for it.
+
+Three things worth knowing:
+
+- **Restart to activate.** The provider list is built once when the process
+  starts, so a provider you have just saved shows a _saved, not yet loaded_
+  badge and cannot sign anyone in until the instance restarts.
+- **The id is permanent.** It is stored on every account that signs in through
+  the provider, so it is read-only once saved. To change it, add a new provider
+  and remove the old one — people will have to link their account again.
+- **The secret is never sent back to the page.** Editing a provider leaves the
+  secret field blank; leave it blank to keep the stored one.
+
+A provider declared in the environment appears here read-only, marked _from the
+environment_ — `config.ts` owns those, and the UI will refuse to save a stored
+provider under the same id. Removing or disabling a provider that is somebody's
+only way in is refused, exactly like the other
+[sign-in methods](#which-methods-may-be-turned-off).
+
+With no `ENABLE_OAUTH_SIGNIN` in the environment, having an enabled provider is
+what turns OAuth sign-in on; setting the variable takes that decision back.
 
 ### Provider configuration
 
 Each provider is configured with the naming pattern
 `OAUTH_<PROVIDER>_<SETTING>`, where `<PROVIDER>` is an uppercase identifier of
-your choice.
+your choice. Declaring one is enough to turn OAuth sign-in on —
+`ENABLE_OAUTH_SIGNIN` only has to be set to force it either way.
 
 | Variable                         | Description            | Default                |
 | -------------------------------- | ---------------------- | ---------------------- |
@@ -209,6 +237,26 @@ that already exists, so opening them does not open sign-ups.
 
 > A sign-in link is a bearer credential — anyone holding the URL is signed in.
 > Treat a forwarded link the way you would treat a forwarded password.
+
+### When the email cannot be sent
+
+If SMTP rejects the message, the sign-in screen now shows the reason the mail
+server gave — `Could not send the sign-in email: <reason>` — rather than a
+generic failure. The same reason is written to the server log. A wrong password,
+an unreachable host and a refused sender address all look different, so start
+there rather than assuming the method is broken.
+
+Two things worth checking first:
+
+- **The admin test button proves the values in the form, not the saved ones.**
+  It builds a one-off sender from whatever is typed in, so a passing test and a
+  failing sign-in mean the settings were never saved. Save, then test again.
+- **A method enabled since the last restart has no endpoint yet.** Its button
+  stays off the sign-in screen until the restart, rather than appearing and
+  failing.
+
+A relay that needs no credentials is supported: leave the SMTP username and
+password empty and no login is attempted.
 
 ## Two-factor authentication
 
