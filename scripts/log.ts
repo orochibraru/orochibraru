@@ -9,7 +9,8 @@
 //
 // `dev` rebuilds on every save, so it runs the build QUIET and prints its own
 // one-line summary. CI and Docker get the default.
-const flag = (name: string) => ["1", "true", "yes"].includes((process.env[name] ?? "").toLowerCase());
+const flag = (name: string) =>
+  ["1", "true", "yes"].includes((process.env[name] ?? "").toLowerCase());
 
 export const VERBOSE = flag("VERBOSE");
 export const QUIET = flag("QUIET") && !VERBOSE;

@@ -21,7 +21,7 @@ type Post = {
   date: string; // ISO, from frontmatter
   description: string;
   body: string; // rendered HTML
-  md: string;   // the Markdown source, reused verbatim for /blog/<slug>.md
+  md: string; // the Markdown source, reused verbatim for /blog/<slug>.md
 };
 
 const esc = (s: string) => Bun.escapeHTML(s);
@@ -37,22 +37,33 @@ const WEBSITE = { "@id": `${SITE}/#website` };
 
 /** A trail of [name, path] pairs, Home first. Rendered under the URL in results. */
 const breadcrumbs = (trail: [string, string][]) => ({
-  "@context": "https://schema.org", "@type": "BreadcrumbList",
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
   itemListElement: [["Home", "/"], ...trail].map(([name, path], i) => ({
-    "@type": "ListItem", position: i + 1, name, item: `${SITE}${path}`,
+    "@type": "ListItem",
+    position: i + 1,
+    name,
+    item: `${SITE}${path}`,
   })),
 });
 
 const jsonld = (...nodes: unknown[]) =>
-  nodes.map((n) => `<script type="application/ld+json">\n${JSON.stringify(n)}\n</script>`).join("\n");
+  nodes
+    .map((n) => `<script type="application/ld+json">\n${JSON.stringify(n)}\n</script>`)
+    .join("\n");
 
 /** Truncate on a word, not mid-syllable, and say so when something was cut. */
 const clip = (text: string, max: number) =>
-  text.length <= max ? text : `${text.slice(0, text.lastIndexOf(" ", max)).replace(/[,;:.]$/, "")}…`;
+  text.length <= max
+    ? text
+    : `${text.slice(0, text.lastIndexOf(" ", max)).replace(/[,;:.]$/, "")}…`;
 
 const readable = (iso: string) =>
   new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", {
-    day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
   });
 
 /** Minimal frontmatter: a leading `---` block of `key: value` scalars. */
@@ -89,9 +100,16 @@ async function loadPosts(): Promise<Post[]> {
 
 /** The shared page shell. Mirrors the hand-written pages in src/. */
 function shell(o: {
-  path: string; title: string; description: string;
-  css?: string; js?: string; width?: string; ogType?: string; source?: { url: string; label: string };
-  head?: string; main: string;
+  path: string;
+  title: string;
+  description: string;
+  css?: string;
+  js?: string;
+  width?: string;
+  ogType?: string;
+  source?: { url: string; label: string };
+  head?: string;
+  main: string;
 }) {
   return `<!doctype html>
 <html lang="en">
@@ -121,16 +139,26 @@ function postPage(p: Post) {
     description: p.description,
     ogType: "article",
     head: `<meta property="article:published_time" content="${p.date}">
-${jsonld({
-  "@context": "https://schema.org", "@type": "BlogPosting",
-  headline: p.title, description: p.description,
-  datePublished: p.date, dateModified: p.date,
-  url: `${SITE}/blog/${p.slug}`,
-  mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/blog/${p.slug}` },
-  isPartOf: { "@id": `${SITE}/blog#blog` },
-  inLanguage: "en",
-  author: PERSON, publisher: PERSON,
-}, breadcrumbs([["Blog", "/blog"], [p.title, `/blog/${p.slug}`]]))}`,
+${jsonld(
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: p.title,
+    description: p.description,
+    datePublished: p.date,
+    dateModified: p.date,
+    url: `${SITE}/blog/${p.slug}`,
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/blog/${p.slug}` },
+    isPartOf: { "@id": `${SITE}/blog#blog` },
+    inLanguage: "en",
+    author: PERSON,
+    publisher: PERSON,
+  },
+  breadcrumbs([
+    ["Blog", "/blog"],
+    [p.title, `/blog/${p.slug}`],
+  ]),
+)}`,
     main: `<main class="mx-auto max-w-page px-6">
 <article>
   <div class="pt-10 pb-8">
@@ -147,11 +175,15 @@ ${jsonld({
 }
 
 function indexPage(posts: Post[]) {
-  const rows = posts.map((p) => `      <a class="card" href="/blog/${p.slug}">
+  const rows = posts
+    .map(
+      (p) => `      <a class="card" href="/blog/${p.slug}">
         <span class="text-[11px] uppercase tracking-[.18em] text-plasma"><time datetime="${p.date}">${readable(p.date)}</time></span>
         <h2 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">${esc(p.title)}</h2>
         <p class="text-[.92rem] text-dim">${esc(p.description)}</p>
-      </a>`).join("\n");
+      </a>`,
+    )
+    .join("\n");
 
   // an odd post count would leave the grid's line-coloured background showing
   const filler = posts.length % 2 ? '\n      <div class="hidden bg-surface sm:block"></div>' : "";
@@ -161,18 +193,30 @@ function indexPage(posts: Post[]) {
     title: "Blog: rants about software that grew a pricing page",
     description:
       "Notes and complaints about self-hosting, homelab software, and every tool that was good until it had a funding round.",
-    head: jsonld({
-      "@context": "https://schema.org", "@type": "Blog",
-      "@id": `${SITE}/blog#blog`,
-      name: "orochibraru", url: `${SITE}/blog`,
-      description:
-        "Notes and complaints about self-hosting, homelab software, and every tool that was good until it had a funding round.",
-      inLanguage: "en", isPartOf: WEBSITE, author: PERSON, publisher: PERSON,
-      blogPost: posts.map((p) => ({
-        "@type": "BlogPosting", headline: p.title, description: p.description,
-        datePublished: p.date, url: `${SITE}/blog/${p.slug}`, author: PERSON,
-      })),
-    }, breadcrumbs([["Blog", "/blog"]])),
+    head: jsonld(
+      {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "@id": `${SITE}/blog#blog`,
+        name: "orochibraru",
+        url: `${SITE}/blog`,
+        description:
+          "Notes and complaints about self-hosting, homelab software, and every tool that was good until it had a funding round.",
+        inLanguage: "en",
+        isPartOf: WEBSITE,
+        author: PERSON,
+        publisher: PERSON,
+        blogPost: posts.map((p) => ({
+          "@type": "BlogPosting",
+          headline: p.title,
+          description: p.description,
+          datePublished: p.date,
+          url: `${SITE}/blog/${p.slug}`,
+          author: PERSON,
+        })),
+      },
+      breadcrumbs([["Blog", "/blog"]]),
+    ),
     main: `<main class="mx-auto max-w-page px-6">
   <div class="pt-15 pb-14">
     <span class="tag">${posts.length} post${posts.length === 1 ? "" : "s"} &middot; <a class="hover:text-acid" href="/feed.xml">RSS</a></span>
@@ -193,13 +237,17 @@ ${rows}${filler}
 }
 
 function feed(posts: Post[]) {
-  const items = posts.map((p) => `  <item>
+  const items = posts
+    .map(
+      (p) => `  <item>
     <title>${esc(p.title)}</title>
     <link>${SITE}/blog/${p.slug}</link>
     <guid isPermaLink="true">${SITE}/blog/${p.slug}</guid>
     <pubDate>${new Date(p.date + "T00:00:00Z").toUTCString()}</pubDate>
     <description>${esc(p.description)}</description>
-  </item>`).join("\n");
+  </item>`,
+    )
+    .join("\n");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
@@ -232,10 +280,12 @@ const DOCS_WIDTH = "max-w-[110rem]";
 
 /** The sidebar: every guide in this project, in reading order. */
 function guideNav(guides: Guide[], current?: string) {
-  const links = guides.map((g) => {
-    const here = g.slug === current;
-    return `<a class="${here ? "text-acid" : "hover:text-acid"}"${here ? ' aria-current="page"' : ""} href="${g.url}">${esc(g.title)}</a>`;
-  }).join("\n      ");
+  const links = guides
+    .map((g) => {
+      const here = g.slug === current;
+      return `<a class="${here ? "text-acid" : "hover:text-acid"}"${here ? ' aria-current="page"' : ""} href="${g.url}">${esc(g.title)}</a>`;
+    })
+    .join("\n      ");
 
   return `<nav class="flex gap-4.5 overflow-x-auto pb-3 text-[.92rem] whitespace-nowrap text-dim lg:flex-col lg:gap-2 lg:overflow-visible lg:pb-0 lg:whitespace-normal">
       ${links}
@@ -251,9 +301,13 @@ function guideContents(guide: Guide) {
   const entries = guide.sections.filter((section) => section.id && section.level <= 3);
   if (entries.length < 2) return '<div class="hidden 2xl:block"></div>';
 
-  const links = entries.map((section) => `<li${section.level === 3 ? ' class="pl-3.5"' : ""}>
+  const links = entries
+    .map(
+      (section) => `<li${section.level === 3 ? ' class="pl-3.5"' : ""}>
         <a class="hover:text-acid" href="#${section.id}">${esc(section.heading)}</a>
-      </li>`).join("\n      ");
+      </li>`,
+    )
+    .join("\n      ");
 
   return `<nav class="hidden text-[.85rem]/[1.5] text-dim 2xl:sticky 2xl:top-9 2xl:block 2xl:self-start">
     <p class="mb-3.5 text-[11px] tracking-[.18em] text-plasma uppercase">On this page</p>
@@ -275,10 +329,11 @@ function guidePage(guide: Guide, siblings: Guide[]) {
   const previous = siblings[at - 1];
   const next = siblings[at + 1];
 
-  const step = (g: Guide | undefined, label: string) => g
-    ? `<a class="card" href="${g.url}"><span class="text-[11px] tracking-[.18em] text-dim uppercase">${label}</span>
+  const step = (g: Guide | undefined, label: string) =>
+    g
+      ? `<a class="card" href="${g.url}"><span class="text-[11px] tracking-[.18em] text-dim uppercase">${label}</span>
         <h2 class="mt-2.5 text-[1.15rem] font-bold tracking-[-.02em] transition-colors">${esc(g.title)}</h2></a>`
-    : '<div class="hidden bg-surface sm:block"></div>';
+      : '<div class="hidden bg-surface sm:block"></div>';
 
   return shell({
     path: guide.url,
@@ -289,22 +344,32 @@ function guidePage(guide: Guide, siblings: Guide[]) {
     description: clip(guide.intro, 180) || `${guide.project.name} documentation.`,
     source: { url: guide.project.repo, label: "Source" },
     ogType: "article",
-    head: `${jsonld({
-  "@context": "https://schema.org", "@type": "TechArticle",
-  headline: guide.title, description: clip(guide.intro, 180),
-  url: `${SITE}${guide.url}`,
-  mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}${guide.url}` },
-  // The docs hub is a collection of guides, not a TechArticle that happens to
-  // contain them; @id matches the node guideIndexPage() emits.
-  isPartOf: { "@id": `${SITE}${docsUrl(guide.project)}#docs` },
-  about: { "@type": "SoftwareApplication", name: guide.project.name, url: `${SITE}/${guide.project.key}` },
-  inLanguage: "en",
-  author: PERSON, publisher: PERSON,
-}, breadcrumbs([
-  [guide.project.name, `/${guide.project.key}`],
-  ["Docs", docsUrl(guide.project)],
-  [guide.title, guide.url],
-]))}`,
+    head: `${jsonld(
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        headline: guide.title,
+        description: clip(guide.intro, 180),
+        url: `${SITE}${guide.url}`,
+        mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}${guide.url}` },
+        // The docs hub is a collection of guides, not a TechArticle that happens to
+        // contain them; @id matches the node guideIndexPage() emits.
+        isPartOf: { "@id": `${SITE}${docsUrl(guide.project)}#docs` },
+        about: {
+          "@type": "SoftwareApplication",
+          name: guide.project.name,
+          url: `${SITE}/${guide.project.key}`,
+        },
+        inLanguage: "en",
+        author: PERSON,
+        publisher: PERSON,
+      },
+      breadcrumbs([
+        [guide.project.name, `/${guide.project.key}`],
+        ["Docs", docsUrl(guide.project)],
+        [guide.title, guide.url],
+      ]),
+    )}`,
     main: `<main class="mx-auto ${DOCS_WIDTH} px-6">
   <div class="grid gap-x-12 gap-y-9 pt-10 pb-22.5 lg:grid-cols-[15rem_minmax(0,1fr)] 2xl:grid-cols-[15rem_minmax(0,1fr)_14rem]">
     ${guideAside(guide.project, siblings, guide.slug)}
@@ -326,10 +391,14 @@ function guidePage(guide: Guide, siblings: Guide[]) {
 }
 
 function guideIndexPage(project: Project, guides: Guide[]) {
-  const rows = guides.map((g) => `      <a class="card" href="${g.url}">
+  const rows = guides
+    .map(
+      (g) => `      <a class="card" href="${g.url}">
         <h2 class="mb-2 text-[1.2rem] font-bold tracking-[-.02em] transition-colors">${esc(g.title)}</h2>
         <p class="text-[.92rem] text-dim">${esc(clip(g.intro, 150))}</p>
-      </a>`).join("\n");
+      </a>`,
+    )
+    .join("\n");
 
   const filler = guides.length % 2 ? '\n      <div class="hidden bg-surface sm:block"></div>' : "";
 
@@ -341,18 +410,36 @@ function guideIndexPage(project: Project, guides: Guide[]) {
     title: `${project.name} documentation`,
     description: `Every guide for ${project.name}: ${project.blurb}`,
     source: { url: project.repo, label: "Source" },
-    head: jsonld({
-      "@context": "https://schema.org", "@type": "CollectionPage",
-      "@id": `${SITE}${docsUrl(project)}#docs`,
-      name: `${project.name} documentation`, url: `${SITE}${docsUrl(project)}`,
-      description: `Every guide for ${project.name}: ${project.blurb}`,
-      inLanguage: "en", isPartOf: WEBSITE, author: PERSON, publisher: PERSON,
-      about: { "@type": "SoftwareApplication", name: project.name, url: `${SITE}/${project.key}` },
-      hasPart: guides.map((g) => ({
-        "@type": "TechArticle", headline: g.title,
-        description: clip(g.intro, 180), url: `${SITE}${g.url}`, author: PERSON,
-      })),
-    }, breadcrumbs([[project.name, `/${project.key}`], ["Docs", docsUrl(project)]])),
+    head: jsonld(
+      {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "@id": `${SITE}${docsUrl(project)}#docs`,
+        name: `${project.name} documentation`,
+        url: `${SITE}${docsUrl(project)}`,
+        description: `Every guide for ${project.name}: ${project.blurb}`,
+        inLanguage: "en",
+        isPartOf: WEBSITE,
+        author: PERSON,
+        publisher: PERSON,
+        about: {
+          "@type": "SoftwareApplication",
+          name: project.name,
+          url: `${SITE}/${project.key}`,
+        },
+        hasPart: guides.map((g) => ({
+          "@type": "TechArticle",
+          headline: g.title,
+          description: clip(g.intro, 180),
+          url: `${SITE}${g.url}`,
+          author: PERSON,
+        })),
+      },
+      breadcrumbs([
+        [project.name, `/${project.key}`],
+        ["Docs", docsUrl(project)],
+      ]),
+    ),
     main: `<main class="mx-auto ${DOCS_WIDTH} px-6">
   <div class="pt-10 pb-14">
     <a class="text-xs tracking-widest text-dim uppercase hover:text-acid" href="/${project.key}">&larr; ${esc(project.name)}</a>
@@ -386,7 +473,12 @@ const PAGES = [
   { path: "/baba", file: "src/baba.html", group: "Projects", pri: "0.8" },
   { path: "/nuvio-web", file: "src/nuvio-web.html", group: "Projects", pri: "0.8" },
   { path: "/svelte-smol", file: "src/svelte-smol.html", group: "Projects", pri: "0.8" },
-  { path: "/dokploy-to-pangolin", file: "src/dokploy-to-pangolin.html", group: "Projects", pri: "0.8" },
+  {
+    path: "/dokploy-to-pangolin",
+    file: "src/dokploy-to-pangolin.html",
+    group: "Projects",
+    pri: "0.8",
+  },
   { path: "/blog", file: "src/blog/index.html", group: "Start here", pri: "0.9" },
   { path: "/about", file: "src/about.html", group: "Start here", pri: "0.7" },
 ];
@@ -395,19 +487,40 @@ const PAGES = [
 const mdPath = (path: string) => (path === "/" ? "/index.md" : `${path}.md`);
 
 const ENTITIES: Record<string, string> = {
-  amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", shy: "",
-  rsquo: "’", lsquo: "‘", ldquo: "“", rdquo: "”",
-  mdash: "—", ndash: "–", hellip: "…", middot: "·",
-  larr: "←", rarr: "→", times: "×", copy: "©", deg: "°",
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  nbsp: " ",
+  shy: "",
+  rsquo: "’",
+  lsquo: "‘",
+  ldquo: "“",
+  rdquo: "”",
+  mdash: "—",
+  ndash: "–",
+  hellip: "…",
+  middot: "·",
+  larr: "←",
+  rarr: "→",
+  times: "×",
+  copy: "©",
+  deg: "°",
 };
 
 const unentity = (s: string) =>
-  s.replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
+  s
+    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
     .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
     .replace(/&([a-z]+);/gi, (m, name) => ENTITIES[name.toLowerCase()] ?? m);
 
 /** The inline content of a tag, markup already converted, flattened to one line. */
-const flat = (s: string) => s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+const flat = (s: string) =>
+  s
+    .replace(/<[^>]+>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 /** `./avatar.jpg` is relative to src/, which is the site root. */
 const absolute = (url: string) => (url.startsWith("./") ? url.slice(1) : url);
@@ -436,13 +549,17 @@ function markdown(html: string): string {
       const alt = tag.match(/\balt="([^"]*)"/i)?.[1] ?? "";
       return src ? `\n\n![${unentity(alt)}](${absolute(src)})\n\n` : "";
     })
-    .replace(/<a\b[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (_m, href: string, inner: string) => {
-      // a card is an <a> wrapped around a whole block: keep its structure and
-      // put the destination underneath, rather than mashing it into one link.
-      if (/<(h[1-6]|p|div|ul|ol)\b/i.test(inner)) return `${inner}\n\n[More &rarr;](${absolute(href)})\n\n`;
-      const text = flat(inner);
-      return text ? `[${text}](${absolute(href)})` : "";
-    })
+    .replace(
+      /<a\b[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi,
+      (_m, href: string, inner: string) => {
+        // a card is an <a> wrapped around a whole block: keep its structure and
+        // put the destination underneath, rather than mashing it into one link.
+        if (/<(h[1-6]|p|div|ul|ol)\b/i.test(inner))
+          return `${inner}\n\n[More &rarr;](${absolute(href)})\n\n`;
+        const text = flat(inner);
+        return text ? `[${text}](${absolute(href)})` : "";
+      },
+    )
     .replace(/<code[^>]*>([\s\S]*?)<\/code>/gi, (_m, t: string) => "`" + flat(t) + "`")
     .replace(/<(strong|b)\b[^>]*>([\s\S]*?)<\/\1>/gi, (_m, _tag, t: string) => {
       const text = flat(t);
@@ -453,18 +570,27 @@ function markdown(html: string): string {
       return text ? `*${text}*` : "";
     })
     .replace(/<br\s*\/?>/gi, " ")
-    .replace(/<h([1-6])[^>]*>([\s\S]*?)<\/h\1>/gi, (_m, level: string, t: string) =>
-      `\n\n${"#".repeat(Number(level))} ${flat(t)}\n\n`)
+    .replace(
+      /<h([1-6])[^>]*>([\s\S]*?)<\/h\1>/gi,
+      (_m, level: string, t: string) => `\n\n${"#".repeat(Number(level))} ${flat(t)}\n\n`,
+    )
     .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, (_m, t: string) => `\n- ${flat(t)}`)
-    .replace(/<\/(p|div|section|article|ul|ol|figure|figcaption|blockquote|header|footer|main)>/gi, "\n\n")
+    .replace(
+      /<\/(p|div|section|article|ul|ol|figure|figcaption|blockquote|header|footer|main)>/gi,
+      "\n\n",
+    )
     .replace(/<[^>]+>/g, "");
 
-  return unentity(s)
-    .split("\n").map((line) => line.replace(/[ \t]+/g, " ").trim()).join("\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim()
-    // only now, so none of the tidying above could reach inside a code block
-    .replace(/@@PRE(\d+)@@/g, (_m, i: string) => "```\n" + pre[Number(i)] + "\n```") + "\n";
+  return (
+    unentity(s)
+      .split("\n")
+      .map((line) => line.replace(/[ \t]+/g, " ").trim())
+      .join("\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim()
+      // only now, so none of the tidying above could reach inside a code block
+      .replace(/@@PRE(\d+)@@/g, (_m, i: string) => "```\n" + pre[Number(i)] + "\n```") + "\n"
+  );
 }
 
 const titleOf = (html: string) =>
@@ -479,8 +605,11 @@ const twin = (d: Doc) =>
   `> ${d.description}\n> Source: ${SITE}${d.path} · Site index: ${SITE}/llms.txt\n\n${d.body}`;
 
 function llmsIndex(docs: Doc[]) {
-  const group = (name: string) => docs.filter((d) => d.group === name)
-    .map((d) => `- [${d.title}](${SITE}${mdPath(d.path)}): ${d.description}`).join("\n");
+  const group = (name: string) =>
+    docs
+      .filter((d) => d.group === name)
+      .map((d) => `- [${d.title}](${SITE}${mdPath(d.path)}): ${d.description}`)
+      .join("\n");
 
   return `# orochibraru
 
@@ -504,11 +633,13 @@ ${group("Start here")}
 ## Blog
 
 ${group("Blog")}
-${PROJECTS.map((project) => `
+${PROJECTS.map(
+  (project) => `
 ## ${project.name} documentation
 
 ${group(`${project.name} docs`)}
-`).join("")}
+`,
+).join("")}
 ## Optional
 
 - [RSS feed](${SITE}/feed.xml): new posts, as they are written.
@@ -520,7 +651,8 @@ ${group(`${project.name} docs`)}
 const llmsFull = (docs: Doc[]) =>
   "# orochibraru.com — the whole site, as Markdown\n\n" +
   `Generated ${new Date().toISOString().slice(0, 10)}. Index: ${SITE}/llms.txt\n\n` +
-  docs.map((d) => `---\n\n${twin(d)}`).join("\n\n") + "\n";
+  docs.map((d) => `---\n\n${twin(d)}`).join("\n\n") +
+  "\n";
 
 function sitemap(posts: Post[], guides: Guide[]) {
   const today = new Date().toISOString().slice(0, 10);
@@ -529,9 +661,12 @@ function sitemap(posts: Post[], guides: Guide[]) {
     ...PROJECTS.map((project) => [docsUrl(project), today, "0.7"] as const),
     ...guides.map((g) => [g.url, today, "0.6"] as const),
     ...posts.map((p) => [`/blog/${p.slug}`, p.date, "0.6"] as const),
-  ].map(([path, mod, pri]) =>
-    `  <url><loc>${SITE}${path}</loc><lastmod>${mod}</lastmod><priority>${pri}</priority></url>`,
-  ).join("\n");
+  ]
+    .map(
+      ([path, mod, pri]) =>
+        `  <url><loc>${SITE}${path}</loc><lastmod>${mod}</lastmod><priority>${pri}</priority></url>`,
+    )
+    .join("\n");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -592,7 +727,9 @@ if (!result.success) {
   for (const message of result.logs) console.error(message);
   process.exit(1);
 }
-out.ok(`bundle ${entrypoints.length} page(s) -> ${result.outputs.length} file(s) ${ms(performance.now() - bundleStartedAt)}`);
+out.ok(
+  `bundle ${entrypoints.length} page(s) -> ${result.outputs.length} file(s) ${ms(performance.now() - bundleStartedAt)}`,
+);
 
 // Bun emits one empty JS chunk per page (the inline scripts stay inline). Drop them
 // so every page isn't fetching a 0-byte module.
@@ -617,13 +754,16 @@ let rewritten = 0;
 await out.time("rewrite built html", async () => {
   for (const html of new Glob("dist/**/*.html").scanSync(".")) {
     const original = await Bun.file(html).text();
-    let page = original.replace(/<script[^>]*\bsrc="([^"]+)"[^>]*><\/script>/g, (tag, url: string) =>
-      empty.has(url.split("/").pop()!) ? "" : tag,
+    let page = original.replace(
+      /<script[^>]*\bsrc="([^"]+)"[^>]*><\/script>/g,
+      (tag, url: string) => (empty.has(url.split("/").pop()!) ? "" : tag),
     );
     const twinUrl = mdTwinOf(html);
     if (twinUrl) {
-      page = page.replace("</head>",
-        `<link rel="alternate" type="text/markdown" href="${twinUrl}">\n</head>`);
+      page = page.replace(
+        "</head>",
+        `<link rel="alternate" type="text/markdown" href="${twinUrl}">\n</head>`,
+      );
     }
     if (page !== original) {
       await Bun.write(html, page);
@@ -639,31 +779,45 @@ const docs: Doc[] = [];
 for (const page of PAGES) {
   const html = await Bun.file(page.file).text();
   docs.push({
-    path: page.path, group: page.group,
-    title: titleOf(html), description: descriptionOf(html), body: markdown(html),
+    path: page.path,
+    group: page.group,
+    title: titleOf(html),
+    description: descriptionOf(html),
+    body: markdown(html),
   });
 }
 for (const project of PROJECTS) {
   const siblings = guides.filter((g) => g.project.key === project.key);
   docs.push({
-    path: docsUrl(project), group: `${project.name} docs`,
-    title: `${project.name} documentation`, description: project.blurb,
-    body: `# ${project.name} documentation\n\n${project.blurb}\n\n`
-      + `The Markdown in [the project repo](${project.repo}/tree/${project.branch}/docs) is the source of truth;\n`
-      + `these pages are generated from it.\n\n`
-      + siblings.map((g) => `- [${g.title}](${SITE}${mdPath(g.url)}): ${clip(g.intro, 160)}`).join("\n")
-      + "\n",
+    path: docsUrl(project),
+    group: `${project.name} docs`,
+    title: `${project.name} documentation`,
+    description: project.blurb,
+    body:
+      `# ${project.name} documentation\n\n${project.blurb}\n\n` +
+      `The Markdown in [the project repo](${project.repo}/tree/${project.branch}/docs) is the source of truth;\n` +
+      `these pages are generated from it.\n\n` +
+      siblings
+        .map((g) => `- [${g.title}](${SITE}${mdPath(g.url)}): ${clip(g.intro, 160)}`)
+        .join("\n") +
+      "\n",
   });
 }
 for (const guide of guides) {
   docs.push({
-    path: guide.url, group: `${guide.project.name} docs`,
-    title: guide.title, description: clip(guide.intro, 180), body: guide.markdown,
+    path: guide.url,
+    group: `${guide.project.name} docs`,
+    title: guide.title,
+    description: clip(guide.intro, 180),
+    body: guide.markdown,
   });
 }
 for (const p of posts) {
   docs.push({
-    path: `/blog/${p.slug}`, group: "Blog", title: p.title, description: p.description,
+    path: `/blog/${p.slug}`,
+    group: "Blog",
+    title: p.title,
+    description: p.description,
     body: `# ${p.title}\n\n*${readable(p.date)}*\n\n${p.md}\n`,
   });
 }
@@ -677,21 +831,37 @@ out.info(`${docs.length} twin(s)`);
 // One flat index for the ⌘K dialog: a guide contributes a row per heading, so
 // a result lands on the section that answers the question, not the page top.
 const searchIndex = [
-  ...guides.flatMap((guide) => guide.sections.map((section) => ({
-    u: `${guide.url}${section.id ? `#${section.id}` : ""}`,
-    t: section.heading,
-    g: section.id ? guide.title : `${guide.project.name} docs`,
-    p: guide.project.name,
-    x: section.text,
-  }))),
+  ...guides.flatMap((guide) =>
+    guide.sections.map((section) => ({
+      u: `${guide.url}${section.id ? `#${section.id}` : ""}`,
+      t: section.heading,
+      g: section.id ? guide.title : `${guide.project.name} docs`,
+      p: guide.project.name,
+      x: section.text,
+    })),
+  ),
   ...PAGES.map((page) => {
     const doc = docs.find((d) => d.path === page.path)!;
-    return { u: page.path, t: doc.title.replace(/[:|].*$/, "").trim(), g: "orochibraru", p: "", x: doc.description };
+    return {
+      u: page.path,
+      t: doc.title.replace(/[:|].*$/, "").trim(),
+      g: "orochibraru",
+      p: "",
+      x: doc.description,
+    };
   }),
-  ...posts.map((post) => ({ u: `/blog/${post.slug}`, t: post.title, g: "Blog", p: "", x: post.description })),
+  ...posts.map((post) => ({
+    u: `/blog/${post.slug}`,
+    t: post.title,
+    g: "Blog",
+    p: "",
+    x: post.description,
+  })),
 ];
 await Bun.write("dist/search.json", JSON.stringify(searchIndex));
-out.info(`search.json: ${searchIndex.length} row(s), ${Math.round(Bun.file("dist/search.json").size / 1024)}kB`);
+out.info(
+  `search.json: ${searchIndex.length} row(s), ${Math.round(Bun.file("dist/search.json").size / 1024)}kB`,
+);
 
 await out.time("write llms.txt", async () => {
   await Bun.write("dist/llms.txt", llmsIndex(docs));
@@ -710,7 +880,12 @@ await out.time("copy static assets", async () => {
     // a project whose guides have no screenshots has no images/ directory at all:
     // git doesn't carry empty ones, so a fresh clone hasn't got it either
     const images = `src/docs/${project.key}/images`;
-    if (await stat(images).then(() => true, () => false)) {
+    if (
+      await stat(images).then(
+        () => true,
+        () => false,
+      )
+    ) {
       await cp(images, `dist/${project.key}/docs/images`, { recursive: true });
       const count = [...new Glob("*.webp").scanSync(images)].length;
       copied.push(`${project.key}: ${count} screenshot(s)`);

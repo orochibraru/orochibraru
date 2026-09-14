@@ -27,7 +27,9 @@ const token = process.env.GITHUB_TOKEN;
 const headers = token ? { authorization: `Bearer ${token}` } : undefined;
 // Anonymous is 60 requests an hour, and a full sync spends one per file: worth
 // saying out loud, because the failure it causes is a 403 halfway through.
-out.info(token ? "authenticating with GITHUB_TOKEN" : "no GITHUB_TOKEN: anonymous, and rate-limited");
+out.info(
+  token ? "authenticating with GITHUB_TOKEN" : "no GITHUB_TOKEN: anonymous, and rate-limited",
+);
 
 const changed: string[] = [];
 const notes: string[] = [];
@@ -35,7 +37,9 @@ const failed: string[] = [];
 
 /** Write only if the bytes differ, so an unchanged sync makes no commit. */
 async function writeIfChanged(path: string, bytes: Uint8Array, label: string) {
-  const before = await Bun.file(path).bytes().catch(() => null);
+  const before = await Bun.file(path)
+    .bytes()
+    .catch(() => null);
   if (before && before.length === bytes.length && Buffer.from(before).equals(bytes)) return;
   await Bun.write(path, bytes);
   changed.push(`${before ? "updated" : "added  "} ${label}`);
@@ -49,16 +53,22 @@ async function listDocs(project: Project) {
   if (!response.ok) {
     const remaining = response.headers.get("x-ratelimit-remaining");
     const limit = remaining === "0" ? " (rate limit exhausted — set GITHUB_TOKEN)" : "";
-    throw new Error(`${project.key}: GitHub said ${response.status} ${response.statusText}${limit}`);
+    throw new Error(
+      `${project.key}: GitHub said ${response.status} ${response.statusText}${limit}`,
+    );
   }
 
   const { tree } = (await response.json()) as { tree: { path: string; type: string }[] };
   const files = tree.filter((entry) => entry.type === "blob").map((entry) => entry.path);
   return {
     guides: files
-      .filter((path) => path.startsWith("docs/") && path.endsWith(".md") && !path.endsWith("/README.md"))
+      .filter(
+        (path) => path.startsWith("docs/") && path.endsWith(".md") && !path.endsWith("/README.md"),
+      )
       .filter((path) => path.split("/").length === 2),
-    images: files.filter((path) => path.startsWith("docs/images/") && /\.(png|jpe?g|webp)$/.test(path)),
+    images: files.filter(
+      (path) => path.startsWith("docs/images/") && /\.(png|jpe?g|webp)$/.test(path),
+    ),
   };
 }
 
@@ -88,7 +98,9 @@ for (const project of PROJECTS) {
     failed.push(String(error));
     continue;
   }
-  out.info(`${project.key}: ${inventory.guides.length} guide(s), ${inventory.images.length} image(s) upstream`);
+  out.info(
+    `${project.key}: ${inventory.guides.length} guide(s), ${inventory.images.length} image(s) upstream`,
+  );
 
   const slugs: string[] = [];
   await out.time(`${project.key}: fetch guides`, async () => {
@@ -96,7 +108,11 @@ for (const project of PROJECTS) {
       const slug = path.slice("docs/".length).replace(/\.md$/, "");
       slugs.push(slug);
       try {
-        await writeIfChanged(`${directory}/${slug}.md`, await fetchBytes(project, path), `${project.key}/${slug}.md`);
+        await writeIfChanged(
+          `${directory}/${slug}.md`,
+          await fetchBytes(project, path),
+          `${project.key}/${slug}.md`,
+        );
       } catch (error) {
         out.fail(String(error));
         failed.push(String(error));
@@ -113,7 +129,16 @@ for (const project of PROJECTS) {
 
         const encoded = join(scratch, `${name}.webp`);
         const run = Bun.spawnSync([
-          "cwebp", "-quiet", "-q", String(QUALITY), "-resize", String(WIDTH), "0", original, "-o", encoded,
+          "cwebp",
+          "-quiet",
+          "-q",
+          String(QUALITY),
+          "-resize",
+          String(WIDTH),
+          "0",
+          original,
+          "-o",
+          encoded,
         ]);
         if (run.exitCode !== 0) throw new Error(`${path}: cwebp exited ${run.exitCode}`);
 
@@ -131,10 +156,12 @@ for (const project of PROJECTS) {
 
   // a guide that exists upstream but isn't in the sidebar, or the other way round
   for (const slug of slugs) {
-    if (!project.order.includes(slug)) notes.push(`${project.key}: ${slug} is not in its order[] — it will sort last`);
+    if (!project.order.includes(slug))
+      notes.push(`${project.key}: ${slug} is not in its order[] — it will sort last`);
   }
   for (const slug of project.order) {
-    if (!slugs.includes(slug)) notes.push(`${project.key}: order[] lists ${slug}, which upstream no longer has`);
+    if (!slugs.includes(slug))
+      notes.push(`${project.key}: order[] lists ${slug}, which upstream no longer has`);
   }
 
   // drop guides and images that upstream deleted
@@ -145,7 +172,9 @@ for (const project of PROJECTS) {
     changed.push(`removed  ${project.key}/${existing}`);
     out.detail(`removed ${project.key}/${existing}, gone upstream`);
   }
-  const keep = new Set(inventory.images.map((p) => `${p.slice("docs/images/".length).replace(/\.[a-z]+$/i, "")}.webp`));
+  const keep = new Set(
+    inventory.images.map((p) => `${p.slice("docs/images/".length).replace(/\.[a-z]+$/i, "")}.webp`),
+  );
   for (const existing of new Glob("*.webp").scanSync(`${directory}/images`)) {
     if (keep.has(existing)) continue;
     await rm(`${directory}/images/${existing}`);
@@ -165,8 +194,8 @@ if (failed.length) {
 }
 
 out.done(
-  `${PROJECTS.length} project(s) synced, ${changed.length} file(s) changed`
-    + (changed.length ? " — commit them" : ""),
+  `${PROJECTS.length} project(s) synced, ${changed.length} file(s) changed` +
+    (changed.length ? " — commit them" : ""),
 );
 
 process.exit(failed.length ? 1 : 0);

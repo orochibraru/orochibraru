@@ -8,6 +8,8 @@
     "lint": "tailwint",
     "lint:fix": "tailwint --fix",
     "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "audit": "bun run scripts/lighthouse.ts",
     "docs": "bun run scripts/docs.ts"
   },
@@ -17,6 +19,7 @@
     "bun-plugin-tailwind": "^0.1.2",
     "htmlhint": "^1.9.2",
     "lighthouse": "^13.4.1",
+    "prettier": "^3.9.6",
     "tailwindcss": "^4.3.3",
     "tailwint": "^1.1.15",
     "typescript": "^7.0.2"

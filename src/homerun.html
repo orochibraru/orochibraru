@@ -1,119 +1,372 @@
 <!doctype html>
 <html lang="en">
-<head>
-<!--#include head.html -->
-<title>Homerun: a free self-hosted PaaS, a Dokploy and Coolify alternative</title>
-<meta name="description" content="Homerun is a free, self-hosted single-host PaaS and a Dokploy, Coolify, Dokku and Cloud Run alternative: deploy Docker images or git repos from a form, get TLS routing via Traefik. Nothing paywalled.">
-<meta name="keywords" content="Dokploy alternative, Coolify alternative, Dokku alternative, CapRover alternative, Google Cloud Run alternative, Google Cloud alternative, AWS alternative, AWS Elastic Beanstalk alternative, AWS App Runner alternative, Heroku alternative, Vercel alternative, Netlify alternative, Render alternative, Railway alternative, Fly.io alternative, DigitalOcean App Platform alternative, Easypanel alternative, Portainer alternative, Kubernetes alternative, Docker Swarm PaaS, self-hosted PaaS, open source PaaS, homelab deployment, Traefik, single host PaaS">
-<link rel="canonical" href="https://orochibraru.com/homerun">
-<meta property="og:url" content="https://orochibraru.com/homerun">
-<meta property="og:title" content="Homerun: a free self-hosted PaaS, a Dokploy and Coolify alternative">
-<meta property="og:description" content="Homerun is a free, self-hosted single-host PaaS and a Dokploy, Coolify, Dokku and Cloud Run alternative: deploy Docker images or git repos from a form, get TLS routing via Traefik. Nothing paywalled.">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Homerun",
-"applicationCategory":"DeveloperApplication","applicationSubCategory":"Platform as a Service",
-"operatingSystem":"Linux, Docker",
-"description":"Homerun is a free, self-hosted single-host PaaS and a Dokploy, Coolify, Dokku and Cloud Run alternative: deploy Docker images or git repos from a form, get TLS routing via Traefik. Nothing paywalled.","url":"https://orochibraru.com/homerun",
-"softwareHelp":"https://orochibraru.com/homerun/docs",
-"isAccessibleForFree":true,
-"keywords":"Dokploy alternative, Coolify alternative, Dokku alternative, CapRover alternative, Cloud Run alternative, AWS alternative, Heroku alternative, self-hosted PaaS, homelab deploys",
-"featureList":["Deploy any Docker image or build from a git repository Dockerfile","Live streamed deploy progress that survives a page reload","Deployment history with logs and image digests","Projects grouping services on a shared Docker network","One-click templates for Redis, Postgres, MySQL, MongoDB and more","docker-compose.yaml import","Automatic connection URLs between linked services","Container logs and an in-browser web terminal","Traefik TLS routing, custom domains and bring-your-own certificates","Remote build servers over TCP, SSH or the Homerun Agent","Optional Docker Swarm mode for replica scaling","Scheduled jobs, auto-redeploy and S3 volume backups","REST API with OpenAPI and a CLI","Users, roles, invites and OAuth/OIDC login","Cloudflare and Pangolin DNS automation"],
-"codeRepository":"https://github.com/orochibraru/homerun",
-"sameAs":["https://hub.docker.com/r/orochibraru/homerun"],
-"author":{"@id":"https://orochibraru.com/#person"},
-"offers":{"@type":"Offer","price":"0","priceCurrency":"USD","availability":"https://schema.org/InStock"}}
-</script>
-<!--#include breadcrumb.html name="Homerun" path="/homerun" -->
-</head>
-<body>
-<!--#include header.html source="https://github.com/orochibraru/homerun" sourceLabel="Source" -->
-<main class="mx-auto max-w-page px-6">
-<article class="prose">
-<div class="pt-10 pb-5">
-  <a class="text-xs uppercase tracking-widest text-dim hover:text-acid" href="/#projects">&larr; All projects</a>
-  <span class="tag ml-3.5">Deploys &middot; Self-hosted PaaS</span>
-  <h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">Homerun</h1>
-  <p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">A single-host PaaS for your own hardware. Point it at an image or a git repo, fill in the form, hit deploy. Traefik puts it on <code>slug.yourdomain.com</code> with TLS. No Kubernetes. No control plane. No pricing page.</p>
-  <div class="mt-6.5 flex flex-wrap gap-2.5"><a class="btn btn-primary" href="/homerun/docs">Read the docs</a>
-   <a class="btn" href="https://github.com/orochibraru/homerun" rel="noopener">Source on GitHub</a>
-   <a class="btn" href="/homerun/docs/faq-and-limitations" rel="noopener">FAQ &amp; limitations</a></div>
-</div>
-<section class="mb-22.5">
-  <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Why it exists</h2>
-  <p>Coolify carries a lot of tech debt and a matching pile of bugs. Dokploy started moving features
-  homelabbers relied on behind an enterprise plan. Both are fine projects; neither is what I wanted
-  running on my one box at home.</p>
-  <p class="mt-5">So Homerun is deliberately small: <strong>one host, the local Docker socket, one user.</strong>
-  No multi-node orchestration to babysit, no cluster to explain to yourself at 3am. Everything it does,
-  it does for free.</p>
-</section>
+  <head>
+    <!--#include head.html -->
+    <title>Homerun: a free self-hosted PaaS, a Dokploy and Coolify alternative</title>
+    <meta
+      name="description"
+      content="Homerun is a free, self-hosted single-host PaaS and a Dokploy, Coolify, Dokku and Cloud Run alternative: deploy Docker images or git repos from a form, get TLS routing via Traefik. Nothing paywalled."
+    />
+    <meta
+      name="keywords"
+      content="Dokploy alternative, Coolify alternative, Dokku alternative, CapRover alternative, Google Cloud Run alternative, Google Cloud alternative, AWS alternative, AWS Elastic Beanstalk alternative, AWS App Runner alternative, Heroku alternative, Vercel alternative, Netlify alternative, Render alternative, Railway alternative, Fly.io alternative, DigitalOcean App Platform alternative, Easypanel alternative, Portainer alternative, Kubernetes alternative, Docker Swarm PaaS, self-hosted PaaS, open source PaaS, homelab deployment, Traefik, single host PaaS"
+    />
+    <link rel="canonical" href="https://orochibraru.com/homerun" />
+    <meta property="og:url" content="https://orochibraru.com/homerun" />
+    <meta
+      property="og:title"
+      content="Homerun: a free self-hosted PaaS, a Dokploy and Coolify alternative"
+    />
+    <meta
+      property="og:description"
+      content="Homerun is a free, self-hosted single-host PaaS and a Dokploy, Coolify, Dokku and Cloud Run alternative: deploy Docker images or git repos from a form, get TLS routing via Traefik. Nothing paywalled."
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Homerun",
+        "applicationCategory": "DeveloperApplication",
+        "applicationSubCategory": "Platform as a Service",
+        "operatingSystem": "Linux, Docker",
+        "description": "Homerun is a free, self-hosted single-host PaaS and a Dokploy, Coolify, Dokku and Cloud Run alternative: deploy Docker images or git repos from a form, get TLS routing via Traefik. Nothing paywalled.",
+        "url": "https://orochibraru.com/homerun",
+        "softwareHelp": "https://orochibraru.com/homerun/docs",
+        "isAccessibleForFree": true,
+        "keywords": "Dokploy alternative, Coolify alternative, Dokku alternative, CapRover alternative, Cloud Run alternative, AWS alternative, Heroku alternative, self-hosted PaaS, homelab deploys",
+        "featureList": [
+          "Deploy any Docker image or build from a git repository Dockerfile",
+          "Live streamed deploy progress that survives a page reload",
+          "Deployment history with logs and image digests",
+          "Projects grouping services on a shared Docker network",
+          "One-click templates for Redis, Postgres, MySQL, MongoDB and more",
+          "docker-compose.yaml import",
+          "Automatic connection URLs between linked services",
+          "Container logs and an in-browser web terminal",
+          "Traefik TLS routing, custom domains and bring-your-own certificates",
+          "Remote build servers over TCP, SSH or the Homerun Agent",
+          "Optional Docker Swarm mode for replica scaling",
+          "Scheduled jobs, auto-redeploy and S3 volume backups",
+          "REST API with OpenAPI and a CLI",
+          "Users, roles, invites and OAuth/OIDC login",
+          "Cloudflare and Pangolin DNS automation"
+        ],
+        "codeRepository": "https://github.com/orochibraru/homerun",
+        "sameAs": ["https://hub.docker.com/r/orochibraru/homerun"],
+        "author": { "@id": "https://orochibraru.com/#person" },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        }
+      }
+    </script>
+    <!--#include breadcrumb.html name="Homerun" path="/homerun" -->
+  </head>
+  <body>
+    <!--#include header.html source="https://github.com/orochibraru/homerun" sourceLabel="Source" -->
+    <main class="mx-auto max-w-page px-6">
+      <article class="prose">
+        <div class="pt-10 pb-5">
+          <a class="text-xs uppercase tracking-widest text-dim hover:text-acid" href="/#projects"
+            >&larr; All projects</a
+          >
+          <span class="tag ml-3.5">Deploys &middot; Self-hosted PaaS</span>
+          <h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">
+            Homerun
+          </h1>
+          <p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">
+            A single-host PaaS for your own hardware. Point it at an image or a git repo, fill in
+            the form, hit deploy. Traefik puts it on <code>slug.yourdomain.com</code> with TLS. No
+            Kubernetes. No control plane. No pricing page.
+          </p>
+          <div class="mt-6.5 flex flex-wrap gap-2.5">
+            <a class="btn btn-primary" href="/homerun/docs">Read the docs</a>
+            <a class="btn" href="https://github.com/orochibraru/homerun" rel="noopener"
+              >Source on GitHub</a
+            >
+            <a class="btn" href="/homerun/docs/faq-and-limitations" rel="noopener"
+              >FAQ &amp; limitations</a
+            >
+          </div>
+        </div>
+        <section class="mb-22.5">
+          <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Why it exists</h2>
+          <p>
+            Coolify carries a lot of tech debt and a matching pile of bugs. Dokploy started moving
+            features homelabbers relied on behind an enterprise plan. Both are fine projects;
+            neither is what I wanted running on my one box at home.
+          </p>
+          <p class="mt-5">
+            So Homerun is deliberately small:
+            <strong>one host, the local Docker socket, one user.</strong> No multi-node
+            orchestration to babysit, no cluster to explain to yourself at 3am. Everything it does,
+            it does for free.
+          </p>
+        </section>
 
-<section class="mb-22.5">
-  <div class="mb-7 flex items-baseline gap-4">
-    <h2 class="text-2xl font-bold tracking-[-.02em]">Features</h2>
-    <div class="h-px flex-1 bg-line"></div>
-  </div>
-  <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Image or git deploys</h3><p>Any Docker image, or build from a git repo&rsquo;s Dockerfile, including your self-hosted Gitea. Env vars, CPU/memory limits, restart policy, private registry auth.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Live deploy progress</h3><p>Pull, build, create and start streamed to the browser in real time, and it resumes correctly if you reload mid-deploy.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Deployment history</h3><p>Every attempt recorded with status, image digest and its full log.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Projects</h3><p>Group services on one Docker network so they reach each other by slug, like <code>http://api:8080</code>.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Templates</h3><p>One-click Redis, Postgres, MySQL, MongoDB, Adminer, Uptime Kuma, n8n and Vaultwarden, or save your own config as a template.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Compose import</h3><p>Paste a <code>docker-compose.yaml</code> and get services, volumes and dependency order, with a preview of whatever doesn&rsquo;t map.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Smart service links</h3><p>Point a new service at an existing Postgres, MySQL, Redis, Mongo or RabbitMQ and the connection URL fills itself in.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Logs &amp; web terminal</h3><p>Tail stdout/stderr or open an interactive shell into a running container, from the browser.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Domains &amp; SSL</h3><p>A second hostname per service, plus bring-your-own cert and key for domains outside Traefik&rsquo;s ACME coverage.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Build servers</h3><p>Build on another Docker daemon over <code>tcp://</code> or <code>ssh://</code>, or via the lightweight Homerun Agent.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Swarm mode</h3><p>Opt in to Docker Swarm for real replica scaling and load balancing, instead of the default single-container model.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Storage volumes</h3><p>Define bind-mounts or Docker-managed volumes once, mount them into as many services as you like.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Scheduled jobs &amp; S3 backups</h3><p>Cron-style auto-redeploy per service, standalone cron jobs with their own run history, and scheduled volume backups to any S3-compatible endpoint.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">REST API, OpenAPI &amp; a CLI</h3><p>Everything the UI does is a typed JSON API at <code>/api/v1</code>, with live Swagger UI and a <code>homerun</code> CLI built against the generated types.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Users, roles &amp; invites</h3><p>Admin and developer roles, email or direct-create invites, and optional OAuth/OIDC login.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Per-service auth gate</h3><p>Optionally require a Homerun login to reach a deployed service. Every container is labelled <code>homerun.managed=true</code>, so it never touches anything it didn&rsquo;t create.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">DNS automation</h3><p>Optional Cloudflare or self-hosted Pangolin integration manages a deployed service&rsquo;s DNS record for you.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Docker cleanup</h3><p>Admin-only host-wide <code>docker system df</code> and prune from the dashboard, with a preview before anything is removed.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Search, filters &amp; bulk actions</h3><p>Server-side search, filters and paging on every list page, plus multi-select start/stop/restart/delete with a typed confirmation before anything destructive runs.</p></div>
-  </div>
-</section>
+        <section class="mb-22.5">
+          <div class="mb-7 flex items-baseline gap-4">
+            <h2 class="text-2xl font-bold tracking-[-.02em]">Features</h2>
+            <div class="h-px flex-1 bg-line"></div>
+          </div>
+          <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Image or git deploys</h3>
+              <p>
+                Any Docker image, or build from a git repo&rsquo;s Dockerfile, including your
+                self-hosted Gitea. Env vars, CPU/memory limits, restart policy, private registry
+                auth.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Live deploy progress</h3>
+              <p>
+                Pull, build, create and start streamed to the browser in real time, and it resumes
+                correctly if you reload mid-deploy.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Deployment history</h3>
+              <p>Every attempt recorded with status, image digest and its full log.</p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Projects</h3>
+              <p>
+                Group services on one Docker network so they reach each other by slug, like
+                <code>http://api:8080</code>.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Templates</h3>
+              <p>
+                One-click Redis, Postgres, MySQL, MongoDB, Adminer, Uptime Kuma, n8n and
+                Vaultwarden, or save your own config as a template.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Compose import</h3>
+              <p>
+                Paste a <code>docker-compose.yaml</code> and get services, volumes and dependency
+                order, with a preview of whatever doesn&rsquo;t map.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Smart service links</h3>
+              <p>
+                Point a new service at an existing Postgres, MySQL, Redis, Mongo or RabbitMQ and the
+                connection URL fills itself in.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Logs &amp; web terminal</h3>
+              <p>
+                Tail stdout/stderr or open an interactive shell into a running container, from the
+                browser.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Domains &amp; SSL</h3>
+              <p>
+                A second hostname per service, plus bring-your-own cert and key for domains outside
+                Traefik&rsquo;s ACME coverage.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Build servers</h3>
+              <p>
+                Build on another Docker daemon over <code>tcp://</code> or <code>ssh://</code>, or
+                via the lightweight Homerun Agent.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Swarm mode</h3>
+              <p>
+                Opt in to Docker Swarm for real replica scaling and load balancing, instead of the
+                default single-container model.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Storage volumes</h3>
+              <p>
+                Define bind-mounts or Docker-managed volumes once, mount them into as many services
+                as you like.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">
+                Scheduled jobs &amp; S3 backups
+              </h3>
+              <p>
+                Cron-style auto-redeploy per service, standalone cron jobs with their own run
+                history, and scheduled volume backups to any S3-compatible endpoint.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">
+                REST API, OpenAPI &amp; a CLI
+              </h3>
+              <p>
+                Everything the UI does is a typed JSON API at <code>/api/v1</code>, with live
+                Swagger UI and a <code>homerun</code> CLI built against the generated types.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">
+                Users, roles &amp; invites
+              </h3>
+              <p>
+                Admin and developer roles, email or direct-create invites, and optional OAuth/OIDC
+                login.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Per-service auth gate</h3>
+              <p>
+                Optionally require a Homerun login to reach a deployed service. Every container is
+                labelled <code>homerun.managed=true</code>, so it never touches anything it
+                didn&rsquo;t create.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">DNS automation</h3>
+              <p>
+                Optional Cloudflare or self-hosted Pangolin integration manages a deployed
+                service&rsquo;s DNS record for you.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Docker cleanup</h3>
+              <p>
+                Admin-only host-wide <code>docker system df</code> and prune from the dashboard,
+                with a preview before anything is removed.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">
+                Search, filters &amp; bulk actions
+              </h3>
+              <p>
+                Server-side search, filters and paging on every list page, plus multi-select
+                start/stop/restart/delete with a typed confirmation before anything destructive
+                runs.
+              </p>
+            </div>
+          </div>
+        </section>
 
-<section id="alternatives" class="mb-22.5">
-  <div class="mb-7 flex items-baseline gap-4">
-    <h2 class="text-2xl font-bold tracking-[-.02em]">An alternative to what, exactly</h2>
-    <div class="h-px flex-1 bg-line"></div>
-  </div>
-  <p class="mb-7">People arrive here from a specific frustration, usually a bill or a bug. So here is where
-  Homerun sits against the things it gets compared to, including where it loses.</p>
-  <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Dokploy alternative</h3><p>Dokploy started moving features homelabbers relied on behind an enterprise plan. Homerun has no plan to move anything behind: remote build servers, S3 backups, roles and invites, the API and the CLI all ship in the one image.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Coolify alternative</h3><p>Coolify does far more than this &mdash; and carries the tech debt and bug count of doing far more than this. Homerun is deliberately one host, one Docker socket, a small surface you can actually read.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Dokku &amp; CapRover alternative</h3><p>Dokku is a git push and an SSH session; CapRover is captain-definition files. Homerun is a form in a browser with live build logs, a compose importer and a web terminal, on the same one box.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Google Cloud Run alternative</h3><p>Container in, URL with TLS out, which is the part of Cloud Run most people actually use. No scale-to-zero, no regions, no per-request billing, no console with nine nested menus.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">AWS alternative</h3><p>If ECS, App Runner or Elastic Beanstalk is running three side projects and an invoice you don&rsquo;t read, this replaces it with one machine you own. If you need IAM, autoscaling groups and multi-region failover, it very much does not.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Heroku, Render, Railway &amp; Fly.io alternative</h3><p>The same deploy-a-repo ergonomics, minus the seat pricing, the sleeping dynos and the usage meter. Your build time costs electricity, not credits.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Portainer alternative</h3><p>Portainer manages containers that already exist. Homerun builds them, routes them, gives them TLS certificates and redeploys them on a schedule &mdash; and labels everything <code>homerun.managed=true</code> so it never touches what it didn&rsquo;t create.</p></div>
-    <div class="feat"><h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Kubernetes alternative</h3><p>No control plane, no YAML dialect, no 3am cluster archaeology. Opt into Docker Swarm if you want real replica scaling; otherwise it is one container per service and that is the whole model.</p></div>
-  </div>
-  <p class="mt-7 text-[.85rem]">Since we&rsquo;re being honest about search: people get here looking for a
-  <em>Dokploy alternative</em>, <em>Coolify alternative</em>, <em>Dokku alternative</em>,
-  <em>CapRover alternative</em>, <em>Cloud Run alternative</em>, <em>Google Cloud alternative</em>,
-  <em>AWS alternative</em>, <em>Heroku alternative</em>, <em>Vercel alternative</em>,
-  <em>Netlify alternative</em>, <em>Render alternative</em>, <em>Railway alternative</em>,
-  <em>Fly.io alternative</em>, <em>DigitalOcean App Platform alternative</em>,
-  <em>Easypanel alternative</em>, <em>Portainer alternative</em> or a <em>Kubernetes alternative</em>
-  for one box. That is the list. It is a self-hosted PaaS, and it is free.</p>
-</section>
+        <section id="alternatives" class="mb-22.5">
+          <div class="mb-7 flex items-baseline gap-4">
+            <h2 class="text-2xl font-bold tracking-[-.02em]">An alternative to what, exactly</h2>
+            <div class="h-px flex-1 bg-line"></div>
+          </div>
+          <p class="mb-7">
+            People arrive here from a specific frustration, usually a bill or a bug. So here is
+            where Homerun sits against the things it gets compared to, including where it loses.
+          </p>
+          <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Dokploy alternative</h3>
+              <p>
+                Dokploy started moving features homelabbers relied on behind an enterprise plan.
+                Homerun has no plan to move anything behind: remote build servers, S3 backups, roles
+                and invites, the API and the CLI all ship in the one image.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Coolify alternative</h3>
+              <p>
+                Coolify does far more than this &mdash; and carries the tech debt and bug count of
+                doing far more than this. Homerun is deliberately one host, one Docker socket, a
+                small surface you can actually read.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">
+                Dokku &amp; CapRover alternative
+              </h3>
+              <p>
+                Dokku is a git push and an SSH session; CapRover is captain-definition files.
+                Homerun is a form in a browser with live build logs, a compose importer and a web
+                terminal, on the same one box.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">
+                Google Cloud Run alternative
+              </h3>
+              <p>
+                Container in, URL with TLS out, which is the part of Cloud Run most people actually
+                use. No scale-to-zero, no regions, no per-request billing, no console with nine
+                nested menus.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">AWS alternative</h3>
+              <p>
+                If ECS, App Runner or Elastic Beanstalk is running three side projects and an
+                invoice you don&rsquo;t read, this replaces it with one machine you own. If you need
+                IAM, autoscaling groups and multi-region failover, it very much does not.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">
+                Heroku, Render, Railway &amp; Fly.io alternative
+              </h3>
+              <p>
+                The same deploy-a-repo ergonomics, minus the seat pricing, the sleeping dynos and
+                the usage meter. Your build time costs electricity, not credits.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Portainer alternative</h3>
+              <p>
+                Portainer manages containers that already exist. Homerun builds them, routes them,
+                gives them TLS certificates and redeploys them on a schedule &mdash; and labels
+                everything <code>homerun.managed=true</code> so it never touches what it
+                didn&rsquo;t create.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Kubernetes alternative</h3>
+              <p>
+                No control plane, no YAML dialect, no 3am cluster archaeology. Opt into Docker Swarm
+                if you want real replica scaling; otherwise it is one container per service and that
+                is the whole model.
+              </p>
+            </div>
+          </div>
+          <p class="mt-7 text-[.85rem]">
+            Since we&rsquo;re being honest about search: people get here looking for a
+            <em>Dokploy alternative</em>, <em>Coolify alternative</em>, <em>Dokku alternative</em>,
+            <em>CapRover alternative</em>, <em>Cloud Run alternative</em>,
+            <em>Google Cloud alternative</em>, <em>AWS alternative</em>,
+            <em>Heroku alternative</em>, <em>Vercel alternative</em>, <em>Netlify alternative</em>,
+            <em>Render alternative</em>, <em>Railway alternative</em>, <em>Fly.io alternative</em>,
+            <em>DigitalOcean App Platform alternative</em>, <em>Easypanel alternative</em>,
+            <em>Portainer alternative</em> or a <em>Kubernetes alternative</em> for one box. That is
+            the list. It is a self-hosted PaaS, and it is free.
+          </p>
+        </section>
 
-<section class="mb-22.5">
-  <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Run it</h2>
-<p class="mb-3 text-xs uppercase tracking-widest text-dim">One-liner, fresh Linux server</p>
-<pre>curl -fsSL https://raw.githubusercontent.com/orochibraru/homerun/main/packages/installer/bootstrap.sh \
+        <section class="mb-22.5">
+          <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Run it</h2>
+          <p class="mb-3 text-xs uppercase tracking-widest text-dim">
+            One-liner, fresh Linux server
+          </p>
+          <pre>
+curl -fsSL https://raw.githubusercontent.com/orochibraru/homerun/main/packages/installer/bootstrap.sh \
   | sudo bash -s -- --mode=full --domain=homerun.example.com</pre>
-  <p class="mt-5">That installs Docker Engine, sets up a dedicated <strong>rootless</strong> Docker user so nothing
-  it deploys runs as root, writes a compose file, and brings up Traefik, Postgres and the app from published images.
-  Pass <code>--dry-run</code> first on a box that matters. Use <code>--mode=agent</code> if this host is only going
-  to be a remote build server for another instance.</p>
-<p class="mt-8 mb-3 text-xs uppercase tracking-widest text-dim">Docker Compose</p>
-<pre><span class="c"># already have Docker set up your way? just take the stack</span>
+          <p class="mt-5">
+            That installs Docker Engine, sets up a dedicated <strong>rootless</strong> Docker user
+            so nothing it deploys runs as root, writes a compose file, and brings up Traefik,
+            Postgres and the app from published images. Pass <code>--dry-run</code> first on a box
+            that matters. Use <code>--mode=agent</code> if this host is only going to be a remote
+            build server for another instance.
+          </p>
+          <p class="mt-8 mb-3 text-xs uppercase tracking-widest text-dim">Docker Compose</p>
+          <pre><span class="c"># already have Docker set up your way? just take the stack</span>
 curl -fsSLO https://raw.githubusercontent.com/orochibraru/homerun/main/compose.prod.yaml
 curl -fsSLO https://raw.githubusercontent.com/orochibraru/homerun/main/.env.example
 curl -fsSL https://raw.githubusercontent.com/orochibraru/homerun/main/homerun.example.yaml -o homerun.yaml
@@ -121,23 +374,31 @@ curl -fsSL https://raw.githubusercontent.com/orochibraru/homerun/main/homerun.ex
 mv .env.example .env    <span class="c"># set AUTH_SECRET at minimum</span>
 docker network create homerun
 docker compose -f compose.prod.yaml up -d</pre>
-  <p class="mt-5"><code>compose.prod.yaml</code> is self-contained and pulls Traefik, Postgres and the app from
-  published images. No installer, no rootless setup, no source checkout. Set <code>ORIGIN</code> to the address you
-  will actually reach the dashboard at: it is never <code>localhost</code>, or the first sign-up fails with an
-  invalid origin from any browser that is not on the box.</p>
-  <p class="mt-5">Both paths are covered properly in the
-  <a href="/homerun/docs/getting-started" rel="noopener">getting started guide</a>.</p>
-</section>
+          <p class="mt-5">
+            <code>compose.prod.yaml</code> is self-contained and pulls Traefik, Postgres and the app
+            from published images. No installer, no rootless setup, no source checkout. Set
+            <code>ORIGIN</code> to the address you will actually reach the dashboard at: it is never
+            <code>localhost</code>, or the first sign-up fails with an invalid origin from any
+            browser that is not on the box.
+          </p>
+          <p class="mt-5">
+            Both paths are covered properly in the
+            <a href="/homerun/docs/getting-started" rel="noopener">getting started guide</a>.
+          </p>
+        </section>
 
-<section class="mb-22.5">
-  <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Status</h2>
-  <p>Actively developed and running on real hardware, but still finding its shape. What&rsquo;s solid and
-  what isn&rsquo;t is written down honestly in
-  <a href="/homerun/docs/faq-and-limitations" rel="noopener">the FAQ and limitations doc</a>.
-  Read it before you point production at it.</p>
-</section>
-</article>
-</main>
-<!--#include footer.html -->
-</body>
+        <section class="mb-22.5">
+          <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Status</h2>
+          <p>
+            Actively developed and running on real hardware, but still finding its shape.
+            What&rsquo;s solid and what isn&rsquo;t is written down honestly in
+            <a href="/homerun/docs/faq-and-limitations" rel="noopener"
+              >the FAQ and limitations doc</a
+            >. Read it before you point production at it.
+          </p>
+        </section>
+      </article>
+    </main>
+    <!--#include footer.html -->
+  </body>
 </html>

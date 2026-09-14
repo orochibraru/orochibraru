@@ -23,6 +23,15 @@ repos:
 
   - repo: local
     hooks:
+      # Formatting first, so the linters below judge the file as it will land.
+      # --ignore-unknown lets it take every staged path and skip the ones it has
+      # no parser for; .prettierignore keeps it off the generated pages.
+      - id: prettier
+        name: prettier
+        entry: bun run prettier --write --ignore-unknown
+        language: system
+        types: [text]
+
       # Pages get htmlhint's stock rules. The fragments in src/_partials can't
       # pass those — no doctype, no <title> — which is the point of a fragment,
       # so they are linted separately against a ruleset with those two dropped.

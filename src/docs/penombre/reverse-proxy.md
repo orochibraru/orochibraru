@@ -134,8 +134,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test:
-        [
+      test: [
           CMD-SHELL,
           "sh -c 'pg_isready -U ${POSTGRES_USER-postgres} -d
           ${POSTGRES_DB-penombre}'",

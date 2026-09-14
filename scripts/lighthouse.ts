@@ -18,7 +18,10 @@ const FLOOR: Record<string, number> = {
   seo: 1,
 };
 
-const rebuild = Bun.spawnSync(["bun", "run", "scripts/build.ts"], { stdout: "inherit", stderr: "inherit" });
+const rebuild = Bun.spawnSync(["bun", "run", "scripts/build.ts"], {
+  stdout: "inherit",
+  stderr: "inherit",
+});
 if (rebuild.exitCode !== 0) {
   out.fail(`build failed (exit ${rebuild.exitCode}): nothing to audit`);
   process.exit(1);
@@ -26,7 +29,13 @@ if (rebuild.exitCode !== 0) {
 
 /** The routes nginx would serve, worked out from what the build produced. */
 const built = [...new Glob("dist/**/*.html").scanSync(".")]
-  .map((f) => f.slice("dist".length).replace(/\.html$/, "").replace(/\/index$/, "") || "/")
+  .map(
+    (f) =>
+      f
+        .slice("dist".length)
+        .replace(/\.html$/, "")
+        .replace(/\/index$/, "") || "/",
+  )
   .filter((route) => route !== "/404")
   .sort();
 
@@ -48,12 +57,17 @@ const server = Bun.serve({
   port: PORT,
   async fetch(request) {
     const { pathname } = new URL(request.url);
-    for (const candidate of [`dist${pathname}`, `dist${pathname}.html`, `dist${pathname}/index.html`]) {
+    for (const candidate of [
+      `dist${pathname}`,
+      `dist${pathname}.html`,
+      `dist${pathname}/index.html`,
+    ]) {
       const file = Bun.file(candidate);
       if (!(await file.exists())) continue;
 
       const headers = new Headers({ "content-type": file.type });
-      if (CACHED.test(candidate)) headers.set("cache-control", "public, max-age=2592000, immutable");
+      if (CACHED.test(candidate))
+        headers.set("cache-control", "public, max-age=2592000, immutable");
 
       if (/^(text|application\/(json|xml|rss))/.test(file.type)) {
         headers.set("content-encoding", "gzip");
@@ -66,18 +80,32 @@ const server = Bun.serve({
 });
 
 type Audit = { title: string; score: number | null; scoreDisplayMode: string };
-type Report = { categories: Record<string, { score: number | null }>; audits: Record<string, Audit> };
+type Report = {
+  categories: Record<string, { score: number | null }>;
+  audits: Record<string, Audit>;
+};
 
 async function audit(route: string): Promise<Report> {
-  const run = Bun.spawn([
-    "bun", "x", "lighthouse", `http://localhost:${PORT}${route}`,
-    "--quiet", "--output=json", "--output-path=stdout",
-    "--chrome-flags=--headless=new --no-sandbox --disable-gpu",
-  ], { stdout: "pipe", stderr: "pipe" });
+  const run = Bun.spawn(
+    [
+      "bun",
+      "x",
+      "lighthouse",
+      `http://localhost:${PORT}${route}`,
+      "--quiet",
+      "--output=json",
+      "--output-path=stdout",
+      "--chrome-flags=--headless=new --no-sandbox --disable-gpu",
+    ],
+    { stdout: "pipe", stderr: "pipe" },
+  );
 
   const [stdout] = await Promise.all([new Response(run.stdout).text(), run.exited]);
   const json = stdout.slice(stdout.indexOf("{")); // lighthouse prints a banner first
-  if (!json) throw new Error(`${route}: lighthouse produced nothing\n${await new Response(run.stderr).text()}`);
+  if (!json)
+    throw new Error(
+      `${route}: lighthouse produced nothing\n${await new Response(run.stderr).text()}`,
+    );
 
   const report = JSON.parse(json) as Report & { runtimeError?: { message: string } };
   if (report.runtimeError) throw new Error(`${route}: ${report.runtimeError.message}`);
@@ -93,7 +121,9 @@ const insights: string[] = []; // Lighthouse 13's advisory diagnostics, not pass
 
 out.info(`each page is a full Chrome run: about 5s apiece, ${routes.length} to go`);
 console.log(`\nauditing ${routes.length} page(s)\n`);
-console.log(`${pad("page", 26)} ${["perf", "a11y", "best", "seo"].map((c) => c.padStart(4)).join(" ")}`);
+console.log(
+  `${pad("page", 26)} ${["perf", "a11y", "best", "seo"].map((c) => c.padStart(4)).join(" ")}`,
+);
 
 let done = 0;
 for (const route of routes) {
@@ -107,7 +137,9 @@ for (const route of routes) {
     if (score < (FLOOR[id] ?? 1)) failed = true;
     return `${Math.round(score * 100)}`.padStart(4);
   });
-  console.log(`${pad(route, 26)} ${scores.join(" ")}  ${dim(`${done}/${routes.length}  ${ms(performance.now() - at)}`)}`);
+  console.log(
+    `${pad(route, 26)} ${scores.join(" ")}  ${dim(`${done}/${routes.length}  ${ms(performance.now() - at)}`)}`,
+  );
 
   for (const [id, a] of Object.entries(report.audits)) {
     if (a.score === null || a.score >= 1) continue;
@@ -127,7 +159,8 @@ list("insights (advisory)", insights);
 
 server.stop(true);
 
-if (failed) out.fail(`${routes.length} page(s) audited — below the floor, see the failed audits above`);
+if (failed)
+  out.fail(`${routes.length} page(s) audited — below the floor, see the failed audits above`);
 else out.done(`${routes.length} page(s) audited, all above the floor`);
 
 process.exit(failed ? 1 : 0);

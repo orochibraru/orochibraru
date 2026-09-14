@@ -26,7 +26,8 @@ function build(reason?: string) {
 
   // Not fatal: the last good dist/ is still on disk and still being served, so
   // fix the file and save again rather than restarting.
-  if (run.exitCode !== 0) out.fail(`build failed (exit ${run.exitCode}) — serving the last good build`);
+  if (run.exitCode !== 0)
+    out.fail(`build failed (exit ${run.exitCode}) — serving the last good build`);
 }
 
 build();
@@ -70,7 +71,8 @@ watch("src", { recursive: true }, (_event, file) => {
     // One save often fires several events; report the batch, not each event.
     const changed = [...pending];
     pending = new Set();
-    const reason = changed.length === 1 ? `${changed[0]} changed` : `${changed.length} files changed`;
+    const reason =
+      changed.length === 1 ? `${changed[0]} changed` : `${changed.length} files changed`;
     for (const name of changed) out.detail(`changed ${name}`);
     build(reason);
   }, 50);

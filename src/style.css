@@ -15,7 +15,7 @@
 @theme {
   --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
-  --container-page: 96rem;   /* the one page-width knob: max-w-page */
+  --container-page: 96rem; /* the one page-width knob: max-w-page */
 
   --color-bg: #f4f5f7;
   --color-surface: #ffffff;
@@ -23,18 +23,22 @@
   --color-edge: #c6ccd6;
   --color-fg: #0a0c10;
   --color-dim: #5a6272;
-  --color-acid: #3f7400;   /* accent for text/borders: contrast-safe */
-  --color-neon: #a8f000;   /* raw lime, only ever used as a fill */
+  --color-acid: #3f7400; /* accent for text/borders: contrast-safe */
+  --color-neon: #a8f000; /* raw lime, only ever used as a fill */
   --color-onneon: #0a0c10;
   --color-plasma: #b3006e;
-  --color-cyan: #0a6f8a;  /* darkened from #0b7f9e: that was 4.24:1 on --color-bg */
+  --color-cyan: #0a6f8a; /* darkened from #0b7f9e: that was 4.24:1 on --color-bg */
 
   --glow-1: rgba(168, 240, 0, 0.26);
   --glow-2: rgba(255, 46, 168, 0.14);
   --grid-op: 0.9;
 
   --animate-marquee: marquee 32s linear infinite;
-  @keyframes marquee { to { transform: translateX(-50%); } }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 /* dark tokens, once for the OS preference and once for the explicit override */
@@ -51,7 +55,7 @@
     --color-onneon: #060709;
     --color-plasma: #ff2ea8;
     --color-cyan: #2ee6ff;
-    --glow-1: rgba(180, 255, 46, 0.10);
+    --glow-1: rgba(180, 255, 46, 0.1);
     --glow-2: rgba(255, 46, 168, 0.09);
     --grid-op: 0.55;
   }
@@ -68,20 +72,26 @@
   --color-onneon: #060709;
   --color-plasma: #ff2ea8;
   --color-cyan: #2ee6ff;
-  --glow-1: rgba(180, 255, 46, 0.10);
+  --glow-1: rgba(180, 255, 46, 0.1);
   --glow-2: rgba(255, 46, 168, 0.09);
   --grid-op: 0.55;
 }
 
 @layer base {
-  html { scroll-behavior: smooth; color-scheme: light dark; }
+  html {
+    scroll-behavior: smooth;
+    color-scheme: light dark;
+  }
   body {
     @apply bg-bg text-fg font-mono text-[15px]/[1.65] antialiased overflow-x-hidden;
   }
   /* decorative backdrop: grid + glow. No utility does masked repeating grids. */
   body::before {
     content: "";
-    position: fixed; inset: 0; z-index: -2; opacity: var(--grid-op);
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    opacity: var(--grid-op);
     background-image:
       linear-gradient(var(--color-line) 1px, transparent 1px),
       linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
@@ -90,13 +100,21 @@
   }
   body::after {
     content: "";
-    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background:
       radial-gradient(60rem 30rem at 15% -10%, var(--glow-1), transparent 60%),
       radial-gradient(50rem 30rem at 90% 5%, var(--glow-2), transparent 60%);
   }
-  a { color: inherit; text-decoration: none; }
-  :focus-visible { @apply outline-2 outline-offset-[3px] outline-acid; }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-[3px] outline-acid;
+  }
 }
 
 @layer components {
@@ -114,7 +132,8 @@
            text-[11px] uppercase tracking-[.18em] text-dim;
   }
   .tag::before {
-    content: ""; @apply size-1.5 rounded-full bg-neon;
+    content: "";
+    @apply size-1.5 rounded-full bg-neon;
     box-shadow: 0 0 10px var(--color-neon);
   }
   .chip {
@@ -129,66 +148,157 @@
     content: "→";
     @apply absolute top-6.5 right-6.5 text-edge transition;
   }
-  .card:hover::after { @apply text-acid translate-x-1; }
-  .feat { @apply bg-surface px-6.5 py-6; }
-  .feat h3::before { content: "// "; @apply text-acid; }
-  .card:hover h3 { @apply text-acid; }
+  .card:hover::after {
+    @apply text-acid translate-x-1;
+  }
+  .feat {
+    @apply bg-surface px-6.5 py-6;
+  }
+  .feat h3::before {
+    content: "// ";
+    @apply text-acid;
+  }
+  .card:hover h3 {
+    @apply text-acid;
+  }
 
   /* body copy inside project pages: classing every <p> and <li> buys nothing */
-  .prose p { @apply max-w-[80ch] text-dim; }
-  .prose ul { @apply max-w-[80ch] list-disc pl-4.5 text-dim; }
-  .prose li { @apply mb-2 marker:text-acid; }
-  .prose strong, .prose b { @apply text-fg; }
-  .prose a:not(.btn):not(.chip) { @apply text-cyan border-b border-edge hover:border-cyan; }
-  .prose code { @apply text-cyan; }
+  .prose p {
+    @apply max-w-[80ch] text-dim;
+  }
+  .prose ul {
+    @apply max-w-[80ch] list-disc pl-4.5 text-dim;
+  }
+  .prose li {
+    @apply mb-2 marker:text-acid;
+  }
+  .prose strong,
+  .prose b {
+    @apply text-fg;
+  }
+  .prose a:not(.btn):not(.chip) {
+    @apply text-cyan border-b border-edge hover:border-cyan;
+  }
+  .prose code {
+    @apply text-cyan;
+  }
   .prose pre {
     @apply overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
   }
-  .prose pre .c { @apply text-dim; }
+  .prose pre .c {
+    @apply text-dim;
+  }
   /* rendered Markdown from src/posts/*.md: no classes on the tags, so style them here */
-  .md p { @apply mb-5 max-w-[80ch] text-dim; }
-  .md h2 { @apply mt-12 mb-4 text-2xl font-bold tracking-[-.02em] text-fg; }
-  .md h3 { @apply mt-8 mb-3 text-lg font-bold tracking-[-.01em] text-fg; }
-  .md ul { @apply mb-5 max-w-[80ch] list-disc pl-4.5 text-dim; }
-  .md ol { @apply mb-5 max-w-[80ch] list-decimal pl-4.5 text-dim; }
-  .md li { @apply mb-2 marker:text-acid; }
-  .md blockquote { @apply mb-5 max-w-[80ch] border-l-2 border-acid pl-5 text-dim italic; }
-  .md blockquote p { @apply mb-0; }
-  .md a { @apply border-b border-edge text-cyan hover:border-cyan; }
-  .md strong { @apply font-semibold text-fg; }
-  .md code { @apply text-cyan; }
-  .md pre { @apply mb-5 max-w-[80ch] overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7]; }
-  .md pre code { @apply text-fg; }
-  .md hr { @apply my-10 border-line; }
-  .md img { @apply my-6 border border-line; }
+  .md p {
+    @apply mb-5 max-w-[80ch] text-dim;
+  }
+  .md h2 {
+    @apply mt-12 mb-4 text-2xl font-bold tracking-[-.02em] text-fg;
+  }
+  .md h3 {
+    @apply mt-8 mb-3 text-lg font-bold tracking-[-.01em] text-fg;
+  }
+  .md ul {
+    @apply mb-5 max-w-[80ch] list-disc pl-4.5 text-dim;
+  }
+  .md ol {
+    @apply mb-5 max-w-[80ch] list-decimal pl-4.5 text-dim;
+  }
+  .md li {
+    @apply mb-2 marker:text-acid;
+  }
+  .md blockquote {
+    @apply mb-5 max-w-[80ch] border-l-2 border-acid pl-5 text-dim italic;
+  }
+  .md blockquote p {
+    @apply mb-0;
+  }
+  .md a {
+    @apply border-b border-edge text-cyan hover:border-cyan;
+  }
+  .md strong {
+    @apply font-semibold text-fg;
+  }
+  .md code {
+    @apply text-cyan;
+  }
+  .md pre {
+    @apply mb-5 max-w-[80ch] overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
+  }
+  .md pre code {
+    @apply text-fg;
+  }
+  .md hr {
+    @apply my-10 border-line;
+  }
+  .md img {
+    @apply my-6 border border-line;
+  }
 
   /* showcase screenshots: <picture> picks one file per figure, light or dark */
-  .shot { @apply m-0 bg-surface p-5; }
-  .shot img { @apply block w-full border border-line; }
-  .shot figcaption { @apply mt-4 text-[.9rem]/[1.6] text-dim; }
-  .shot figcaption b { @apply block text-fg; }
+  .shot {
+    @apply m-0 bg-surface p-5;
+  }
+  .shot img {
+    @apply block w-full border border-line;
+  }
+  .shot figcaption {
+    @apply mt-4 text-[.9rem]/[1.6] text-dim;
+  }
+  .shot figcaption b {
+    @apply block text-fg;
+  }
 
   /* On a guide the reading measure applies to prose only: a compose file or a
      wide table should use the column it has rather than scroll inside 80ch. */
-  .docs .md pre, .docs .md img, .docs .md blockquote { @apply max-w-none; }
+  .docs .md pre,
+  .docs .md img,
+  .docs .md blockquote {
+    @apply max-w-none;
+  }
 
   /* the theme button shows which mode you are in; no attribute means system */
-  .theme-icon { @apply hidden; }
+  .theme-icon {
+    @apply hidden;
+  }
   :root:not([data-theme]) .theme-system,
   :root[data-theme="light"] .theme-light,
-  :root[data-theme="dark"] .theme-dark { @apply block; }
+  :root[data-theme="dark"] .theme-dark {
+    @apply block;
+  }
 
   /* guides: tables, deeper headings and the odd nested list the blog never had */
-  .md h4 { @apply mt-6 mb-2 text-[.95rem] font-bold tracking-[-.01em] text-fg; }
-  .md-table { @apply mb-5 overflow-x-auto border border-line; }
-  .md-table table { @apply w-full border-collapse text-[.85rem]/[1.55] whitespace-nowrap; }
-  .md-table th { @apply border-b border-edge bg-surface px-3.5 py-2.5 text-left font-bold; }
-  .md-table td { @apply border-b border-line px-3.5 py-2.5 align-top text-dim; }
-  .md-table tr:last-child td { @apply border-b-0; }
-  .md-table code { @apply whitespace-nowrap; }
-  .md li > ul, .md li > ol { @apply mt-2 mb-0; }
-  .md h2 + h3 { @apply mt-6; }
+  .md h4 {
+    @apply mt-6 mb-2 text-[.95rem] font-bold tracking-[-.01em] text-fg;
+  }
+  .md-table {
+    @apply mb-5 overflow-x-auto border border-line;
+  }
+  .md-table table {
+    @apply w-full border-collapse text-[.85rem]/[1.55] whitespace-nowrap;
+  }
+  .md-table th {
+    @apply border-b border-edge bg-surface px-3.5 py-2.5 text-left font-bold;
+  }
+  .md-table td {
+    @apply border-b border-line px-3.5 py-2.5 align-top text-dim;
+  }
+  .md-table tr:last-child td {
+    @apply border-b-0;
+  }
+  .md-table code {
+    @apply whitespace-nowrap;
+  }
+  .md li > ul,
+  .md li > ol {
+    @apply mt-2 mb-0;
+  }
+  .md h2 + h3 {
+    @apply mt-6;
+  }
 
   /* feature tiles opt out of prose paragraph sizing */
-  .feat p { @apply m-0 max-w-none text-[.9rem]; }
+  .feat p {
+    @apply m-0 max-w-none text-[.9rem];
+  }
 }

@@ -133,7 +133,10 @@ function sections(body: string, title: string): Section[] {
     const heading = line.match(/^(#{2,4})\s+(.+?)\s*$/);
     if (heading) {
       found.push({
-        id: slugify(heading[2]!), heading: plain(heading[2]!), text: "", level: heading[1]!.length,
+        id: slugify(heading[2]!),
+        heading: plain(heading[2]!),
+        text: "",
+        level: heading[1]!.length,
       });
       continue;
     }
@@ -156,7 +159,8 @@ export async function loadGuides(): Promise<Guide[]> {
     const directory = docsDir(project);
     const files = [...new Glob("*.md").scanSync(directory)];
     const slugs = new Set(files.map((file) => file.replace(/\.md$/, "")));
-    if (!files.length) out.warn(`${directory} is empty: run \`bun run docs\` to vendor ${project.key}'s guides`);
+    if (!files.length)
+      out.warn(`${directory} is empty: run \`bun run docs\` to vendor ${project.key}'s guides`);
 
     // order[] first, then anything upstream added that nobody has placed yet
     const ordered = [
@@ -189,8 +193,10 @@ export async function loadGuides(): Promise<Guide[]> {
           const id = seen ? `${base}-${seen}` : base;
           return `<h${level} id="${id}">${inner}</h${level}>`;
         })
-        .replace(/<a href="([^"]*)"/g, (_tag, href: string) =>
-          `<a href="${rewrite(href, project, slugs, inPage)}"`)
+        .replace(
+          /<a href="([^"]*)"/g,
+          (_tag, href: string) => `<a href="${rewrite(href, project, slugs, inPage)}"`,
+        )
         .replace(/<img src="([^"]*)"([^>]*?)\/?>/g, (_tag, src: string, rest: string) => {
           const source = rewrite(src, project, slugs, inPage);
           const name = src.match(/^images\/(.+)\.[a-z]+$/i)?.[1];
@@ -202,7 +208,8 @@ export async function loadGuides(): Promise<Guide[]> {
         .replace(/<table>/g, '<div class="md-table"><table>')
         .replace(/<\/table>/g, "</table></div>");
 
-      const firstParagraph = body.split(/\n\s*\n/).find((block) => !/^[#`|\-!]/.test(block.trim())) ?? "";
+      const firstParagraph =
+        body.split(/\n\s*\n/).find((block) => !/^[#`|\-!]/.test(block.trim())) ?? "";
       const intro = plain(firstParagraph);
 
       guides.push({
@@ -212,8 +219,10 @@ export async function loadGuides(): Promise<Guide[]> {
         title,
         intro,
         html,
-        markdown: raw.replace(/\]\(([^)]+)\)/g, (_link, target: string) =>
-          `](${rewrite(target, project, slugs, inTwin)})`),
+        markdown: raw.replace(
+          /\]\(([^)]+)\)/g,
+          (_link, target: string) => `](${rewrite(target, project, slugs, inTwin)})`,
+        ),
         sections: sections(body, title),
       });
     }

@@ -47,13 +47,15 @@ export function expandIncludes(html: string, page = "page", depth = 0): string {
 
     const filled = fragment.replace(SLOT, (_slot, name: string, fallback?: string) => {
       const value = values[name] ?? fallback;
-      if (value === undefined) throw new Error(`${page}: ${file} wants {{${name}}}, which has no default`);
+      if (value === undefined)
+        throw new Error(`${page}: ${file} wants {{${name}}}, which has no default`);
       return value;
     });
 
     // keep the fragment at the indentation the page put the include at
     return expandIncludes(filled, `${page} > ${file}`, depth + 1)
-      .split("\n").join(`\n${indent}`)
+      .split("\n")
+      .join(`\n${indent}`)
       .replace(/^/, indent);
   });
 }

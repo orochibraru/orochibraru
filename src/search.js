@@ -25,7 +25,13 @@ function search(query) {
 
       let score = 0;
       for (const term of terms) {
-        const hit = heading.includes(term) ? 8 : context.includes(term) ? 4 : body.includes(term) ? 2 : 0;
+        const hit = heading.includes(term)
+          ? 8
+          : context.includes(term)
+            ? 4
+            : body.includes(term)
+              ? 2
+              : 0;
         if (!hit) return null; // every word has to land somewhere
         score += hit + (heading.startsWith(term) ? 3 : 0);
       }
@@ -42,13 +48,15 @@ function render(query) {
   active = 0;
 
   list.innerHTML = shown
-    .map((entry, i) => `<li>
+    .map(
+      (entry, i) => `<li>
       <a class="block px-4 py-3 ${i === 0 ? "bg-fg/5 text-acid" : ""}" href="${entry.u}">
         <span class="block text-[.95rem] font-bold tracking-[-.01em]">${escape(entry.t)}</span>
         <span class="mt-0.5 block text-[11px] tracking-[.14em] text-plasma uppercase">${escape(entry.g ?? entry.p ?? "")}</span>
         ${entry.x ? `<span class="mt-1.5 block truncate text-[.85rem] text-dim">${escape(entry.x.slice(0, 120))}</span>` : ""}
       </a>
-    </li>`)
+    </li>`,
+    )
     .join("");
 
   empty.hidden = !query || shown.length > 0;
@@ -59,7 +67,9 @@ function highlight(next) {
   const links = [...list.querySelectorAll("a")];
   if (!links.length) return;
   active = (next + links.length) % links.length;
-  links.forEach((link, i) => link.className = `block px-4 py-3 ${i === active ? "bg-fg/5 text-acid" : ""}`);
+  links.forEach(
+    (link, i) => (link.className = `block px-4 py-3 ${i === active ? "bg-fg/5 text-acid" : ""}`),
+  );
   links[active].scrollIntoView({ block: "nearest" });
 }
 
@@ -91,11 +101,18 @@ if (dialog) {
   field.addEventListener("input", () => render(field.value));
 
   dialog.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowDown") { event.preventDefault(); highlight(active + 1); }
-    else if (event.key === "ArrowUp") { event.preventDefault(); highlight(active - 1); }
-    else if (event.key === "Enter") {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      highlight(active + 1);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      highlight(active - 1);
+    } else if (event.key === "Enter") {
       const link = list.querySelectorAll("a")[active];
-      if (link) { event.preventDefault(); location.href = link.href; }
+      if (link) {
+        event.preventDefault();
+        location.href = link.href;
+      }
     }
   });
 
