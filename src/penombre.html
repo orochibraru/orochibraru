@@ -5,11 +5,11 @@
     <title>Penombre: a free self-hosted Nextcloud and Google Drive alternative</title>
     <meta
       name="description"
-      content="Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, documents, a waveform music player. One Docker container, SQLite by default, no subscription."
+      content="Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, shared drives, Word/Excel/PowerPoint editing, a waveform music player. One Docker container, SQLite by default, no subscription."
     />
     <meta
       name="keywords"
-      content="Nextcloud alternative, Google Drive alternative, ownCloud alternative, Seafile alternative, iCloud alternative, iCloud Drive alternative, Dropbox alternative, OneDrive alternative, Box alternative, pCloud alternative, MEGA alternative, Synology Drive alternative, FileRun alternative, File Browser alternative, Filestash alternative, Proton Drive alternative, self-hosted cloud storage, self-hosted drive, open source file manager, homelab file server, Docker file storage, SQLite file storage"
+      content="self-hosted shared drive, edit docx in the browser, Nextcloud alternative, Google Drive alternative, ownCloud alternative, Seafile alternative, iCloud alternative, iCloud Drive alternative, Dropbox alternative, OneDrive alternative, Box alternative, pCloud alternative, MEGA alternative, Synology Drive alternative, FileRun alternative, File Browser alternative, Filestash alternative, Proton Drive alternative, self-hosted cloud storage, self-hosted drive, open source file manager, homelab file server, Docker file storage, SQLite file storage"
     />
     <link rel="canonical" href="https://orochibraru.com/penombre" />
     <meta property="og:url" content="https://orochibraru.com/penombre" />
@@ -19,7 +19,7 @@
     />
     <meta
       property="og:description"
-      content="Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, documents, a waveform music player. One Docker container, SQLite by default, no subscription."
+      content="Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, shared drives, Word/Excel/PowerPoint editing, a waveform music player. One Docker container, SQLite by default, no subscription."
     />
     <script type="application/ld+json">
       {
@@ -30,7 +30,7 @@
         "applicationCategory": "BrowserApplication",
         "applicationSubCategory": "File storage and sharing",
         "operatingSystem": "Linux, macOS, Docker",
-        "description": "Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, documents, a waveform music player. One Docker container, SQLite by default, no subscription.",
+        "description": "Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, shared drives, Word/Excel/PowerPoint editing, a waveform music player. One Docker container, SQLite by default, no subscription.",
         "url": "https://orochibraru.com/penombre",
         "screenshot": "https://orochibraru.com/penombre/docs/images/hero-dark.webp",
         "softwareHelp": "https://orochibraru.com/penombre/docs",
@@ -40,16 +40,19 @@
         "featureList": [
           "Grid and list file browsing with generated thumbnails",
           "In-place previews for images, video, audio, PDFs and source code",
-          "Notes on any file, pinned to a moment in a track or video",
+          "Notes on any file, pinned to a moment in a track or video and marked on the waveform",
           "Waveform music player",
           "Documents, spreadsheets and presentations stored as HTML, CSV and Markdown",
+          "Editing .docx, .xlsx and .pptx files in place, saved back as themselves",
           "Share links with password, expiry and sign-in requirements",
           "Per-user sharing with view, edit and full-access permissions",
+          "Shared drives owned by a group, with manager, editor and viewer roles",
+          "Notifications for notes and shares, with optional emailed copies",
           "Automatic categories for images, video, music, documents, code, archives and 3D objects",
-          "Mounted volumes for NAS shares and existing directory trees",
+          "Mounted volumes for NAS shares and existing directory trees, per-user or shared whole",
           "Resumable uploads that survive a page reload",
           "Soft trash with restore",
-          "Admin panel with instance statistics, user management and an audit log",
+          "Admin panel with instance statistics, user management, OIDC providers and an audit log",
           "OpenAPI-documented REST API with API-key auth",
           "SQLite by default, PostgreSQL optional"
         ],
@@ -99,8 +102,8 @@
             Penombre is a file storage and sharing platform for people who want their files back.
             Drop it on a box, mount a volume, and you get a modern web drive: uploads that survive a
             reload, generated thumbnails, previews that open in place, notes on any file, share
-            links with an expiry, automatic categories, recoverable soft-trash and OAuth logins,
-            without renting the disk from anyone.
+            links with an expiry, shared drives for a team, automatic categories, recoverable
+            soft-trash and OAuth logins, without renting the disk from anyone.
           </p>
           <p class="mt-5">
             It runs on <strong>SQLite out of the box</strong>: one container, one volume, no
@@ -279,8 +282,9 @@
             <div class="feat">
               <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Notes on any file</h3>
               <p>
-                A thread beside the preview. On a track or a video a note pins to a timestamp you
-                can click to jump back to.
+                A thread beside the preview. On a track or a video a note pins to a timestamp, and
+                every timestamp is drawn on the waveform as a dot you can hover to read and click to
+                jump to &mdash; in the player, the preview and the full-screen viewer alike.
               </p>
             </div>
             <div class="feat">
@@ -288,6 +292,15 @@
               <p>
                 Persistent bottom player, waveform-as-progress-bar drawn from cached peak data,
                 keeps playing while you browse.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Full screen, properly</h3>
+              <p>
+                An image, a video or a track opens in Penombre&rsquo;s own viewer rather than the
+                browser&rsquo;s bare built-in player: name, size, download, real transport controls
+                and the notes thread beside it. A track has no picture to fill a screen with, so it
+                gets a now-playing panel with the waveform where the artwork would have been.
               </p>
             </div>
             <div class="feat">
@@ -301,10 +314,37 @@
               </p>
             </div>
             <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">
+                Word, Excel and PowerPoint
+              </h3>
+              <p>
+                A <code>.docx</code>, <code>.xlsx</code> or <code>.pptx</code> opens in the same
+                three editors and saves back as itself &mdash; same file, same place, no import and
+                no export. Only the part you edited is rewritten: untouched cells keep their
+                formulas and formatting, slides keep their layouts and theme.
+              </p>
+            </div>
+            <div class="feat">
               <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Sharing, two ways</h3>
               <p>
                 Public links with optional password, expiry and sign-in requirement, or per-user
                 grants at view, edit or full access.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Shared drives</h3>
+              <p>
+                A drive that belongs to a group instead of a person: one tree, one trash, manager /
+                editor / viewer roles. Files belong to the drive rather than to whoever happened to
+                upload them, so a project folder survives the person who started it.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Notifications</h3>
+              <p>
+                A bell for the things other people did &mdash; a note on your file, something shared
+                with you &mdash; and nothing you did yourself. Opt in per account to have them
+                emailed too, once an admin has configured SMTP.
               </p>
             </div>
             <div class="feat">
@@ -327,7 +367,9 @@
               <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Mounted volumes</h3>
               <p>
                 Point <code>VOLUME_*_PATH</code> at a NAS share or an existing tree and it appears
-                in the sidebar, browsable and searchable, optionally read-only.
+                in the sidebar, browsable and searchable, optionally read-only. Give each account
+                its own subdirectory, or set <code>_SHARED</code> and serve the whole library to
+                everyone.
               </p>
             </div>
             <div class="feat">
@@ -345,7 +387,8 @@
               <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Admin panel</h3>
               <p>
                 Instance and per-user storage, invites, roles, bans, sign-up and security policy,
-                and an audit log that records no file names.
+                OIDC providers added without touching the environment, and an audit log that records
+                no file names.
               </p>
             </div>
             <div class="feat">

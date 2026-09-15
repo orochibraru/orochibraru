@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!--#include head.html -->
+    <!--#include head.html card="summary_large_image" ogImage="https://orochibraru.com/homerun/docs/images/hero-dark.webp" ogImageWidth="1200" ogImageHeight="675" ogImageAlt="The Homerun dashboard, showing service counts and live host resources" -->
     <title>Homerun: a free self-hosted PaaS, a Dokploy and Coolify alternative</title>
     <meta
       name="description"
@@ -31,6 +31,7 @@
         "operatingSystem": "Linux, Docker",
         "description": "Homerun is a free, self-hosted single-host PaaS and a Dokploy, Coolify, Dokku and Cloud Run alternative: deploy Docker images or git repos from a form, get TLS routing via Traefik. Nothing paywalled.",
         "url": "https://orochibraru.com/homerun",
+        "screenshot": "https://orochibraru.com/homerun/docs/images/hero-dark.webp",
         "softwareHelp": "https://orochibraru.com/homerun/docs",
         "isAccessibleForFree": true,
         "keywords": "Dokploy alternative, Coolify alternative, Dokku alternative, CapRover alternative, Cloud Run alternative, AWS alternative, Heroku alternative, self-hosted PaaS, homelab deploys",
@@ -39,16 +40,23 @@
           "Live streamed deploy progress that survives a page reload",
           "Deployment history with logs and image digests",
           "Projects grouping services on a shared Docker network",
-          "One-click templates for Redis, Postgres, MySQL, MongoDB and more",
+          "A catalog of ~58 one-click templates with Quick Deploy and linked companion containers",
+          "Connect GitHub, GitLab, Gitea or Bitbucket and browse your repositories",
           "docker-compose.yaml import",
           "Automatic connection URLs between linked services",
-          "Container logs and an in-browser web terminal",
+          "Container logs, uptime probes and an in-browser web terminal",
+          "Live host CPU, memory, disk and GPU usage on the dashboard",
+          "Setup diagnostics that deep-link into the setting they are complaining about",
           "Traefik TLS routing, custom domains and bring-your-own certificates",
-          "Remote build servers over TCP, SSH or the Homerun Agent",
+          "Remote build servers over TCP, SSH or the Homerun Agent, with a registry layer cache",
           "Optional Docker Swarm mode for replica scaling",
-          "Scheduled jobs, auto-redeploy and S3 volume backups",
-          "REST API with OpenAPI and a CLI",
-          "Users, roles, invites and OAuth/OIDC login",
+          "Scheduled jobs, auto-redeploy and S3 volume backups, on one Scheduling page",
+          "Reusable S3 destinations and a searchable backup history",
+          "Traefik system logs, with restart and update from the dashboard",
+          "A per-account notification feed for deploys, lifecycle events and errors",
+          "Configured from the dashboard: a first-run wizard and live settings, no config file",
+          "REST API with OpenAPI and a CLI with device-code login",
+          "Users, roles, invites, sessions, API keys and OAuth/OIDC login",
           "Cloudflare and Pangolin DNS automation"
         ],
         "codeRepository": "https://github.com/orochibraru/homerun",
@@ -83,6 +91,7 @@
           </p>
           <div class="mt-6.5 flex flex-wrap gap-2.5">
             <a class="btn btn-primary" href="/homerun/docs">Read the docs</a>
+            <a class="btn" href="#showcase">Screenshots</a>
             <a class="btn" href="https://github.com/orochibraru/homerun" rel="noopener"
               >Source on GitHub</a
             >
@@ -106,6 +115,197 @@
           </p>
         </section>
 
+        <section id="showcase" class="mb-22.5">
+          <div class="mb-7 flex items-baseline gap-4">
+            <h2 class="text-2xl font-bold tracking-[-.02em]">Showcase</h2>
+            <div class="h-px flex-1 bg-line"></div>
+          </div>
+          <p class="mb-7">
+            None of these are mockups. Playwright drives a real instance from a blank database
+            &mdash; a real sign-up, the first-run wizard, then a project with three services, two of
+            them actually deployed as containers on the host&rsquo;s Docker socket. If a screen
+            stops rendering the run fails instead of publishing it. Light or dark follows your
+            system; both are the real thing.
+          </p>
+          <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+            <figure class="shot">
+              <picture>
+                <source
+                  media="(prefers-color-scheme: dark)"
+                  srcset="./docs/homerun/images/hero-dark.webp"
+                />
+                <img
+                  src="./docs/homerun/images/hero.webp"
+                  width="1200"
+                  height="675"
+                  loading="lazy"
+                  decoding="async"
+                  alt="The Homerun dashboard, showing service counts and live host resources"
+                />
+              </picture>
+              <figcaption>
+                <b>The dashboard</b> Service counts, live host CPU, memory and disk (plus GPU if
+                there&rsquo;s an NVIDIA card), per-service usage, the deploys that just ran, and a
+                banner for any setup issue that links straight to the field it&rsquo;s complaining
+                about.
+              </figcaption>
+            </figure>
+            <figure class="shot">
+              <picture>
+                <source
+                  media="(prefers-color-scheme: dark)"
+                  srcset="./docs/homerun/images/service-dark.webp"
+                />
+                <img
+                  src="./docs/homerun/images/service.webp"
+                  width="1200"
+                  height="675"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A service overview page with its status, hostname and live log tail"
+                />
+              </picture>
+              <figcaption>
+                <b>A service</b> Status, the hostname Traefik routes to it, and a tab each for
+                source, revisions, observability, env vars, volumes, networking, compute and a web
+                terminal.
+              </figcaption>
+            </figure>
+            <figure class="shot">
+              <picture>
+                <source
+                  media="(prefers-color-scheme: dark)"
+                  srcset="./docs/homerun/images/deploy-dark.webp"
+                />
+                <img
+                  src="./docs/homerun/images/deploy.webp"
+                  width="1200"
+                  height="675"
+                  loading="lazy"
+                  decoding="async"
+                  alt="The four-step deploy wizard, on the basic info step"
+                />
+              </picture>
+              <figcaption>
+                <b>Deploying something new</b> Four steps &mdash; basic info, networking,
+                environment, compute &mdash; from a Docker image or straight from a git repo&rsquo;s
+                Dockerfile.
+              </figcaption>
+            </figure>
+            <figure class="shot">
+              <picture>
+                <source
+                  media="(prefers-color-scheme: dark)"
+                  srcset="./docs/homerun/images/templates-dark.webp"
+                />
+                <img
+                  src="./docs/homerun/images/templates.webp"
+                  width="1200"
+                  height="675"
+                  loading="lazy"
+                  decoding="async"
+                  alt="The template gallery, showing built-in app cards with their logos"
+                />
+              </picture>
+              <figcaption>
+                <b>Templates</b> Around 58 common self-hosted apps with their real logos bundled in,
+                searchable and filtered by category. Quick Deploy skips the wizard entirely;
+                Configure pre-fills it.
+              </figcaption>
+            </figure>
+            <figure class="shot">
+              <picture>
+                <source
+                  media="(prefers-color-scheme: dark)"
+                  srcset="./docs/homerun/images/logs-dark.webp"
+                />
+                <img
+                  src="./docs/homerun/images/logs.webp"
+                  width="1200"
+                  height="675"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A service&rsquo;s observability tab: uptime checks above a live log stream"
+                />
+              </picture>
+              <figcaption>
+                <b>Logs and uptime</b> <code>stdout</code>/<code>stderr</code> streamed from the
+                container as it runs, ANSI colours intact, under uptime probes from the network and
+                from its own hostname.
+              </figcaption>
+            </figure>
+            <figure class="shot">
+              <picture>
+                <source
+                  media="(prefers-color-scheme: dark)"
+                  srcset="./docs/homerun/images/project-dark.webp"
+                />
+                <img
+                  src="./docs/homerun/images/project.webp"
+                  width="1200"
+                  height="675"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A project page grouping three services with their resource usage"
+                />
+              </picture>
+              <figcaption>
+                <b>Projects</b> A project puts its services on a shared Docker network, so they
+                reach each other by slug (<code>http://cache:6379</code>) without going back out
+                through Traefik.
+              </figcaption>
+            </figure>
+            <figure class="shot">
+              <picture>
+                <source
+                  media="(prefers-color-scheme: dark)"
+                  srcset="./docs/homerun/images/networking-dark.webp"
+                />
+                <img
+                  src="./docs/homerun/images/networking.webp"
+                  width="1200"
+                  height="675"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A service&rsquo;s networking tab, showing its public hostname and custom domain"
+                />
+              </picture>
+              <figcaption>
+                <b>Domains and access</b> The hostname Traefik routes to the service, a second
+                custom domain beside it, and a switch that puts a Homerun login in front of the app.
+                These are Traefik labels, so the tab says plainly that changing them needs a
+                redeploy.
+              </figcaption>
+            </figure>
+            <figure class="shot">
+              <picture>
+                <source
+                  media="(prefers-color-scheme: dark)"
+                  srcset="./docs/homerun/images/settings-dark.webp"
+                />
+                <img
+                  src="./docs/homerun/images/settings.webp"
+                  width="1200"
+                  height="675"
+                  loading="lazy"
+                  decoding="async"
+                  alt="The instance settings page, on the General tab"
+                />
+              </picture>
+              <figcaption>
+                <b>Settings, not files</b> Base domain, Docker, Traefik, DNS automation and SMTP are
+                stored in the database and applied live. Each field shows the env var behind it as
+                its placeholder.
+              </figcaption>
+            </figure>
+          </div>
+          <p class="mt-7">
+            Env vars, compute limits, revisions, users and signing in are in the
+            <a href="/homerun/docs/showcase" rel="noopener">full showcase</a>, all of it generated
+            the same way.
+          </p>
+        </section>
+
         <section class="mb-22.5">
           <div class="mb-7 flex items-baseline gap-4">
             <h2 class="text-2xl font-bold tracking-[-.02em]">Features</h2>
@@ -115,9 +315,17 @@
             <div class="feat">
               <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Image or git deploys</h3>
               <p>
-                Any Docker image, or build from a git repo&rsquo;s Dockerfile, including your
-                self-hosted Gitea. Env vars, CPU/memory limits, restart policy, private registry
-                auth.
+                Any Docker image, or build from a git repo&rsquo;s Dockerfile. Env vars, CPU/memory
+                limits, restart policy, private registry auth.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Your git host, connected</h3>
+              <p>
+                An admin registers an OAuth app once for GitHub, GitLab, self-hosted Gitea or
+                Bitbucket; everyone else connects their own account and picks a repo and branch from
+                a list. Private repos without a token in the clone URL, and the branch is checked
+                for a <code>Dockerfile</code> before you commit to it.
               </p>
             </div>
             <div class="feat">
@@ -139,10 +347,22 @@
               </p>
             </div>
             <div class="feat">
-              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Templates</h3>
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">A template catalog</h3>
               <p>
-                One-click Redis, Postgres, MySQL, MongoDB, Adminer, Uptime Kuma, n8n and
-                Vaultwarden, or save your own config as a template.
+                Around 58 built-in apps &mdash; Jellyfin, the *arr stack, Postgres, Redis, Pi-hole,
+                Grafana, Vaultwarden, Excalidraw and the rest &mdash; each with its real logo
+                bundled in, so the gallery renders with no outbound internet. Quick Deploy skips the
+                wizard; a details page pulls the repo&rsquo;s README, stars and latest release from
+                GitHub. Save any service of your own as a template too.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Linked containers</h3>
+              <p>
+                A template can bring its companions along: WordPress ships linked to MySQL, Umami to
+                Postgres. <code>{{db}}</code> resolves to the companion&rsquo;s hostname and
+                <code>{{db.POSTGRES_PASSWORD}}</code> to its own value, so the two agree on a
+                password you never typed.
               </p>
             </div>
             <div class="feat">
@@ -163,7 +383,8 @@
               <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Logs &amp; web terminal</h3>
               <p>
                 Tail stdout/stderr or open an interactive shell into a running container, from the
-                browser.
+                browser, with uptime probes from the network and from the service&rsquo;s own
+                hostname beside them.
               </p>
             </div>
             <div class="feat">
@@ -174,10 +395,14 @@
               </p>
             </div>
             <div class="feat">
-              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Build servers</h3>
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">
+                Build servers &amp; cache
+              </h3>
               <p>
                 Build on another Docker daemon over <code>tcp://</code> or <code>ssh://</code>, or
-                via the lightweight Homerun Agent.
+                via the lightweight Homerun Agent. Point a build at a registry credential and it
+                pulls the last image as a layer cache and pushes the fresh layers back, so a repeat
+                build doesn&rsquo;t start cold.
               </p>
             </div>
             <div class="feat">
@@ -200,7 +425,24 @@
               </h3>
               <p>
                 Cron-style auto-redeploy per service, standalone cron jobs with their own run
-                history, and scheduled volume backups to any S3-compatible endpoint.
+                history, and scheduled volume backups to a named S3 destination &mdash; defined
+                once, pointed at from as many volumes as you like. AWS, MinIO, R2, B2, Wasabi.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">One Scheduling page</h3>
+              <p>
+                Every cron redeploy, cron job and backup schedule on the instance in one read-only
+                view, with the job queue underneath it: what&rsquo;s running now, what&rsquo;s
+                waiting, and how the last handful finished.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Backup history</h3>
+              <p>
+                One row per attempt across every volume, scheduled or manual, with the uploaded size
+                and the error if it failed. Searchable, filterable by outcome, and paged all the way
+                back.
               </p>
             </div>
             <div class="feat">
@@ -210,6 +452,9 @@
               <p>
                 Everything the UI does is a typed JSON API at <code>/api/v1</code>, with live
                 Swagger UI and a <code>homerun</code> CLI built against the generated types.
+                <code>homerun login</code> is a device-code flow &mdash; approve it in the browser
+                and the binary keeps its own API key &mdash; and <code>homerun update</code>
+                replaces itself.
               </p>
             </div>
             <div class="feat">
@@ -218,7 +463,8 @@
               </h3>
               <p>
                 Admin and developer roles, email or direct-create invites, and optional OAuth/OIDC
-                login.
+                login. Each account gets its own sessions list, revocable one by one, and its own
+                API keys.
               </p>
             </div>
             <div class="feat">
@@ -251,6 +497,55 @@
                 Server-side search, filters and paging on every list page, plus multi-select
                 start/stop/restart/delete with a typed confirmation before anything destructive
                 runs.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">
+                Host metrics &amp; self-diagnostics
+              </h3>
+              <p>
+                Live CPU, memory, disk and &mdash; with an NVIDIA card present &mdash; GPU usage for
+                the host, alongside per-service CPU, memory and traffic. Read-only checks run on
+                every dashboard load and any that fail become a banner that deep-links into the
+                offending settings field.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">System logs</h3>
+              <p>
+                Traefik&rsquo;s own output streamed live, which is where a 404 on a service that
+                deployed fine, or a certificate that won&rsquo;t issue, actually shows up. Admins
+                can restart or update the Traefik container from the same panel, without touching
+                the compose file.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Errors that stick around</h3>
+              <p>
+                Anything Homerun logs at warn or error level about one of your services is persisted
+                and shown on that service, and the newest few sit on the dashboard. A
+                container&rsquo;s own scrollback is no longer the only record of what went wrong.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Notifications</h3>
+              <p>
+                A per-account bell for deploy succeeded or failed, service created, started or
+                stopped, an auto-redeploy firing, and runtime errors attributed to one of your
+                services. Click through to the service it happened to.
+              </p>
+            </div>
+            <div class="feat">
+              <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">
+                Configured from the dashboard
+              </h3>
+              <p>
+                A five-step first-run wizard, then <code>/settings</code> for the rest, stored in
+                the database and applied live with no restart. Three env vars genuinely can&rsquo;t
+                live there &mdash; the database URL, <code>AUTH_SECRET</code> and
+                <code>ORIGIN</code> &mdash; and the installer writes all three. A
+                <code>homerun.yaml</code> exists if you&rsquo;d rather keep config as code, and is
+                entirely optional.
               </p>
             </div>
           </div>
@@ -382,7 +677,10 @@ docker compose -f compose.prod.yaml up -d</pre>
             browser that is not on the box.
           </p>
           <p class="mt-5">
-            Both paths are covered properly in the
+            Either way, that is the last file you touch. The first sign-in drops you into a
+            five-step wizard, and after that the base domain, Docker, Traefik, email, sign-in
+            methods and DNS automation are all pages in the dashboard, stored in the database and
+            applied live. Both paths are covered properly in the
             <a href="/homerun/docs/getting-started" rel="noopener">getting started guide</a>.
           </p>
         </section>
