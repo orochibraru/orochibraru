@@ -10,20 +10,14 @@ export type Post = {
 	markdown: string;
 };
 
-/** Minimal frontmatter: a leading `---` block of `key: value` scalars. */
-function frontmatter(raw: string): [Record<string, string>, string] {
+/** A leading `---` YAML block. Real YAML, because prettier folds long values onto several lines. */
+function frontmatter(raw: string): [Record<string, unknown>, string] {
 	const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
 	if (!match) {
 		return [{}, raw];
 	}
-	const meta: Record<string, string> = {};
-	for (const line of match[1]?.split("\n") ?? []) {
-		const colon = line.indexOf(":");
-		if (colon > 0) {
-			meta[line.slice(0, colon).trim()] = line.slice(colon + 1).trim();
-		}
-	}
-	return [meta, raw.slice(match[0].length)];
+	const meta = Bun.YAML.parse(match[1] ?? "") as Record<string, unknown> | null;
+	return [meta ?? {}, raw.slice(match[0].length)];
 }
 
 async function readPosts(): Promise<Post[]> {
@@ -32,7 +26,7 @@ async function readPosts(): Promise<Post[]> {
 		const slug = file.split("/").pop()?.replace(/\.md$/, "") ?? file;
 		const [meta, markdown] = frontmatter(await Bun.file(file).text());
 		const { title, date, description } = meta;
-		if (!title || !date || !description) {
+		if (typeof title !== "string" || typeof date !== "string" || typeof description !== "string") {
 			throw new Error(`${file}: frontmatter needs title, date and description`);
 		}
 		posts.push({

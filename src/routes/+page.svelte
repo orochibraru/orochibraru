@@ -127,7 +127,7 @@
 					<span class="chip">Web player</span>
 					<span class="chip">HLS</span>
 					<span class="chip">Cast</span>
-					<span class="chip">AGPL-3.0</span>
+					<span class="chip">AGPL-3.0-or-later</span>
 				</div>
 			</a>
 			<a class="card" href={resolve("/svelte-smol")}>

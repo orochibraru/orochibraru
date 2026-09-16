@@ -126,6 +126,14 @@ import adapter from "@orochibraru/svelte-smol";
 						job.
 					</p>
 				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Cross-compilation</h3>
+					<p>
+						<code>target</code>
+						builds for Linux, macOS, Windows or Alpine&rsquo;s musl from any host &mdash; Bun
+						fetches the matching runtime the first time you use it.
+					</p>
+				</div>
 			</div>
 		</section>
 	</article>

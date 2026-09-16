@@ -45,7 +45,7 @@
 				"Shared drives owned by a group, with manager, editor and viewer roles",
 				"Notifications for notes and shares, with optional emailed copies",
 				"Automatic categories for images, video, music, documents, code, archives and 3D objects",
-				"Mounted volumes for NAS shares and existing directory trees, per-user or shared whole",
+				"Mounted volumes for NAS shares and existing directory trees, shared by everyone and kept in sync with background and on-demand rescans",
 				"Resumable uploads that survive a page reload",
 				"Soft trash with restore",
 				"Admin panel with instance statistics, user management, OIDC providers and an audit log",
@@ -350,8 +350,9 @@
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Mounted volumes</h3>
 					<p>
 						Point <code>VOLUME_*_PATH</code> at a NAS share or an existing tree and it appears in
-						the sidebar, browsable and searchable, optionally read-only. Give each account its own
-						subdirectory, or set <code>_SHARED</code> and serve the whole library to everyone.
+						the sidebar as one library everyone browses, optionally read-only. A background pass
+						keeps it in sync with what&rsquo;s actually on disk, and a Rescan button in its header
+						forces one on demand.
 					</p>
 				</div>
 				<div class="feat">
@@ -515,8 +516,6 @@
 			<pre>docker run -d --name penombre \
   -p 3000:3000 \
   -v penombre_data:/data \
-  -e ADMIN_EMAIL=you@example.com \
-  -e ADMIN_PASSWORD=change-me \
   -e AUTH_SECRET=$(openssl rand -hex 32) \
   -e ORIGIN=https://drive.example.com \
   orochibraru/penombre:latest</pre>
@@ -530,8 +529,6 @@ ports:
 volumes:
   - penombre_data:/data
 environment:
-  ADMIN_EMAIL: you@example.com
-  ADMIN_PASSWORD: change-me
   AUTH_SECRET: a-long-random-string
   ORIGIN: https://drive.example.com
 
@@ -540,7 +537,9 @@ volumes:
 			<p class="mt-5">
 				Either way it comes up on <code>http://localhost:3000</code>. One volume holds the lot: the
 				SQLite database under <code>/data/db</code>, your files under
-				<code>/data/storage</code>. Those four variables are the only ones required on a first run.
+				<code>/data/storage</code>. Those two variables are the only ones required on a first run
+				&mdash; a setup screen creates the administrator account the first time anyone opens it,
+				so no default password ever ships in an env file.
 			</p>
 			<p class="mt-5">
 				The

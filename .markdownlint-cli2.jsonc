@@ -1,0 +1,9 @@
+{
+	"config": {
+		// prettier wraps prose at 80 (proseWrap: always); tables and code can't wrap
+		"MD013": { "line_length": 80, "tables": false, "code_blocks": false },
+		// agent and skill files open with front matter whose `name` is the title
+		"MD041": { "front_matter_title": "^\\s*(title|name)\\s*[:=]" }
+	},
+	"ignores": ["node_modules", "dist", ".svelte-kit", "src/docs", ".claude/skills"]
+}

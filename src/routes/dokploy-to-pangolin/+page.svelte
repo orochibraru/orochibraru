@@ -103,6 +103,14 @@
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Fast and small</h3>
 					<p>Bun + Hono, full TypeScript, graceful SIGINT/SIGTERM shutdown, 90%+ test coverage.</p>
 				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Duplicate cleanup</h3>
+					<p>
+						<code>bun run reconcile</code> reports resources sharing a host name and, with
+						<code>--apply</code>, deletes the newer copies and tidies their names. The same report
+						and cleanup are exposed over the API as <code>GET</code>/<code>DELETE /duplicates</code>.
+					</p>
+				</div>
 			</div>
 		</section>
 

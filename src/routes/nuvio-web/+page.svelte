@@ -42,7 +42,7 @@
 				href={resolve("/#projects")}
 				>&larr; All projects</a
 			>
-			<span class="tag ml-3.5">Media &middot; AGPL-3.0</span>
+			<span class="tag ml-3.5">Media &middot; AGPL-3.0-or-later</span>
 			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.03em]">
 				Nuvio Web
 			</h1>
@@ -162,8 +162,85 @@
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Auto-play next</h3>
 					<p>Rolls into the next episode with an end-of-episode panel.</p>
 				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Hand off to another app</h3>
+					<p>
+						An Intent chooser on Android, VLC&rsquo;s x-callback on iOS, the raw
+						<code>magnet:</code>
+						link for a P2P source, or copy to clipboard on desktop.
+					</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Playback diagnostics</h3>
+					<p>
+						The codec is probed before a stream reaches the player. One that decodes no video
+						(unsupported HEVC/AV1) or no audio (Dolby Digital, DTS, Atmos) raises a dismissible
+						banner instead of a black screen.
+					</p>
+				</div>
 			</div>
 		</section>
+
+		<section class="mb-22.5">
+			<div class="mb-7 flex items-baseline gap-4">
+				<h2 class="text-2xl font-bold tracking-[-.02em]">Library &amp; sync</h2>
+				<div class="h-px flex-1 bg-line"></div>
+			</div>
+			<div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Library</h3>
+					<p>Your library, continue watching, and history, kept per profile.</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Collections</h3>
+					<p>Your own folders of titles, separate from the library.</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Offline-first sync</h3>
+					<p>
+						An IndexedDB mirror with an optimistic write queue and a background delta pull, so a
+						bookmark or a progress save lands instantly and reconciles later. Open tabs stay in
+						step over <code>BroadcastChannel</code>.
+					</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Watch stats</h3>
+					<p>A full, editable history under Account.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="mb-22.5">
+			<div class="mb-7 flex items-baseline gap-4">
+				<h2 class="text-2xl font-bold tracking-[-.02em]">Make it yours</h2>
+				<div class="h-px flex-1 bg-line"></div>
+			</div>
+			<div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Profiles</h3>
+					<p>With avatars, as on mobile.</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Themes</h3>
+					<p>Light, dark or system, a dim or AMOLED dark style, and seven accent colours.</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Settings</h3>
+					<p>
+						Appearance, playback, sync, addons and integrations, stored on your Nuvio account so
+						they follow you between devices.
+					</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Accessible by default</h3>
+					<p>
+						Every route is checked against WCAG 2 A/AA in CI (axe), including skip links and focus
+						management.
+					</p>
+				</div>
+			</div>
+		</section>
+
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Run it</h2>
 			<p class="mb-3 text-xs uppercase tracking-widest text-dim">Docker run</p>
@@ -198,6 +275,13 @@ healthcheck:
 				and for orchestrator probes. Images are published for
 				<code>linux/amd64</code>
 				and <code>linux/arm64</code>.
+			</p>
+			<p class="mt-5">
+				An optional admin page lists who has signed in and can lock sign-in to an allowlist. Set
+				<code>NUVIO_ADMIN_EMAILS</code>
+				to turn it on, and mount a volume at <code>/app/data</code> if you want its sign-in metrics
+				and lock state to survive a restart &mdash; without a writable volume it just runs without
+				them.
 			</p>
 			<p class="mt-5">
 				Behind a reverse proxy, set <code>PROTOCOL_HEADER=x-forwarded-proto</code> and

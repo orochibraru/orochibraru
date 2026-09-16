@@ -1,7 +1,9 @@
 ---
 title: This is where I rant
 date: 2026-09-09
-description: Why there is a blog on a site that exists to give software away, and what is going to end up on it.
+description:
+  Why there is a blog on a site that exists to give software away, and what is
+  going to end up on it.
 ---
 
 I did not want a blog. Blogs are where good intentions go to die: three posts, a
@@ -17,8 +19,8 @@ Mostly the things that annoy me enough to write them down.
 
 - Software that was good and then had a funding round.
 - Self-hosting problems that took me a weekend and should have taken an hour.
-- Decisions I made in these projects that I would like to explain once, properly,
-  instead of eleven times in issue threads.
+- Decisions I made in these projects that I would like to explain once,
+  properly, instead of eleven times in issue threads.
 - The occasional thing I got wrong, because that is more useful to you than the
   things I got right.
 
@@ -26,8 +28,8 @@ Mostly the things that annoy me enough to write them down.
 
 No tutorials that exist already. No "10 tools you need in 2026". No engagement
 bait, no newsletter, no popup asking whether I can interest you in my thoughts.
-If a post is worth reading you will know within two paragraphs, and if it is not,
-close the tab. I will never know and I would not mind.
+If a post is worth reading you will know within two paragraphs, and if it is
+not, close the tab. I will never know and I would not mind.
 
 ## How it is written
 

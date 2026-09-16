@@ -38,25 +38,31 @@
 			featureList: [
 				"Deploy any Docker image or build from a git repository Dockerfile",
 				"Live streamed deploy progress that survives a page reload",
-				"Deployment history with logs and image digests",
+				"Deployment history with logs, image digests and one-click rollback, with optional auto-rollback when a new revision comes up unhealthy",
+				"Automatic Trivy vulnerability scanning on every deploy",
+				"Required CI status checks from GitHub, GitLab, Gitea/Forgejo or Bitbucket before a build starts",
 				"Stacks grouping services on a shared Docker network",
-				"A catalog of ~58 one-click templates with Quick Deploy and linked companion containers",
+				"A catalog of ~70 one-click templates with Quick Deploy and linked companion containers",
 				"Connect GitHub, GitLab, Gitea or Bitbucket and browse your repositories",
 				"docker-compose.yaml import",
+				"Migrate apps, compose stacks and databases straight from a Dokploy or Coolify instance",
 				"Automatic connection URLs between linked services",
 				"Container logs, uptime probes and an in-browser web terminal",
-				"Live host CPU, memory, disk and GPU usage on the dashboard",
+				"Live host CPU, memory, disk and GPU usage on the dashboard, with usage history charts",
 				"Setup diagnostics that deep-link into the setting they are complaining about",
+				"A ⌘K command palette that searches everything you own",
 				"Traefik TLS routing, custom domains and bring-your-own certificates",
 				"Remote build servers over TCP, SSH or the Homerun Agent, with a registry layer cache",
 				"Optional Docker Swarm mode for replica scaling",
 				"Scheduled jobs, auto-redeploy and S3 volume backups, on one Scheduling page",
 				"Reusable S3 destinations and a searchable backup history",
 				"Traefik system logs, with restart and update from the dashboard",
-				"A per-account notification feed for deploys, lifecycle events and errors",
+				"One-click self-update to the latest release from the dashboard",
+				"A per-account notification feed, plus Discord, webhook and email notification channels",
+				"Public or private status pages built from your uptime probes",
 				"Configured from the dashboard: a first-run wizard and live settings, no config file",
 				"REST API with OpenAPI and a CLI with device-code login",
-				"Users, roles, invites, sessions, API keys and OAuth/OIDC login",
+				"Users, roles, invites, sessions, API keys, passkeys, two-factor auth and OAuth/OIDC login",
 				"Cloudflare and Pangolin DNS automation",
 			],
 			codeRepository: "https://github.com/orochibraru/homerun",
@@ -211,7 +217,7 @@
 					</picture>
 					<figcaption>
 						<b>Templates</b>
-						Around 58 common self-hosted apps with their real logos bundled in, searchable and
+						Around 70 common self-hosted apps with their real logos bundled in, searchable and
 						filtered by category. Quick Deploy skips the wizard entirely; Configure pre-fills it.
 					</figcaption>
 				</figure>
@@ -327,8 +333,29 @@
 					</p>
 				</div>
 				<div class="feat">
-					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Deployment history</h3>
-					<p>Every attempt recorded with status, image digest and its full log.</p>
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Revisions &amp; rollback</h3>
+					<p>
+						Every attempt recorded with status, image digest and its full log. Roll back to an
+						earlier revision with one click &mdash; the last five distinct images per service are
+						kept on hand so it needs no rebuild &mdash; or turn on auto-rollback so an unhealthy
+						revision reverts itself.
+					</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Image scanning</h3>
+					<p>
+						Every deploy is scanned for known vulnerabilities with Trivy before the workload starts,
+						on by default and never enforced unless you ask for it. The Security tab shows the
+						findings by severity.
+					</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Required status checks</h3>
+					<p>
+						A git-based service can refuse to build until its CI agrees &mdash; GitHub check runs,
+						GitLab pipelines, Gitea/Forgejo or Bitbucket statuses, read live for the exact commit
+						being deployed.
+					</p>
 				</div>
 				<div class="feat">
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Stacks</h3>
@@ -340,7 +367,7 @@
 				<div class="feat">
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">A template catalog</h3>
 					<p>
-						Around 58 built-in apps &mdash; Jellyfin, the *arr stack, Postgres, Redis, Pi-hole,
+						Around 70 built-in apps &mdash; Jellyfin, the *arr stack, Postgres, Redis, Pi-hole,
 						Grafana, Vaultwarden, Excalidraw and the rest &mdash; each with its real logo bundled
 						in, so the gallery renders with no outbound internet. Quick Deploy skips the wizard; a
 						details page pulls the repo&rsquo;s README, stars and latest release from GitHub. Save
@@ -364,6 +391,14 @@
 					</p>
 				</div>
 				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Migrate from Dokploy or Coolify</h3>
+					<p>
+						Point <code>Settings &rarr; Migrate</code> at an existing Dokploy or Coolify instance and
+						it reads its apps, compose stacks and databases and recreates them here, unstarted until
+						you deploy them. Read-only against the other side; nothing there is touched.
+					</p>
+				</div>
+				<div class="feat">
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Smart service links</h3>
 					<p>
 						Point a new service at an existing Postgres, MySQL, Redis, Mongo or RabbitMQ and the
@@ -376,6 +411,15 @@
 						Tail stdout/stderr or open an interactive shell into a running container, from the
 						browser, with uptime probes from the network and from the service&rsquo;s own hostname
 						beside them.
+					</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Status pages</h3>
+					<p>
+						Build an uptime page from your services&rsquo; probes &mdash; every service you own, one
+						stack, or a hand-picked set &mdash; and publish it, unauthenticated, at
+						<code>/status/&lt;slug&gt;</code>. A public page shows only names, up/down and recent
+						uptime, never images, ports or hostnames.
 					</p>
 				</div>
 				<div class="feat">
@@ -447,11 +491,22 @@
 					</p>
 				</div>
 				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">One-click self-update</h3>
+					<p>
+						Admins see a notice by the version number in the sidebar when a newer release exists.
+						Clicking it holds the job queue and launches a short-lived updater container that pulls
+						and restarts just the app, leaving Traefik and Postgres alone &mdash; no SSH session
+						needed.
+					</p>
+				</div>
+				<div class="feat">
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Users, roles &amp; invites</h3>
 					<p>
 						Admin and developer roles, email or direct-create invites, and optional OAuth/OIDC
-						login. Each account gets its own sessions list, revocable one by one, and its own API
-						keys.
+						login with one-click presets for Pocket ID, Keycloak, Authelia, Authentik, Logto,
+						Zitadel and Kanidm. Passkeys and two-factor authentication, either one required
+						instance-wide if you want. Each account gets its own sessions list, revocable one by
+						one, and its own API keys.
 					</p>
 				</div>
 				<div class="feat">
@@ -483,6 +538,9 @@
 					<p>
 						Server-side search, filters and paging on every list page, plus multi-select
 						start/stop/restart/delete with a typed confirmation before anything destructive runs.
+						<code>&#8984;K</code>
+						anywhere opens a command palette that jumps to any dashboard page and, after two
+						characters, searches everything you own.
 					</p>
 				</div>
 				<div class="feat">
@@ -491,9 +549,9 @@
 					</h3>
 					<p>
 						Live CPU, memory, disk and &mdash; with an NVIDIA card present &mdash; GPU usage for the
-						host, alongside per-service CPU, memory and traffic. Read-only checks run on every
-						dashboard load and any that fail become a banner that deep-links into the offending
-						settings field.
+						host, alongside per-service CPU, memory and traffic, and a chart of host usage over the
+						last hour up to a year. Read-only checks run on every dashboard load and any that fail
+						become a banner that deep-links into the offending settings field.
 					</p>
 				</div>
 				<div class="feat">
@@ -518,7 +576,9 @@
 					<p>
 						A per-account bell for deploy succeeded or failed, service created, started or stopped,
 						an auto-redeploy firing, and runtime errors attributed to one of your services. Click
-						through to the service it happened to.
+						through to the service it happened to. Discord, generic webhook and email notification
+						channels carry the same events outside the dashboard, each with its own event matrix
+						and a send-test button.
 					</p>
 				</div>
 				<div class="feat">
@@ -553,7 +613,8 @@
 					<p>
 						Dokploy started moving features homelabbers relied on behind an enterprise plan. Homerun
 						has no plan to move anything behind: remote build servers, S3 backups, roles and
-						invites, the API and the CLI all ship in the one image.
+						invites, the API and the CLI all ship in the one image. <code>Settings &rarr; Migrate</code>
+						reads an existing Dokploy (or Coolify) instance and recreates it here.
 					</p>
 				</div>
 				<div class="feat">

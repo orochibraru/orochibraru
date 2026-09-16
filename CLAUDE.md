@@ -2,8 +2,8 @@
 
 ## Biome output must be empty
 
-`bunx biome check .` must report nothing: no errors, no warnings, no infos. If it
-reports anything — including in code you did not touch — fix the cause before
+`bunx biome check .` must report nothing: no errors, no warnings, no infos. If
+it reports anything — including in code you did not touch — fix the cause before
 calling the work done. Don't silence a diagnostic with a `biome-ignore` comment
 or by switching a rule off; if a rule really is wrong for this repo, ask first.
 
