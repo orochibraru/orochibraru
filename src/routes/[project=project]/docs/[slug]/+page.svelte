@@ -1,18 +1,35 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
-import Meta from "$lib/components/Meta.svelte";
-import { clip, PERSON, SITE } from "$lib/seo";
+	import { resolve } from "$app/paths";
+	import Meta from "$lib/components/Meta.svelte";
+	import { clip, PERSON, SITE } from "$lib/seo";
 
-let { data } = $props();
-const project = $derived(data.project);
-const guide = $derived(data.guides.find((guide) => guide.slug === data.slug));
-const position = $derived(data.guides.findIndex((guide) => guide.slug === data.slug));
-const steps = $derived([
-	{ guide: data.guides[position - 1], label: "← Previous" },
-	{ guide: data.guides[position + 1], label: "Next →" },
-]);
-const path = $derived(`/${project.key}/docs/${data.slug}`);
-const description = $derived(clip(guide?.intro ?? "", 180) || `${project.name} documentation.`);
+	let { data } = $props();
+	const project = $derived(data.project);
+	const guide = $derived(data.guides.find((guide) => guide.slug === data.slug));
+	const position = $derived(data.guides.findIndex((guide) => guide.slug === data.slug));
+	const steps = $derived([
+		{ guide: data.guides[position - 1], label: "← Previous" },
+		{ guide: data.guides[position + 1], label: "Next →" },
+	]);
+	const path = $derived(`/${project.key}/docs/${data.slug}`);
+	const description = $derived(clip(guide?.intro ?? "", 180) || `${project.name} documentation.`);
+
+	// The section being read is the last heading scrolled past; at the very bottom it is the
+	// last one, since short closing sections never reach the top of the viewport.
+	let active = $state("");
+	function spy() {
+		const ids = data.contents.map((section) => section.id);
+		let current = ids[0] ?? "";
+		for (const id of ids) {
+			const top = document.getElementById(id)?.getBoundingClientRect().top;
+			if (top === undefined || top > 120) break;
+			current = id;
+		}
+		if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2)
+			current = ids.at(-1) ?? "";
+		active = current;
+	}
+	$effect(spy);
 </script>
 
 <Meta
@@ -42,48 +59,31 @@ const description = $derived(clip(guide?.intro ?? "", 180) || `${project.name} d
 ]}
 />
 
-<main class="mx-auto max-w-[110rem] px-6">
+<svelte:window onscroll={spy} onresize={spy} />
+
+<main class="px-6">
 	<div
-		class="grid gap-x-12 gap-y-9 pt-10 pb-22.5 lg:grid-cols-[15rem_minmax(0,1fr)] 2xl:grid-cols-[15rem_minmax(0,1fr)_14rem]"
+		class="mx-auto grid max-w-208 gap-x-16 gap-y-9 pt-12 pb-22.5 2xl:max-w-276 2xl:grid-cols-[minmax(0,1fr)_14rem]"
 	>
-		<aside class="min-w-0 lg:sticky lg:top-9 lg:self-start">
-			<a
-				class="text-xs tracking-widest text-dim uppercase hover:text-acid"
-				href={resolve(`/${project.key}`)}
-				>&larr; {project.name}</a
-			>
-			<p class="mt-3 mb-4 text-[11px] tracking-[.18em] text-plasma uppercase">Documentation</p>
-			<nav
-				class="flex gap-4.5 overflow-x-auto pb-3 text-[.92rem] whitespace-nowrap text-dim lg:flex-col lg:gap-2 lg:overflow-visible lg:pb-0 lg:whitespace-normal"
-			>
-				{#each data.guides as sibling (sibling.slug)}
-					<a
-						class={sibling.slug === data.slug ? "text-acid" : "hover:text-acid"}
-						aria-current={sibling.slug === data.slug ? "page" : undefined}
-						href={resolve("/[project=project]/docs/[slug]", { project: project.key, slug: sibling.slug })}
-						>{sibling.title}</a
-					>
-				{/each}
-			</nav>
-		</aside>
 		<article class="docs min-w-0">
-			<h1 class="mb-7 text-[clamp(2rem,5vw,3rem)]/[1.05] font-extrabold tracking-[-.04em]">
+			<h1 class="mb-7 text-[clamp(2rem,5vw,3rem)]/[1.05] font-extrabold tracking-tight">
 				{data.title}
 			</h1>
 			<div class="md">{@html data.html}</div>
-			<div class="mt-14 grid gap-px border border-line bg-line sm:grid-cols-2">
+			<div class="mt-14 grid gap-3 sm:grid-cols-2">
 				{#each steps as step (step.label)}
 					{#if step.guide}
 						<a
-							class="card"
+							class={[
+								"group rounded-xl border border-line bg-surface px-5 py-4 transition hover:border-edge",
+								step.label.startsWith("Next") && "sm:col-start-2 sm:text-right",
+							]}
 							href={resolve("/[project=project]/docs/[slug]", { project: project.key, slug: step.guide.slug })}
-							><span class="text-[11px] tracking-[.18em] text-dim uppercase">{step.label}</span>
-							<h2 class="mt-2.5 text-[1.15rem] font-bold tracking-[-.02em] transition-colors">
+							><span class="font-sans text-xs text-dim">{step.label}</span>
+							<h2 class="mt-1 font-bold tracking-[-.02em] transition-colors group-hover:text-acid">
 								{step.guide.title}
 							</h2></a
 						>
-					{:else}
-						<div class="hidden bg-surface sm:block"></div>
 					{/if}
 				{/each}
 			</div>
@@ -99,13 +99,20 @@ const description = $derived(clip(guide?.intro ?? "", 180) || `${project.name} d
 		</article>
 		{#if data.contents.length >= 2}
 			<nav
-				class="hidden text-[.85rem]/[1.5] text-dim 2xl:sticky 2xl:top-9 2xl:block 2xl:self-start"
+				class="hidden text-[.85rem]/[1.5] text-fg/75 2xl:sticky 2xl:top-9 2xl:block 2xl:max-h-[calc(100vh-4.5rem)] 2xl:self-start 2xl:overflow-y-auto"
 			>
 				<p class="mb-3.5 text-[11px] tracking-[.18em] text-plasma uppercase">On this page</p>
-				<ul class="flex flex-col gap-2.5 border-l border-line pl-4">
+				<ul class="font-sans text-[.9rem]">
 					{#each data.contents as section (section.id)}
-						<li class={section.level === 3 ? "pl-3.5" : undefined}>
-							<a class="hover:text-acid" href="#{section.id}">{section.heading}</a>
+						<li
+							class="border-l py-1.25 {section.level === 3 ? "pl-7.5" : "pl-4"} {section.id === active ? "border-acid text-acid" : "border-line"}"
+						>
+							<a
+								class="block hover:text-acid"
+								aria-current={section.id === active ? "location" : undefined}
+								href="#{section.id}"
+								>{section.heading}</a
+							>
 						</li>
 					{/each}
 				</ul>

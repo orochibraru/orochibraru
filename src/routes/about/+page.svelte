@@ -1,25 +1,25 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
-import Meta from "$lib/components/Meta.svelte";
+	import { resolve } from "$app/paths";
+	import Meta from "$lib/components/Meta.svelte";
 
-const structuredData = [
-	{
-		"@context": "https://schema.org",
-		"@type": "AboutPage",
-		url: "https://orochibraru.com/about",
-		isPartOf: { "@id": "https://orochibraru.com/#website" },
-		mainEntity: {
-			"@type": "Person",
-			"@id": "https://orochibraru.com/#person",
-			name: "orochibraru",
-			description:
-				"Self-taught software engineer with ten years of experience, building free self-hosted tools for homelabs.",
+	const structuredData = [
+		{
+			"@context": "https://schema.org",
+			"@type": "AboutPage",
 			url: "https://orochibraru.com/about",
-			sameAs: ["https://github.com/orochibraru", "https://hub.docker.com/u/orochibraru"],
-			knowsAbout: ["self-hosting", "homelab", "Docker", "SvelteKit", "Bun", "TypeScript"],
+			isPartOf: { "@id": "https://orochibraru.com/#website" },
+			mainEntity: {
+				"@type": "Person",
+				"@id": "https://orochibraru.com/#person",
+				name: "orochibraru",
+				description:
+					"Self-taught software engineer with ten years of experience, building free self-hosted tools for homelabs.",
+				url: "https://orochibraru.com/about",
+				sameAs: ["https://github.com/orochibraru", "https://hub.docker.com/u/orochibraru"],
+				knowsAbout: ["self-hosting", "homelab", "Docker", "SvelteKit", "Bun", "TypeScript"],
+			},
 		},
-	},
-];
+	];
 </script>
 
 <Meta
@@ -47,7 +47,7 @@ const structuredData = [
 					class="size-28 shrink-0 border border-line object-cover"
 					loading="eager"
 				>
-				<h1 class="text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">
+				<h1 class="text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.03em]">
 					Who&rsquo;s writing<br>
 					<span class="bg-linear-to-r from-acid via-cyan to-plasma bg-clip-text text-transparent"
 						>all this.</span

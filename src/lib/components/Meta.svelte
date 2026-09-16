@@ -1,35 +1,35 @@
 <script lang="ts">
-import { breadcrumbs, jsonld, mdPath, SITE } from "$lib/seo";
+	import { breadcrumbs, jsonld, mdPath, SITE } from "$lib/seo";
 
-type Image = { url: string; width: number; height: number; alt: string };
+	type Image = { url: string; width: number; height: number; alt: string };
 
-let {
-	title,
-	description,
-	path,
-	ogType = "website",
-	image,
-	trail,
-	structuredData = [],
-	twin = true,
-	noindex = false,
-}: {
-	title: string;
-	description: string;
-	path: string;
-	ogType?: string;
-	image?: Image;
-	trail?: [string, string][];
-	structuredData?: unknown[];
-	twin?: boolean;
-	noindex?: boolean;
-} = $props();
+	let {
+		title,
+		description,
+		path,
+		ogType = "website",
+		image,
+		trail,
+		structuredData = [],
+		twin = true,
+		noindex = false,
+	}: {
+		title: string;
+		description: string;
+		path: string;
+		ogType?: string;
+		image?: Image;
+		trail?: [string, string][];
+		structuredData?: unknown[];
+		twin?: boolean;
+		noindex?: boolean;
+	} = $props();
 
-// A page without a real wide screenshot gets the square avatar, and the small card is the honest one for it.
-const card = $derived(
-	image ?? { url: `${SITE}/avatar.jpg`, width: 320, height: 320, alt: "orochibraru" },
-);
-const nodes = $derived(trail ? [...structuredData, breadcrumbs(trail)] : structuredData);
+	// A page without a real wide screenshot gets the square avatar, and the small card is the honest one for it.
+	const card = $derived(
+		image ?? { url: `${SITE}/avatar.jpg`, width: 320, height: 320, alt: "orochibraru" },
+	);
+	const nodes = $derived(trail ? [...structuredData, breadcrumbs(trail)] : structuredData);
 </script>
 
 <svelte:head>

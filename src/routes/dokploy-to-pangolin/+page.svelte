@@ -1,28 +1,28 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
-import Meta from "$lib/components/Meta.svelte";
+	import { resolve } from "$app/paths";
+	import Meta from "$lib/components/Meta.svelte";
 
-const structuredData = [
-	{
-		"@context": "https://schema.org",
-		"@type": "SoftwareApplication",
-		name: "dokploy-to-pangolin",
-		applicationCategory: "DeveloperApplication",
-		operatingSystem: "Linux, macOS, Docker",
-		description:
-			"A free, open-source webhook bridge that registers new Dokploy applications with Pangolin automatically: creates the resource and target so every deploy is routed without hand-editing anything.",
-		url: "https://orochibraru.com/dokploy-to-pangolin",
-		isAccessibleForFree: true,
-		codeRepository: "https://github.com/orochibraru/dokploy-to-pangolin",
-		author: { "@id": "https://orochibraru.com/#person" },
-		offers: {
-			"@type": "Offer",
-			price: "0",
-			priceCurrency: "USD",
-			availability: "https://schema.org/InStock",
+	const structuredData = [
+		{
+			"@context": "https://schema.org",
+			"@type": "SoftwareApplication",
+			name: "dokploy-to-pangolin",
+			applicationCategory: "DeveloperApplication",
+			operatingSystem: "Linux, macOS, Docker",
+			description:
+				"A free, open-source webhook bridge that registers new Dokploy applications with Pangolin automatically: creates the resource and target so every deploy is routed without hand-editing anything.",
+			url: "https://orochibraru.com/dokploy-to-pangolin",
+			isAccessibleForFree: true,
+			codeRepository: "https://github.com/orochibraru/dokploy-to-pangolin",
+			author: { "@id": "https://orochibraru.com/#person" },
+			offers: {
+				"@type": "Offer",
+				price: "0",
+				priceCurrency: "USD",
+				availability: "https://schema.org/InStock",
+			},
 		},
-	},
-];
+	];
 </script>
 
 <Meta
@@ -42,7 +42,7 @@ const structuredData = [
 				>&larr; All projects</a
 			>
 			<span class="tag ml-3.5">Networking &middot; Bun + Hono</span>
-			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">
+			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.03em]">
 				dokploy-to-pangolin
 			</h1>
 			<p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">

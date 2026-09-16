@@ -1,40 +1,47 @@
 <script lang="ts">
-import { onMount } from "svelte";
-import { resolve } from "$app/paths";
+	import { onMount } from "svelte";
+	import { resolve } from "$app/paths";
 
-let { width, source, onsearch }: { width: string; source?: string; onsearch: () => void } =
-	$props();
+	let {
+		width,
+		source,
+		docs = false,
+		onsearch,
+	}: { width: string; source?: string; docs?: boolean; onsearch: () => void } = $props();
 
-const MODES = ["system", "light", "dark"] as const;
-type Mode = (typeof MODES)[number];
+	const MODES = ["system", "light", "dark"] as const;
+	type Mode = (typeof MODES)[number];
 
-let mode = $state<Mode>("system");
-const next = $derived(MODES[(MODES.indexOf(mode) + 1) % MODES.length] ?? "system");
+	let mode = $state<Mode>("system");
+	const next = $derived(MODES[(MODES.indexOf(mode) + 1) % MODES.length] ?? "system");
 
-onMount(() => {
-	const stored = document.documentElement.dataset.theme;
-	if (stored === "light" || stored === "dark") mode = stored;
-});
+	onMount(() => {
+		const stored = document.documentElement.dataset.theme;
+		if (stored === "light" || stored === "dark") mode = stored;
+	});
 
-// System stores nothing, so the stylesheet's prefers-color-scheme rules keep following the OS.
-function cycleTheme() {
-	mode = next;
-	const root = document.documentElement;
-	if (mode === "system") delete root.dataset.theme;
-	else root.dataset.theme = mode;
-	try {
-		if (mode === "system") localStorage.removeItem("theme");
-		else localStorage.setItem("theme", mode);
-	} catch {}
-}
+	// System stores nothing, so the stylesheet's prefers-color-scheme rules keep following the OS.
+	function cycleTheme() {
+		mode = next;
+		const root = document.documentElement;
+		if (mode === "system") delete root.dataset.theme;
+		else root.dataset.theme = mode;
+		try {
+			if (mode === "system") localStorage.removeItem("theme");
+			else localStorage.setItem("theme", mode);
+		} catch {}
+	}
 </script>
 
-<header class="mx-auto {width} px-6">
-	<nav class="flex flex-wrap items-center justify-between gap-4 py-7">
-		<a class="text-[15px] font-bold tracking-[-.02em]" href={resolve("/")}
+<header class="mx-auto {width} px-6 {docs ? "lg:border-b lg:border-line" : ""}">
+	<nav
+		class="flex flex-wrap items-center justify-between gap-4 py-7 {docs ? "lg:h-22 lg:py-0" : ""}"
+	>
+		<!-- docs pages carry the logo in their sidebar from lg up -->
+		<a class="font-mono text-[17px] font-bold tracking-[-.02em] {docs ? "lg:hidden" : ""}" href={resolve("/")}
 			>orochi<span class="text-acid">braru</span></a
 		>
-		<div class="flex items-center gap-4 text-[13px] whitespace-nowrap text-dim sm:gap-5">
+		<div class="ml-auto flex items-center gap-4 text-[15px] font-medium whitespace-nowrap text-fg/80 sm:gap-6">
 			<a class="hover:text-acid" href={resolve("/#projects")}>Projects</a>
 			<a class="hover:text-acid" href={resolve("/blog")}>Blog</a>
 			<a class="hover:text-acid" href={resolve("/about")}>About</a>
@@ -47,12 +54,12 @@ function cycleTheme() {
 			<button
 				type="button"
 				aria-label="Search the site"
-				class="flex items-center gap-2 border border-edge px-2.5 py-1.5 transition hover:border-acid hover:text-acid"
+				class="flex h-9 items-center gap-2 border border-edge px-3 transition hover:border-acid hover:text-acid"
 				onclick={onsearch}
 			>
 				<svg
 					viewBox="0 0 24 24"
-					class="size-3.5"
+					class="size-4"
 					fill="none"
 					stroke="currentColor"
 					stroke-width="2"
@@ -62,13 +69,13 @@ function cycleTheme() {
 					<path d="m20 20-3.5-3.5" />
 				</svg>
 				<span class="hidden sm:inline">Search</span>
-				<kbd class="hidden font-mono text-[11px] text-edge sm:inline">&#8984;K</kbd>
+				<kbd class="hidden font-mono text-xs font-normal text-dim sm:inline">&#8984;K</kbd>
 			</button>
 			<button
 				type="button"
 				aria-label="Theme: {mode}. Switch to {next}."
 				title="Theme: {mode}"
-				class="grid size-8 place-items-center border border-edge transition hover:border-acid hover:text-acid"
+				class="grid size-9 place-items-center border border-edge transition hover:border-acid hover:text-acid"
 				onclick={cycleTheme}
 			>
 				<svg

@@ -1,6 +1,6 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
-import Meta from "$lib/components/Meta.svelte";
+	import { resolve } from "$app/paths";
+	import Meta from "$lib/components/Meta.svelte";
 </script>
 
 <Meta
@@ -13,7 +13,7 @@ import Meta from "$lib/components/Meta.svelte";
 	<div class="pt-15 pb-22.5">
 		<span class="tag">6 projects &middot; self-hosted &middot; MIT &amp; AGPL</span>
 		<h1
-			class="mt-6.5 text-[clamp(2.6rem,9vw,6.2rem)]/[.92] font-extrabold tracking-[-.045em] text-balance"
+			class="mt-6.5 text-[clamp(2.6rem,9vw,6.2rem)]/[.92] font-extrabold tracking-[-.03em] text-balance"
 		>
 			Software that<br>never grew<br>
 			<span class="bg-linear-to-r from-acid via-cyan to-plasma bg-clip-text text-transparent"

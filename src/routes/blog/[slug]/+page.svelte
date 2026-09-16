@@ -1,11 +1,11 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
-import Meta from "$lib/components/Meta.svelte";
-import { PERSON, readable, SITE } from "$lib/seo";
+	import { resolve } from "$app/paths";
+	import Meta from "$lib/components/Meta.svelte";
+	import { PERSON, readable, SITE } from "$lib/seo";
 
-let { data } = $props();
-const post = $derived(data.post);
-const path = $derived(`/blog/${post.slug}`);
+	let { data } = $props();
+	const post = $derived(data.post);
+	const path = $derived(`/blog/${post.slug}`);
 </script>
 
 <svelte:head>
@@ -46,7 +46,7 @@ const path = $derived(`/blog/${post.slug}`);
 				>&larr; All posts</a
 			>
 			<h1
-				class="mt-4.5 max-w-[24ch] text-[clamp(2.2rem,6vw,3.8rem)]/[1.05] font-extrabold tracking-[-.04em]"
+				class="mt-4.5 max-w-[24ch] text-[clamp(2.2rem,6vw,3.8rem)]/[1.05] font-extrabold tracking-tight"
 			>
 				{post.title}
 			</h1>

@@ -1,93 +1,93 @@
 <script lang="ts">
-import { afterNavigate, goto } from "$app/navigation";
+	import { afterNavigate, goto } from "$app/navigation";
 
-type Entry = { u: string; t: string; g: string; p: string; x: string };
+	type Entry = { u: string; t: string; g: string; p: string; x: string };
 
-let dialog = $state<HTMLDialogElement>();
-let field = $state<HTMLInputElement>();
-let query = $state("");
-let index = $state<Entry[]>();
-let active = $state(0);
+	let dialog = $state<HTMLDialogElement>();
+	let field = $state<HTMLInputElement>();
+	let query = $state("");
+	let index = $state<Entry[]>();
+	let active = $state(0);
 
-const results = $derived.by(() => {
-	const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-	if (!index || !terms.length) return [];
+	const results = $derived.by(() => {
+		const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+		if (!index || !terms.length) return [];
 
-	const scored: { entry: Entry; score: number }[] = [];
-	for (const entry of index) {
-		const heading = entry.t.toLowerCase();
-		const context = entry.g.toLowerCase();
-		const body = entry.x.toLowerCase();
+		const scored: { entry: Entry; score: number }[] = [];
+		for (const entry of index) {
+			const heading = entry.t.toLowerCase();
+			const context = entry.g.toLowerCase();
+			const body = entry.x.toLowerCase();
 
-		let score = 0;
-		for (const term of terms) {
-			const hit = heading.includes(term)
-				? 8
-				: context.includes(term)
-					? 4
-					: body.includes(term)
-						? 2
-						: 0;
-			if (!hit) {
-				score = 0;
-				break;
+			let score = 0;
+			for (const term of terms) {
+				const hit = heading.includes(term)
+					? 8
+					: context.includes(term)
+						? 4
+						: body.includes(term)
+							? 2
+							: 0;
+				if (!hit) {
+					score = 0;
+					break;
+				}
+				score += hit + (heading.startsWith(term) ? 3 : 0);
 			}
-			score += hit + (heading.startsWith(term) ? 3 : 0);
+			if (score) scored.push({ entry, score });
 		}
-		if (score) scored.push({ entry, score });
-	}
-	return scored
-		.sort((a, b) => b.score - a.score)
-		.slice(0, 24)
-		.map((hit) => hit.entry);
-});
+		return scored
+			.sort((a, b) => b.score - a.score)
+			.slice(0, 24)
+			.map((hit) => hit.entry);
+	});
 
-export async function open() {
-	if (!dialog || dialog.open) return;
-	dialog.showModal();
-	field?.select();
-	if (!index) {
-		try {
-			index = await (await fetch("/search.json")).json();
-		} catch {
-			index = [];
+	export async function open() {
+		if (!dialog || dialog.open) return;
+		dialog.showModal();
+		field?.select();
+		if (!index) {
+			try {
+				index = await (await fetch("/search.json")).json();
+			} catch {
+				index = [];
+			}
 		}
 	}
-}
 
-afterNavigate(() => dialog?.close());
+	afterNavigate(() => dialog?.close());
 
-function onWindowKeydown(event: KeyboardEvent) {
-	if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-		event.preventDefault();
-		open();
+	function onWindowKeydown(event: KeyboardEvent) {
+		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+			event.preventDefault();
+			open();
+		}
 	}
-}
 
-function onDialogKeydown(event: KeyboardEvent) {
-	const count = results.length;
-	if (event.key === "ArrowDown" && count) {
-		event.preventDefault();
-		active = (active + 1) % count;
-	} else if (event.key === "ArrowUp" && count) {
-		event.preventDefault();
-		active = (active - 1 + count) % count;
-	} else if (event.key === "Enter") {
-		const result = results[active];
-		if (!result) return;
-		event.preventDefault();
-		goto(result.u);
+	function onDialogKeydown(event: KeyboardEvent) {
+		const count = results.length;
+		if (event.key === "ArrowDown" && count) {
+			event.preventDefault();
+			active = (active + 1) % count;
+		} else if (event.key === "ArrowUp" && count) {
+			event.preventDefault();
+			active = (active - 1 + count) % count;
+		} else if (event.key === "Enter") {
+			const result = results[active];
+			if (!result) return;
+			event.preventDefault();
+			goto(result.u);
+		}
 	}
-}
 
-$effect(() => {
-	query;
-	active = 0;
-});
+	$effect(() => {
+		query;
+		active = 0;
+	});
 
-$effect(() => {
-	dialog?.querySelectorAll("a")[active]?.scrollIntoView({ block: "nearest" });
-});
+	$effect(() => {
+		dialog?.querySelectorAll("a")[active]?.scrollIntoView({ block: "nearest" });
+	});
 </script>
 
 <svelte:window onkeydown={onWindowKeydown} />

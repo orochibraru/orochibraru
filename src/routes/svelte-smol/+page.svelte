@@ -1,29 +1,29 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
-import Meta from "$lib/components/Meta.svelte";
+	import { resolve } from "$app/paths";
+	import Meta from "$lib/components/Meta.svelte";
 
-const structuredData = [
-	{
-		"@context": "https://schema.org",
-		"@type": "SoftwareApplication",
-		name: "svelte-smol",
-		applicationCategory: "DeveloperApplication",
-		operatingSystem: "Linux, macOS, Docker",
-		description:
-			"svelte-smol is a free SvelteKit adapter that compiles your app to one standalone executable with bun build --compile. No node_modules to ship, a built-in Docker healthcheck, MIT licensed.",
-		url: "https://orochibraru.com/svelte-smol",
-		isAccessibleForFree: true,
-		license: "https://opensource.org/licenses/MIT",
-		codeRepository: "https://github.com/orochibraru/svelte-smol",
-		author: { "@id": "https://orochibraru.com/#person" },
-		offers: {
-			"@type": "Offer",
-			price: "0",
-			priceCurrency: "USD",
-			availability: "https://schema.org/InStock",
+	const structuredData = [
+		{
+			"@context": "https://schema.org",
+			"@type": "SoftwareApplication",
+			name: "svelte-smol",
+			applicationCategory: "DeveloperApplication",
+			operatingSystem: "Linux, macOS, Docker",
+			description:
+				"svelte-smol is a free SvelteKit adapter that compiles your app to one standalone executable with bun build --compile. No node_modules to ship, a built-in Docker healthcheck, MIT licensed.",
+			url: "https://orochibraru.com/svelte-smol",
+			isAccessibleForFree: true,
+			license: "https://opensource.org/licenses/MIT",
+			codeRepository: "https://github.com/orochibraru/svelte-smol",
+			author: { "@id": "https://orochibraru.com/#person" },
+			offers: {
+				"@type": "Offer",
+				price: "0",
+				priceCurrency: "USD",
+				availability: "https://schema.org/InStock",
+			},
 		},
-	},
-];
+	];
 </script>
 
 <Meta
@@ -43,7 +43,7 @@ const structuredData = [
 				>&larr; All projects</a
 			>
 			<span class="tag ml-3.5">Tooling &middot; npm package</span>
-			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">
+			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.03em]">
 				svelte-smol
 			</h1>
 			<p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">

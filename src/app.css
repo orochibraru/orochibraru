@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 
 /* ---------------------------------------------------------------
    Design tokens. Light is the base; dark is applied either by the
@@ -6,24 +8,25 @@
    Everything theme-dependent lives here so the rest is utilities.
    --------------------------------------------------------------- */
 @theme {
-	--font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+	--font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+	--font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
 	--container-page: 96rem; /* the one page-width knob: max-w-page */
 
-	--color-bg: #f4f5f7;
+	--color-bg: #fbfbfd;
 	--color-surface: #ffffff;
-	--color-line: #e3e6eb;
-	--color-edge: #c6ccd6;
+	--color-line: #e6e8ee;
+	--color-edge: #cbd1db;
 	--color-fg: #0a0c10;
-	--color-dim: #5a6272;
+	--color-dim: #525a69;
 	--color-acid: #3f7400; /* accent for text/borders: contrast-safe */
 	--color-neon: #a8f000; /* raw lime, only ever used as a fill */
 	--color-onneon: #0a0c10;
 	--color-plasma: #b3006e;
 	--color-cyan: #0a6f8a; /* darkened from #0b7f9e: that was 4.24:1 on --color-bg */
 
-	--glow-1: rgba(168, 240, 0, 0.26);
-	--glow-2: rgba(255, 46, 168, 0.14);
+	--glow-1: rgba(168, 240, 0, 0.32);
+	--glow-2: rgba(255, 46, 168, 0.18);
 	--grid-op: 0.9;
 
 	--animate-marquee: marquee 32s linear infinite;
@@ -76,7 +79,7 @@
 		color-scheme: light dark;
 	}
 	body {
-		@apply bg-bg text-fg font-mono text-[15px]/[1.65] antialiased overflow-x-hidden;
+		@apply bg-bg text-fg font-sans text-base/[1.65] antialiased overflow-x-hidden;
 	}
 	/* decorative backdrop: grid + glow. No utility does masked repeating grids. */
 	body::before {
@@ -105,6 +108,11 @@
 		color: inherit;
 		text-decoration: none;
 	}
+	/* Sans is the reading face; mono stays as the accent for eyebrow labels, which are
+     always uppercase. :where keeps it overridable by a font-* utility. */
+	:where(.uppercase) {
+		font-family: var(--font-mono);
+	}
 	:focus-visible {
 		@apply outline-2 outline-offset-[3px] outline-acid;
 	}
@@ -113,13 +121,13 @@
 @layer components {
 	/* the five atoms that repeat on every page */
 	.btn {
-		@apply inline-block border border-edge px-5.5 py-3 text-[13px] uppercase tracking-[.04em] transition duration-150 hover:border-acid hover:text-acid;
+		@apply inline-block border border-edge font-mono px-5.5 py-3 text-[13px] uppercase tracking-[.04em] transition duration-150 hover:border-acid hover:text-acid;
 	}
 	.btn-primary {
 		@apply border-neon bg-neon font-bold text-onneon hover:border-neon hover:bg-neon hover:text-onneon hover:brightness-110;
 	}
 	.tag {
-		@apply inline-flex items-center gap-2 rounded-full border border-edge px-3 py-1.25 text-[11px] uppercase tracking-[.18em] text-dim;
+		@apply inline-flex items-center gap-2 rounded-full border border-edge font-mono px-3 py-1.25 text-[11px] uppercase tracking-[.18em] text-dim;
 	}
 	.tag::before {
 		content: "";
@@ -127,7 +135,7 @@
 		box-shadow: 0 0 10px var(--color-neon);
 	}
 	.chip {
-		@apply rounded-[3px] border border-edge px-2.25 py-0.75 text-[10.5px] uppercase tracking-[.08em] text-dim;
+		@apply rounded-[3px] border border-edge font-mono px-2.25 py-0.75 text-[10.5px] uppercase tracking-[.08em] text-dim;
 	}
 	.card {
 		@apply relative block bg-surface px-7 pt-7.5 pb-6.5 transition-colors hover:bg-fg/4;
@@ -208,13 +216,13 @@
 		@apply font-semibold text-fg;
 	}
 	.md code {
-		@apply text-cyan;
+		@apply text-[.9em] text-cyan;
 	}
 	.md pre {
 		@apply mb-5 max-w-[80ch] overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
 	}
 	.md pre code {
-		@apply text-fg;
+		@apply text-[1em] text-fg;
 	}
 	.md hr {
 		@apply my-10 border-line;
@@ -244,6 +252,24 @@
 	.docs .md blockquote {
 		@apply max-w-none;
 	}
+	/* the guide column is already a reading width, so prose uses all of it and
+     tables wrap instead of pushing past it */
+	.docs .md p,
+	.docs .md ul,
+	.docs .md ol {
+		@apply max-w-none;
+	}
+	.docs .md-table table {
+		@apply whitespace-normal;
+	}
+	/* guides are read end to end over the grid backdrop: dim is too faint for that */
+	.docs .md p,
+	.docs .md ul,
+	.docs .md ol,
+	.docs .md blockquote,
+	.docs .md-table td {
+		@apply text-fg/80;
+	}
 
 	/* the theme button shows which mode you are in; no attribute means system */
 	.theme-icon {
@@ -260,13 +286,13 @@
 		@apply mt-6 mb-2 text-[.95rem] font-bold tracking-[-.01em] text-fg;
 	}
 	.md-table {
-		@apply mb-5 overflow-x-auto border border-line;
+		@apply mb-5 overflow-x-auto border border-line bg-surface;
 	}
 	.md-table table {
 		@apply w-full border-collapse text-[.85rem]/[1.55] whitespace-nowrap;
 	}
 	.md-table th {
-		@apply border-b border-edge bg-surface px-3.5 py-2.5 text-left font-bold;
+		@apply border-b border-edge bg-fg/4 px-3.5 py-2.5 text-left font-bold;
 	}
 	.md-table td {
 		@apply border-b border-line px-3.5 py-2.5 align-top text-dim;

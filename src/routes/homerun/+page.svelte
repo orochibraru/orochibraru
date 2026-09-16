@@ -1,75 +1,75 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
-import deploy from "$docs/homerun/images/deploy.webp";
-import deployDark from "$docs/homerun/images/deploy-dark.webp";
-import hero from "$docs/homerun/images/hero.webp";
-import heroDark from "$docs/homerun/images/hero-dark.webp";
-import logs from "$docs/homerun/images/logs.webp";
-import logsDark from "$docs/homerun/images/logs-dark.webp";
-import networking from "$docs/homerun/images/networking.webp";
-import networkingDark from "$docs/homerun/images/networking-dark.webp";
-import project from "$docs/homerun/images/project.webp";
-import projectDark from "$docs/homerun/images/project-dark.webp";
-import service from "$docs/homerun/images/service.webp";
-import serviceDark from "$docs/homerun/images/service-dark.webp";
-import settings from "$docs/homerun/images/settings.webp";
-import settingsDark from "$docs/homerun/images/settings-dark.webp";
-import templates from "$docs/homerun/images/templates.webp";
-import templatesDark from "$docs/homerun/images/templates-dark.webp";
-import Meta from "$lib/components/Meta.svelte";
-import { SITE } from "$lib/seo";
+	import { resolve } from "$app/paths";
+	import deploy from "$docs/homerun/images/deploy.webp";
+	import deployDark from "$docs/homerun/images/deploy-dark.webp";
+	import hero from "$docs/homerun/images/hero.webp";
+	import heroDark from "$docs/homerun/images/hero-dark.webp";
+	import logs from "$docs/homerun/images/logs.webp";
+	import logsDark from "$docs/homerun/images/logs-dark.webp";
+	import networking from "$docs/homerun/images/networking.webp";
+	import networkingDark from "$docs/homerun/images/networking-dark.webp";
+	import project from "$docs/homerun/images/project.webp";
+	import projectDark from "$docs/homerun/images/project-dark.webp";
+	import service from "$docs/homerun/images/service.webp";
+	import serviceDark from "$docs/homerun/images/service-dark.webp";
+	import settings from "$docs/homerun/images/settings.webp";
+	import settingsDark from "$docs/homerun/images/settings-dark.webp";
+	import templates from "$docs/homerun/images/templates.webp";
+	import templatesDark from "$docs/homerun/images/templates-dark.webp";
+	import Meta from "$lib/components/Meta.svelte";
+	import { SITE } from "$lib/seo";
 
-const structuredData = [
-	{
-		"@context": "https://schema.org",
-		"@type": "SoftwareApplication",
-		name: "Homerun",
-		applicationCategory: "DeveloperApplication",
-		applicationSubCategory: "Platform as a Service",
-		operatingSystem: "Linux, Docker",
-		description:
-			"Homerun is a free, self-hosted single-host PaaS and a Dokploy, Coolify, Dokku and Cloud Run alternative: deploy Docker images or git repos from a form, get TLS routing via Traefik. Nothing paywalled.",
-		url: "https://orochibraru.com/homerun",
-		screenshot: `${SITE}${heroDark}`,
-		softwareHelp: "https://orochibraru.com/homerun/docs",
-		isAccessibleForFree: true,
-		keywords:
-			"Dokploy alternative, Coolify alternative, Dokku alternative, CapRover alternative, Cloud Run alternative, AWS alternative, Heroku alternative, self-hosted PaaS, homelab deploys",
-		featureList: [
-			"Deploy any Docker image or build from a git repository Dockerfile",
-			"Live streamed deploy progress that survives a page reload",
-			"Deployment history with logs and image digests",
-			"Projects grouping services on a shared Docker network",
-			"A catalog of ~58 one-click templates with Quick Deploy and linked companion containers",
-			"Connect GitHub, GitLab, Gitea or Bitbucket and browse your repositories",
-			"docker-compose.yaml import",
-			"Automatic connection URLs between linked services",
-			"Container logs, uptime probes and an in-browser web terminal",
-			"Live host CPU, memory, disk and GPU usage on the dashboard",
-			"Setup diagnostics that deep-link into the setting they are complaining about",
-			"Traefik TLS routing, custom domains and bring-your-own certificates",
-			"Remote build servers over TCP, SSH or the Homerun Agent, with a registry layer cache",
-			"Optional Docker Swarm mode for replica scaling",
-			"Scheduled jobs, auto-redeploy and S3 volume backups, on one Scheduling page",
-			"Reusable S3 destinations and a searchable backup history",
-			"Traefik system logs, with restart and update from the dashboard",
-			"A per-account notification feed for deploys, lifecycle events and errors",
-			"Configured from the dashboard: a first-run wizard and live settings, no config file",
-			"REST API with OpenAPI and a CLI with device-code login",
-			"Users, roles, invites, sessions, API keys and OAuth/OIDC login",
-			"Cloudflare and Pangolin DNS automation",
-		],
-		codeRepository: "https://github.com/orochibraru/homerun",
-		sameAs: ["https://hub.docker.com/r/orochibraru/homerun"],
-		author: { "@id": "https://orochibraru.com/#person" },
-		offers: {
-			"@type": "Offer",
-			price: "0",
-			priceCurrency: "USD",
-			availability: "https://schema.org/InStock",
+	const structuredData = [
+		{
+			"@context": "https://schema.org",
+			"@type": "SoftwareApplication",
+			name: "Homerun",
+			applicationCategory: "DeveloperApplication",
+			applicationSubCategory: "Platform as a Service",
+			operatingSystem: "Linux, Docker",
+			description:
+				"Homerun is a free, self-hosted single-host PaaS and a Dokploy, Coolify, Dokku and Cloud Run alternative: deploy Docker images or git repos from a form, get TLS routing via Traefik. Nothing paywalled.",
+			url: "https://orochibraru.com/homerun",
+			screenshot: `${SITE}${heroDark}`,
+			softwareHelp: "https://orochibraru.com/homerun/docs",
+			isAccessibleForFree: true,
+			keywords:
+				"Dokploy alternative, Coolify alternative, Dokku alternative, CapRover alternative, Cloud Run alternative, AWS alternative, Heroku alternative, self-hosted PaaS, homelab deploys",
+			featureList: [
+				"Deploy any Docker image or build from a git repository Dockerfile",
+				"Live streamed deploy progress that survives a page reload",
+				"Deployment history with logs and image digests",
+				"Projects grouping services on a shared Docker network",
+				"A catalog of ~58 one-click templates with Quick Deploy and linked companion containers",
+				"Connect GitHub, GitLab, Gitea or Bitbucket and browse your repositories",
+				"docker-compose.yaml import",
+				"Automatic connection URLs between linked services",
+				"Container logs, uptime probes and an in-browser web terminal",
+				"Live host CPU, memory, disk and GPU usage on the dashboard",
+				"Setup diagnostics that deep-link into the setting they are complaining about",
+				"Traefik TLS routing, custom domains and bring-your-own certificates",
+				"Remote build servers over TCP, SSH or the Homerun Agent, with a registry layer cache",
+				"Optional Docker Swarm mode for replica scaling",
+				"Scheduled jobs, auto-redeploy and S3 volume backups, on one Scheduling page",
+				"Reusable S3 destinations and a searchable backup history",
+				"Traefik system logs, with restart and update from the dashboard",
+				"A per-account notification feed for deploys, lifecycle events and errors",
+				"Configured from the dashboard: a first-run wizard and live settings, no config file",
+				"REST API with OpenAPI and a CLI with device-code login",
+				"Users, roles, invites, sessions, API keys and OAuth/OIDC login",
+				"Cloudflare and Pangolin DNS automation",
+			],
+			codeRepository: "https://github.com/orochibraru/homerun",
+			sameAs: ["https://hub.docker.com/r/orochibraru/homerun"],
+			author: { "@id": "https://orochibraru.com/#person" },
+			offers: {
+				"@type": "Offer",
+				price: "0",
+				priceCurrency: "USD",
+				availability: "https://schema.org/InStock",
+			},
 		},
-	},
-];
+	];
 </script>
 
 <Meta
@@ -95,7 +95,7 @@ const structuredData = [
 				>&larr; All projects</a
 			>
 			<span class="tag ml-3.5">Deploys &middot; Self-hosted PaaS</span>
-			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">
+			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.03em]">
 				Homerun
 			</h1>
 			<p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">

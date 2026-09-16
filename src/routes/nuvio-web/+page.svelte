@@ -1,29 +1,29 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
-import Meta from "$lib/components/Meta.svelte";
+	import { resolve } from "$app/paths";
+	import Meta from "$lib/components/Meta.svelte";
 
-const structuredData = [
-	{
-		"@context": "https://schema.org",
-		"@type": "SoftwareApplication",
-		name: "Nuvio Web",
-		applicationCategory: "DeveloperApplication",
-		operatingSystem: "Linux, macOS, Docker",
-		description:
-			"Nuvio Web is a free, open-source unofficial web client for Nuvio: your profiles, addons, library and watch progress in the browser, with HLS playback, subtitles, skip intro and cast to TV.",
-		url: "https://orochibraru.com/nuvio-web",
-		isAccessibleForFree: true,
-		license: "https://www.gnu.org/licenses/agpl-3.0.html",
-		codeRepository: "https://github.com/orochibraru/nuvio-web",
-		author: { "@id": "https://orochibraru.com/#person" },
-		offers: {
-			"@type": "Offer",
-			price: "0",
-			priceCurrency: "USD",
-			availability: "https://schema.org/InStock",
+	const structuredData = [
+		{
+			"@context": "https://schema.org",
+			"@type": "SoftwareApplication",
+			name: "Nuvio Web",
+			applicationCategory: "DeveloperApplication",
+			operatingSystem: "Linux, macOS, Docker",
+			description:
+				"Nuvio Web is a free, open-source unofficial web client for Nuvio: your profiles, addons, library and watch progress in the browser, with HLS playback, subtitles, skip intro and cast to TV.",
+			url: "https://orochibraru.com/nuvio-web",
+			isAccessibleForFree: true,
+			license: "https://www.gnu.org/licenses/agpl-3.0.html",
+			codeRepository: "https://github.com/orochibraru/nuvio-web",
+			author: { "@id": "https://orochibraru.com/#person" },
+			offers: {
+				"@type": "Offer",
+				price: "0",
+				priceCurrency: "USD",
+				availability: "https://schema.org/InStock",
+			},
 		},
-	},
-];
+	];
 </script>
 
 <Meta
@@ -43,7 +43,7 @@ const structuredData = [
 				>&larr; All projects</a
 			>
 			<span class="tag ml-3.5">Media &middot; AGPL-3.0</span>
-			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">
+			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.03em]">
 				Nuvio Web
 			</h1>
 			<p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">

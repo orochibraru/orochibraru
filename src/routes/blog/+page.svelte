@@ -1,12 +1,12 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
-import Meta from "$lib/components/Meta.svelte";
-import { PERSON, readable, SITE, WEBSITE } from "$lib/seo";
+	import { resolve } from "$app/paths";
+	import Meta from "$lib/components/Meta.svelte";
+	import { PERSON, readable, SITE, WEBSITE } from "$lib/seo";
 
-let { data } = $props();
+	let { data } = $props();
 
-const description =
-	"Notes and complaints about self-hosting, homelab software, and every tool that was good until it had a funding round.";
+	const description =
+		"Notes and complaints about self-hosting, homelab software, and every tool that was good until it had a funding round.";
 </script>
 
 <Meta
@@ -46,7 +46,7 @@ const description =
 			&middot;
 			<a class="hover:text-acid" href={resolve("/feed.xml")} data-sveltekit-reload>RSS</a></span
 		>
-		<h1 class="mt-6.5 text-[clamp(2.6rem,9vw,6.2rem)]/[.92] font-extrabold tracking-[-.045em]">
+		<h1 class="mt-6.5 text-[clamp(2.6rem,9vw,6.2rem)]/[.92] font-extrabold tracking-[-.03em]">
 			Things that<br>
 			<span class="bg-linear-to-r from-acid via-cyan to-plasma bg-clip-text text-transparent"
 				>annoyed me.</span

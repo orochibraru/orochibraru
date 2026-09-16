@@ -1,28 +1,28 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
-import Meta from "$lib/components/Meta.svelte";
+	import { resolve } from "$app/paths";
+	import Meta from "$lib/components/Meta.svelte";
 
-const structuredData = [
-	{
-		"@context": "https://schema.org",
-		"@type": "SoftwareApplication",
-		name: "Baba",
-		applicationCategory: "DeveloperApplication",
-		operatingSystem: "Linux, macOS, Docker",
-		description:
-			"Baba is a free, open-source homelab monitor. It watches CPU, load, memory, disk, temperature and GPU, sends Discord or Telegram alerts, and tells you when things recover. Single binary or Docker.",
-		url: "https://orochibraru.com/baba",
-		isAccessibleForFree: true,
-		codeRepository: "https://github.com/orochibraru/baba",
-		author: { "@id": "https://orochibraru.com/#person" },
-		offers: {
-			"@type": "Offer",
-			price: "0",
-			priceCurrency: "USD",
-			availability: "https://schema.org/InStock",
+	const structuredData = [
+		{
+			"@context": "https://schema.org",
+			"@type": "SoftwareApplication",
+			name: "Baba",
+			applicationCategory: "DeveloperApplication",
+			operatingSystem: "Linux, macOS, Docker",
+			description:
+				"Baba is a free, open-source homelab monitor. It watches CPU, load, memory, disk, temperature and GPU, sends Discord or Telegram alerts, and tells you when things recover. Single binary or Docker.",
+			url: "https://orochibraru.com/baba",
+			isAccessibleForFree: true,
+			codeRepository: "https://github.com/orochibraru/baba",
+			author: { "@id": "https://orochibraru.com/#person" },
+			offers: {
+				"@type": "Offer",
+				price: "0",
+				priceCurrency: "USD",
+				availability: "https://schema.org/InStock",
+			},
 		},
-	},
-];
+	];
 </script>
 
 <Meta
@@ -42,7 +42,7 @@ const structuredData = [
 				>&larr; All projects</a
 			>
 			<span class="tag ml-3.5">Monitoring &middot; Single binary</span>
-			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">
+			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.03em]">
 				Baba
 			</h1>
 			<p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">

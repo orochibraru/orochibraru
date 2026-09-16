@@ -1,68 +1,68 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
-import admin from "$docs/penombre/images/admin.webp";
-import adminDark from "$docs/penombre/images/admin-dark.webp";
-import categories from "$docs/penombre/images/categories.webp";
-import categoriesDark from "$docs/penombre/images/categories-dark.webp";
-import hero from "$docs/penombre/images/hero.webp";
-import heroDark from "$docs/penombre/images/hero-dark.webp";
-import music from "$docs/penombre/images/music.webp";
-import musicDark from "$docs/penombre/images/music-dark.webp";
-import preview from "$docs/penombre/images/preview.webp";
-import previewDark from "$docs/penombre/images/preview-dark.webp";
-import settingsAppearance from "$docs/penombre/images/settings-appearance.webp";
-import settingsAppearanceDark from "$docs/penombre/images/settings-appearance-dark.webp";
-import Meta from "$lib/components/Meta.svelte";
-import { SITE } from "$lib/seo";
+	import { resolve } from "$app/paths";
+	import admin from "$docs/penombre/images/admin.webp";
+	import adminDark from "$docs/penombre/images/admin-dark.webp";
+	import categories from "$docs/penombre/images/categories.webp";
+	import categoriesDark from "$docs/penombre/images/categories-dark.webp";
+	import hero from "$docs/penombre/images/hero.webp";
+	import heroDark from "$docs/penombre/images/hero-dark.webp";
+	import music from "$docs/penombre/images/music.webp";
+	import musicDark from "$docs/penombre/images/music-dark.webp";
+	import preview from "$docs/penombre/images/preview.webp";
+	import previewDark from "$docs/penombre/images/preview-dark.webp";
+	import settingsAppearance from "$docs/penombre/images/settings-appearance.webp";
+	import settingsAppearanceDark from "$docs/penombre/images/settings-appearance-dark.webp";
+	import Meta from "$lib/components/Meta.svelte";
+	import { SITE } from "$lib/seo";
 
-const structuredData = [
-	{
-		"@context": "https://schema.org",
-		"@type": "SoftwareApplication",
-		name: "Penombre",
-		alternateName: "Penombre self-hosted drive",
-		applicationCategory: "BrowserApplication",
-		applicationSubCategory: "File storage and sharing",
-		operatingSystem: "Linux, macOS, Docker",
-		description:
-			"Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, shared drives, Word/Excel/PowerPoint editing, a waveform music player. One Docker container, SQLite by default, no subscription.",
-		url: "https://orochibraru.com/penombre",
-		screenshot: `${SITE}${heroDark}`,
-		softwareHelp: "https://orochibraru.com/penombre/docs",
-		license: "https://opensource.org/licenses/MIT",
-		isAccessibleForFree: true,
-		keywords:
-			"Nextcloud alternative, Google Drive alternative, ownCloud alternative, Seafile alternative, iCloud alternative, Dropbox alternative, OneDrive alternative, self-hosted cloud storage, open source drive, homelab",
-		featureList: [
-			"Grid and list file browsing with generated thumbnails",
-			"In-place previews for images, video, audio, PDFs and source code",
-			"Notes on any file, pinned to a moment in a track or video and marked on the waveform",
-			"Waveform music player",
-			"Documents, spreadsheets and presentations stored as HTML, CSV and Markdown",
-			"Editing .docx, .xlsx and .pptx files in place, saved back as themselves",
-			"Share links with password, expiry and sign-in requirements",
-			"Per-user sharing with view, edit and full-access permissions",
-			"Shared drives owned by a group, with manager, editor and viewer roles",
-			"Notifications for notes and shares, with optional emailed copies",
-			"Automatic categories for images, video, music, documents, code, archives and 3D objects",
-			"Mounted volumes for NAS shares and existing directory trees, per-user or shared whole",
-			"Resumable uploads that survive a page reload",
-			"Soft trash with restore",
-			"Admin panel with instance statistics, user management, OIDC providers and an audit log",
-			"OpenAPI-documented REST API with API-key auth",
-			"SQLite by default, PostgreSQL optional",
-		],
-		codeRepository: "https://github.com/orochibraru/penombre",
-		sameAs: ["https://hub.docker.com/r/orochibraru/penombre"],
-		author: { "@id": "https://orochibraru.com/#person" },
-		offers: {
-			"@type": "Offer",
-			price: "0",
-			priceCurrency: "USD",
-			availability: "https://schema.org/InStock",
+	const structuredData = [
+		{
+			"@context": "https://schema.org",
+			"@type": "SoftwareApplication",
+			name: "Penombre",
+			alternateName: "Penombre self-hosted drive",
+			applicationCategory: "BrowserApplication",
+			applicationSubCategory: "File storage and sharing",
+			operatingSystem: "Linux, macOS, Docker",
+			description:
+				"Penombre is a free, open-source self-hosted drive, and a Nextcloud, Google Drive, Seafile and ownCloud alternative. Previews, notes, share links, shared drives, Word/Excel/PowerPoint editing, a waveform music player. One Docker container, SQLite by default, no subscription.",
+			url: "https://orochibraru.com/penombre",
+			screenshot: `${SITE}${heroDark}`,
+			softwareHelp: "https://orochibraru.com/penombre/docs",
+			license: "https://opensource.org/licenses/MIT",
+			isAccessibleForFree: true,
+			keywords:
+				"Nextcloud alternative, Google Drive alternative, ownCloud alternative, Seafile alternative, iCloud alternative, Dropbox alternative, OneDrive alternative, self-hosted cloud storage, open source drive, homelab",
+			featureList: [
+				"Grid and list file browsing with generated thumbnails",
+				"In-place previews for images, video, audio, PDFs and source code",
+				"Notes on any file, pinned to a moment in a track or video and marked on the waveform",
+				"Waveform music player",
+				"Documents, spreadsheets and presentations stored as HTML, CSV and Markdown",
+				"Editing .docx, .xlsx and .pptx files in place, saved back as themselves",
+				"Share links with password, expiry and sign-in requirements",
+				"Per-user sharing with view, edit and full-access permissions",
+				"Shared drives owned by a group, with manager, editor and viewer roles",
+				"Notifications for notes and shares, with optional emailed copies",
+				"Automatic categories for images, video, music, documents, code, archives and 3D objects",
+				"Mounted volumes for NAS shares and existing directory trees, per-user or shared whole",
+				"Resumable uploads that survive a page reload",
+				"Soft trash with restore",
+				"Admin panel with instance statistics, user management, OIDC providers and an audit log",
+				"OpenAPI-documented REST API with API-key auth",
+				"SQLite by default, PostgreSQL optional",
+			],
+			codeRepository: "https://github.com/orochibraru/penombre",
+			sameAs: ["https://hub.docker.com/r/orochibraru/penombre"],
+			author: { "@id": "https://orochibraru.com/#person" },
+			offers: {
+				"@type": "Offer",
+				price: "0",
+				priceCurrency: "USD",
+				availability: "https://schema.org/InStock",
+			},
 		},
-	},
-];
+	];
 </script>
 
 <Meta
@@ -83,7 +83,7 @@ const structuredData = [
 				>&larr; All projects</a
 			>
 			<span class="tag ml-3.5">Storage &middot; MIT</span>
-			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">
+			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.03em]">
 				Penombre
 			</h1>
 			<p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">

@@ -1,7 +1,7 @@
 <script lang="ts">
-import { resolve } from "$app/paths";
+	import { resolve } from "$app/paths";
 
-let { width }: { width: string } = $props();
+	let { width }: { width: string } = $props();
 </script>
 
 <footer

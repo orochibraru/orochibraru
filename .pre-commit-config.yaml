@@ -62,7 +62,7 @@ repos:
       # tailwint needs app.css in the same run to resolve the project, so it gets the globs, not filenames
       - id: tailwint
         name: tailwint
-        entry: bun run tailwint 'src/**/*.{css,svelte}'
+        entry: bun run tailwint --fix 'src/**/*.{css,svelte}'
         language: system
         pass_filenames: false
         files: ^src/.*\.(css|svelte)$
