@@ -1,0 +1,122 @@
+<script lang="ts">
+import { resolve } from "$app/paths";
+import Meta from "$lib/components/Meta.svelte";
+
+const structuredData = [
+	{
+		"@context": "https://schema.org",
+		"@type": "SoftwareApplication",
+		name: "dokploy-to-pangolin",
+		applicationCategory: "DeveloperApplication",
+		operatingSystem: "Linux, macOS, Docker",
+		description:
+			"A free, open-source webhook bridge that registers new Dokploy applications with Pangolin automatically: creates the resource and target so every deploy is routed without hand-editing anything.",
+		url: "https://orochibraru.com/dokploy-to-pangolin",
+		isAccessibleForFree: true,
+		codeRepository: "https://github.com/orochibraru/dokploy-to-pangolin",
+		author: { "@id": "https://orochibraru.com/#person" },
+		offers: {
+			"@type": "Offer",
+			price: "0",
+			priceCurrency: "USD",
+			availability: "https://schema.org/InStock",
+		},
+	},
+];
+</script>
+
+<Meta
+	title="dokploy-to-pangolin: auto-provision Pangolin routes from Dokploy deploys, free"
+	description="A free, open-source webhook bridge that registers new Dokploy applications with Pangolin automatically: creates the resource and target so every deploy is routed without hand-editing anything."
+	path="/dokploy-to-pangolin"
+	trail={[["dokploy-to-pangolin", "/dokploy-to-pangolin"]]}
+	{structuredData}
+/>
+
+<main class="mx-auto max-w-page px-6">
+	<article class="prose">
+		<div class="pt-10 pb-5">
+			<a
+				class="text-xs uppercase tracking-widest text-dim hover:text-acid"
+				href={resolve("/#projects")}
+				>&larr; All projects</a
+			>
+			<span class="tag ml-3.5">Networking &middot; Bun + Hono</span>
+			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">
+				dokploy-to-pangolin
+			</h1>
+			<p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">
+				A webhook service that registers new Dokploy applications with Pangolin automatically,
+				creating the resource and the target so a fresh deploy is routed the moment it exists. Stop
+				hand-writing a route for every app.
+			</p>
+			<div class="mt-6.5 flex flex-wrap gap-2.5">
+				<a
+					class="btn btn-primary"
+					href="https://github.com/orochibraru/dokploy-to-pangolin"
+					rel="noopener"
+					>Source on GitHub</a
+				>
+				<a
+					class="btn"
+					href="https://hub.docker.com/r/orochibraru/dokploy-to-pangolin"
+					rel="noopener"
+					>Docker Hub</a
+				>
+			</div>
+		</div>
+		<section class="mb-22.5">
+			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">What happens</h2>
+			<pre
+			>&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;         &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;         &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474; Dokploy  &#9474;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9654;&#9474;  This service   &#9474;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9654;&#9474; Pangolin &#9474;
+&#9474;          &#9474; webhook &#9474;                 &#9474;   API   &#9474;          &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;         &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;         &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</pre>
+			<p class="mt-5">
+				It receives the build notification from Dokploy, checks whether the domain already exists in
+				Pangolin, creates the resource if it doesn&rsquo;t, configures a resource target pointing at
+				your main site, and routing starts working. That&rsquo;s the entire job.
+			</p>
+		</section>
+
+		<section class="mb-22.5">
+			<div class="mb-7 flex items-baseline gap-4">
+				<h2 class="text-2xl font-bold tracking-[-.02em]">Features</h2>
+				<div class="h-px flex-1 bg-line"></div>
+			</div>
+			<div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Automatic resources</h3>
+					<p>New domain deployed, new Pangolin resource created. No console visit.</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Duplicate-safe</h3>
+					<p>Intelligent domain matching, so redeploys don&rsquo;t pile up duplicate resources.</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Authenticated webhooks</h3>
+					<p>Shared secret token on the incoming hook, validated before anything is created.</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Fast and small</h3>
+					<p>Bun + Hono, full TypeScript, graceful SIGINT/SIGTERM shutdown, 90%+ test coverage.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="mb-22.5">
+			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Run it</h2>
+			<pre>docker run -p 3000:3000 \
+  -e WEBHOOK_SECRET=your-secret \
+  -e PANGOLIN_API_KEY=your-key \
+  orochibraru/dokploy-to-pangolin</pre>
+			<p class="mt-5">
+				It has to be reachable by Dokploy to receive webhooks. Deploying it
+				<em>through</em>
+				Dokploy and Pangolin works fine; running it separately just means making sure the configured
+				URL resolves. Full environment reference is in the
+				<a href="https://github.com/orochibraru/dokploy-to-pangolin" rel="noopener">README</a>.
+			</p>
+		</section>
+	</article>
+</main>

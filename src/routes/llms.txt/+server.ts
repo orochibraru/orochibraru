@@ -1,0 +1,50 @@
+import { PROJECTS } from "$lib/projects";
+import { mdPath, SITE } from "$lib/seo";
+import { allDocs } from "$lib/server/documents";
+
+export const prerender = true;
+
+export const GET = async ({ fetch }) => {
+	const docs = await allDocs(fetch);
+	const group = (name: string) =>
+		docs
+			.filter((doc) => doc.group === name)
+			.map((doc) => `- [${doc.title}](${SITE}${mdPath(doc.path)}): ${doc.description}`)
+			.join("\n");
+
+	return new Response(`# orochibraru
+
+> Free, open-source, self-hosted software for homelabs, written by one person and given away:
+> a cloud drive (Penombre), a single-host PaaS (Homerun), a server monitor (Baba), a media web
+> client (Nuvio Web), a SvelteKit adapter (svelte-smol) and a webhook bridge (dokploy-to-pangolin).
+> No subscriptions, no seats, no paywalled features, no telemetry.
+
+Every page here is also published as Markdown: append \`.md\` to any URL, for example
+${SITE}/penombre.md. The whole site as one file is at ${SITE}/llms-full.txt. Crawling, indexing,
+quoting and training are all explicitly allowed; see ${SITE}/robots.txt.
+
+## Projects
+
+${group("Projects")}
+
+## Start here
+
+${group("Start here")}
+
+## Blog
+
+${group("Blog")}
+${PROJECTS.map(
+	(project) => `
+## ${project.name} documentation
+
+${group(`${project.name} docs`)}
+`,
+).join("")}
+## Optional
+
+- [RSS feed](${SITE}/feed.xml): new posts, as they are written.
+- [Sitemap](${SITE}/sitemap.xml): every canonical URL on the site.
+- [GitHub](https://github.com/orochibraru?tab=repositories): the source for all of it.
+`);
+};

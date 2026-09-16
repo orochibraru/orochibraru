@@ -1,27 +1,35 @@
 {
-  "name": "orochibraru.com",
-  "private": true,
-  "scripts": {
-    "prepare": "prek install || echo 'prek not installed: skipping git hooks'",
-    "dev": "bun run scripts/dev.ts",
-    "build": "bun run scripts/build.ts",
-    "lint": "tailwint",
-    "lint:fix": "tailwint --fix",
-    "typecheck": "tsc --noEmit",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "audit": "bun run scripts/lighthouse.ts",
-    "docs": "bun run scripts/docs.ts"
-  },
-  "devDependencies": {
-    "@tailwindcss/language-server": "^0.16.0",
-    "@types/bun": "^1.4.2",
-    "bun-plugin-tailwind": "^0.1.2",
-    "htmlhint": "^1.9.2",
-    "lighthouse": "^13.4.1",
-    "prettier": "^3.9.6",
-    "tailwindcss": "^4.3.3",
-    "tailwint": "^1.1.15",
-    "typescript": "^7.0.2"
-  }
+	"name": "orochibraru.com",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"prepare": "svelte-kit sync && (prek install || echo 'prek not installed: skipping git hooks')",
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"check:app": "svelte-kit sync && svelte-check --tsgo --tsconfig ./tsconfig.json --threshold error",
+		"lint": "biome check . && tailwint 'src/**/*.{css,svelte}'",
+		"lint:fix": "biome check --write . && tailwint --fix 'src/**/*.{css,svelte}'",
+		"format": "biome format --write . && prettier --write '**/*.md'",
+		"audit": "bun run scripts/lighthouse.ts",
+		"docs": "bun run scripts/docs.ts"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.14",
+		"@sveltejs/adapter-static": "^3.0.10",
+		"@sveltejs/kit": "^2.70.3",
+		"@sveltejs/vite-plugin-svelte": "^7.3.0",
+		"@tailwindcss/language-server": "^0.16.0",
+		"@tailwindcss/vite": "^4.3.3",
+		"@types/bun": "^1.4.2",
+		"@typescript/native": "npm:typescript@7",
+		"lighthouse": "^13.4.1",
+		"prettier": "^3.9.6",
+		"svelte": "^5.57.0",
+		"svelte-check": "^4.7.6",
+		"tailwindcss": "^4.3.3",
+		"tailwint": "^1.1.15",
+		"typescript": "~6",
+		"vite": "^8.3.0"
+	}
 }

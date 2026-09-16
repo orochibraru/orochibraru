@@ -1,0 +1,127 @@
+<script lang="ts">
+import { resolve } from "$app/paths";
+import Meta from "$lib/components/Meta.svelte";
+
+const structuredData = [
+	{
+		"@context": "https://schema.org",
+		"@type": "SoftwareApplication",
+		name: "Baba",
+		applicationCategory: "DeveloperApplication",
+		operatingSystem: "Linux, macOS, Docker",
+		description:
+			"Baba is a free, open-source homelab monitor. It watches CPU, load, memory, disk, temperature and GPU, sends Discord or Telegram alerts, and tells you when things recover. Single binary or Docker.",
+		url: "https://orochibraru.com/baba",
+		isAccessibleForFree: true,
+		codeRepository: "https://github.com/orochibraru/baba",
+		author: { "@id": "https://orochibraru.com/#person" },
+		offers: {
+			"@type": "Offer",
+			price: "0",
+			priceCurrency: "USD",
+			availability: "https://schema.org/InStock",
+		},
+	},
+];
+</script>
+
+<Meta
+	title="Baba: free homelab server monitoring with Discord and Telegram alerts"
+	description="Baba is a free, open-source homelab monitor. It watches CPU, load, memory, disk, temperature and GPU, sends Discord or Telegram alerts, and tells you when things recover. Single binary or Docker."
+	path="/baba"
+	trail={[["Baba", "/baba"]]}
+	{structuredData}
+/>
+
+<main class="mx-auto max-w-page px-6">
+	<article class="prose">
+		<div class="pt-10 pb-5">
+			<a
+				class="text-xs uppercase tracking-widest text-dim hover:text-acid"
+				href={resolve("/#projects")}
+				>&larr; All projects</a
+			>
+			<span class="tag ml-3.5">Monitoring &middot; Single binary</span>
+			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.045em]">
+				Baba
+			</h1>
+			<p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">
+				Named after the lookout pirate in <em>Ast&eacute;rix</em>, always watching the horizon for
+				trouble. A lightweight homelab monitor that pings you on Discord or Telegram when something
+				goes wrong, and again when it&rsquo;s fixed.
+			</p>
+			<div class="mt-6.5 flex flex-wrap gap-2.5">
+				<a class="btn btn-primary" href="https://github.com/orochibraru/baba" rel="noopener"
+					>Source on GitHub</a
+				>
+				<a class="btn" href="https://github.com/orochibraru/baba/releases" rel="noopener"
+					>Releases</a
+				>
+			</div>
+		</div>
+		<section class="mb-22.5">
+			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">What it watches</h2>
+			<p>
+				CPU usage, system load, memory, disk, CPU and GPU temperature, and GPU utilisation. When a
+				threshold breaks it opens an incident and tells you; when the metric comes back it tells you
+				that too. Everything lands in a local SQLite database so you keep the history.
+			</p>
+		</section>
+
+		<section class="mb-22.5">
+			<div class="mb-7 flex items-baseline gap-4">
+				<h2 class="text-2xl font-bold tracking-[-.02em]">Features</h2>
+				<div class="h-px flex-1 bg-line"></div>
+			</div>
+			<div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Discord &amp; Telegram</h3>
+					<p>Multiple notifiers supported, use one or both.</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Deduplication</h3>
+					<p>An incident opens only on the Nth consecutive breach. No per-cycle spam at 4am.</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Recovery alerts</h3>
+					<p>You get told when the metric returns to normal, not just when it broke.</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Reminders</h3>
+					<p>Re-alerts on a configurable interval while an incident stays open.</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Incident history</h3>
+					<p>Full history in a local SQLite database. No cloud, no account, no retention tier.</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Runs as a service</h3>
+					<p><code>baba install</code> registers it with systemd on Linux or launchd on macOS.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="mb-22.5">
+			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Install</h2>
+			<pre><span class="c"># Linux / macOS</span>
+curl -fsSL https://github.com/orochibraru/baba/releases/latest/download/install.sh | sh
+
+baba setup    <span class="c"># interactive wizard: notifier credentials + thresholds</span>
+baba install  <span class="c"># register as a background service</span></pre>
+			<p class="mt-5">
+				Or run it in the foreground with <code>baba start</code>, or in Docker with the
+				<a href="https://github.com/orochibraru/baba" rel="noopener">example compose file</a>.
+				Binaries for every platform are on the releases page.
+			</p>
+		</section>
+
+		<section class="mb-22.5">
+			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Honest status</h2>
+			<p>
+				The version number is past 1.x but it&rsquo;s still beta. It won&rsquo;t hurt your system,
+				but I won&rsquo;t call it reliable until there&rsquo;s long-term data to prove it. That
+				warning is in the README too. I&rsquo;d rather say it twice than oversell a free tool.
+			</p>
+		</section>
+	</article>
+</main>
