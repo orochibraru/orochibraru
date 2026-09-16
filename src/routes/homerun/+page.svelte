@@ -8,12 +8,12 @@
 	import logsDark from "$docs/homerun/images/logs-dark.webp";
 	import networking from "$docs/homerun/images/networking.webp";
 	import networkingDark from "$docs/homerun/images/networking-dark.webp";
-	import project from "$docs/homerun/images/project.webp";
-	import projectDark from "$docs/homerun/images/project-dark.webp";
 	import service from "$docs/homerun/images/service.webp";
 	import serviceDark from "$docs/homerun/images/service-dark.webp";
 	import settings from "$docs/homerun/images/settings.webp";
 	import settingsDark from "$docs/homerun/images/settings-dark.webp";
+	import stack from "$docs/homerun/images/stack.webp";
+	import stackDark from "$docs/homerun/images/stack-dark.webp";
 	import templates from "$docs/homerun/images/templates.webp";
 	import templatesDark from "$docs/homerun/images/templates-dark.webp";
 	import Meta from "$lib/components/Meta.svelte";
@@ -39,7 +39,7 @@
 				"Deploy any Docker image or build from a git repository Dockerfile",
 				"Live streamed deploy progress that survives a page reload",
 				"Deployment history with logs and image digests",
-				"Projects grouping services on a shared Docker network",
+				"Stacks grouping services on a shared Docker network",
 				"A catalog of ~58 one-click templates with Quick Deploy and linked companion containers",
 				"Connect GitHub, GitLab, Gitea or Bitbucket and browse your repositories",
 				"docker-compose.yaml import",
@@ -136,7 +136,7 @@
 			</div>
 			<p class="mb-7">
 				None of these are mockups. Playwright drives a real instance from a blank database &mdash; a
-				real sign-up, the first-run wizard, then a project with three services, two of them actually
+				real sign-up, the first-run wizard, then a stack with three services, two of them actually
 				deployed as containers on the host&rsquo;s Docker socket. If a screen stops rendering the
 				run fails instead of publishing it. Light or dark follows your system; both are the real
 				thing.
@@ -235,19 +235,19 @@
 				</figure>
 				<figure class="shot">
 					<picture>
-						<source media="(prefers-color-scheme: dark)" srcset={projectDark}>
+						<source media="(prefers-color-scheme: dark)" srcset={stackDark}>
 						<img
-							src={project}
+							src={stack}
 							width="1200"
 							height="675"
 							loading="lazy"
 							decoding="async"
-							alt="A project page grouping three services with their resource usage"
+							alt="A stack page grouping three services with their resource usage"
 						>
 					</picture>
 					<figcaption>
-						<b>Projects</b>
-						A project puts its services on a shared Docker network, so they reach each other by slug
+						<b>Stacks</b>
+						A stack puts its services on a shared Docker network, so they reach each other by slug
 						(<code>http://cache:6379</code>) without going back out through Traefik.
 					</figcaption>
 				</figure>
@@ -331,7 +331,7 @@
 					<p>Every attempt recorded with status, image digest and its full log.</p>
 				</div>
 				<div class="feat">
-					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Projects</h3>
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Stacks</h3>
 					<p>
 						Group services on one Docker network so they reach each other by slug, like
 						<code>http://api:8080</code>.

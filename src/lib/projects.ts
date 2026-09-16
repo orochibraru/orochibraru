@@ -52,7 +52,7 @@ export const PROJECTS: Project[] = [
 			"showcase",
 			"configuration",
 			"services",
-			"projects-and-templates",
+			"stacks-and-templates",
 			"storage-and-backups",
 			"remote-hosts-and-agent",
 			"operations",

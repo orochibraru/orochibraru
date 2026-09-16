@@ -39,7 +39,7 @@ const ICONS = {
 	// homerun
 	configuration: Settings2,
 	services: Container,
-	"projects-and-templates": FolderTree,
+	"stacks-and-templates": FolderTree,
 	"remote-hosts-and-agent": Network,
 	"users-and-access": Users,
 	"storage-and-backups": Archive,

@@ -1,27 +1,29 @@
-# Projects & templates
+# Stacks & templates
 
-## Projects
+## Stacks
 
-A project groups services together and gives them a shared, private Docker
+A stack groups services together and gives them a shared, private Docker
 network, member services can reach each other by plain slug (`http://api:8080`),
 separate from the shared `homerun` every service also joins for Traefik routing.
-A project also prefixes its member services' public subdomains:
-`<projectSlug>-<slug>.<baseDomain>`.
+A stack also prefixes its member services' public subdomains:
+`<stackSlug>-<slug>.<baseDomain>`.
 
-Every project gets its network created alongside the project row and removed on
-delete. Deleting a project (`cascadeDelete`) is the real "delete a project"
+Every stack gets its network created alongside the stack row and removed on
+delete. Deleting a stack (`cascadeDelete`) is the real "delete a stack"
 operation, it stops and removes every member container, deletes their deployment
-history and service rows, deletes the project row itself, and finally removes
-the project's Docker network, in that order.
+history and service rows, deletes the stack row itself, and finally removes the
+stack's Docker network, in that order.
 
-Assign a service to a project on the New Service wizard, or move it later from
-the service's Settings tab.
+Assign a service to a stack on the New Service wizard, or move it later from the
+service's Settings tab. A stack's page lists its services with what each one is
+using right now; its **Settings** tab renames it (name, slug, description) and
+deletes it.
 
-`/projects` has a search box, a list/card view toggle, and a pager once you have
+`/stacks` has a search box, a list/card view toggle, and a pager once you have
 more than a page's worth, same as the
 [services list](services.md#the-services-list) and searched/paginated
-server-side the same way. Deleting a project from its own page requires typing
-the project's name to confirm, since it also deletes every service inside it.
+server-side the same way. Deleting a stack from its own page requires typing the
+stack's name to confirm, since it also deletes every service inside it.
 
 ## Templates
 
@@ -29,7 +31,7 @@ A template is a saved service config (image, tag, container port, env vars, CPU/
 memory) you can deploy from repeatedly without re-entering everything. Two
 kinds:
 
-- **Built-in**, a catalog of ~58 common self-hosted apps, media (Jellyfin,
+- **Built-in**, a catalog of ~70 common self-hosted apps, media (Jellyfin,
   Navidrome, the *arr stack, qBittorrent), databases and caches (PostgreSQL,
   MySQL, MongoDB, Redis), networking (Pi-hole, AdGuard Home, Nginx Proxy
   Manager), monitoring (Uptime Kuma, Grafana, Gatus, Healthchecks), dashboards
@@ -59,7 +61,7 @@ Every card, and the template's own details page, offers two actions:
   quick-deploy several apps back to back; from a details page it takes you to
   the new service.
 - **Configure** opens the New Service wizard pre-filled from the template
-  (`?templateId=`, plus `?projectId=` if you arrived from a project) so you can
+  (`?templateId=`, plus `?stackId=` if you arrived from a stack) so you can
   adjust anything before creating it. Nothing is deployed until you submit.
 
 ### The details page
@@ -76,10 +78,10 @@ down just means the panel doesn't render.
 ### Linked containers
 
 A template can pull its companions along with it. WordPress ships linked to
-MySQL, Umami and Miniflux to PostgreSQL, and you can link your own the same way
-from the "Linked containers" section on `Templates → New`: tick any other
-template, give it an alias (defaults to a slug of its name), and deploying the
-primary deploys the companions too.
+MySQL, Umami and Miniflux to PostgreSQL, Paperless-ngx to Redis, and you can
+link your own the same way from the "Linked containers" section on
+`Templates → New`: tick any other template, give it an alias (defaults to a slug
+of its name), and deploying the primary deploys the companions too.
 
 Env vars on the primary template can then reference a companion:
 
@@ -92,9 +94,9 @@ Env vars on the primary template can then reference a companion:
 An alias that doesn't resolve is left in the deployed env var verbatim rather
 than silently blanked, so a typo is visible instead of mysterious.
 
-Deploying a linked template creates a project for the stack if the service
-doesn't already belong to one (so it shows up grouped), gives each companion a
-deterministic slug (`<primary>-<alias>`), and creates them **not**
+Deploying a linked template creates a stack for the linked services if the
+service doesn't already belong to one (so it shows up grouped), gives each
+companion a deterministic slug (`<primary>-<alias>`), and creates them **not**
 DNS-resolvable by default, a database or cache usually doesn't want a public
 subdomain. Companions are queued ahead of the primary, and if one fails the
 primary is cancelled rather than started against a missing dependency (see
