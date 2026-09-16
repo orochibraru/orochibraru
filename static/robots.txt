@@ -5,7 +5,8 @@ User-agent: *
 Allow: /
 
 # Plain-Markdown mirrors of every page live at <url>.md, and the whole site
-# is summarised for language models at /llms.txt and /llms-full.txt.
+# is summarised for language models at /llms.txt and /llms-full.txt. Projects with
+# documentation have their own at /<project>/llms.txt and /<project>/llms-full.txt.
 
 # Answer engines and AI crawlers, named explicitly so there is no ambiguity:
 # all of them are welcome, including the ones that default to disallowed.

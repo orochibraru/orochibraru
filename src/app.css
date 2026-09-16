@@ -78,6 +78,10 @@
 		scroll-behavior: smooth;
 		color-scheme: light dark;
 	}
+	/* an open drawer or search dialog holds the page still behind it */
+	html:has(dialog[open]) {
+		overflow: hidden;
+	}
 	body {
 		@apply bg-bg text-fg font-sans text-base/[1.65] antialiased overflow-x-hidden;
 	}
@@ -115,6 +119,11 @@
 	}
 	:focus-visible {
 		@apply outline-2 outline-offset-[3px] outline-acid;
+	}
+
+	button,
+	input {
+		@apply cursor-pointer;
 	}
 }
 
@@ -154,9 +163,6 @@
 		content: "// ";
 		@apply text-acid;
 	}
-	.card:hover h3 {
-		@apply text-acid;
-	}
 
 	/* body copy inside project pages: classing every <p> and <li> buys nothing */
 	.prose p {
@@ -188,6 +194,10 @@
 	.md p {
 		@apply mb-5 max-w-[80ch] text-dim;
 	}
+	/* feature tiles opt out of prose paragraph sizing */
+	.feat p {
+		@apply m-0 max-w-none text-[.9rem];
+	}
 	.md h2 {
 		@apply mt-12 mb-4 text-2xl font-bold tracking-[-.02em] text-fg;
 	}
@@ -218,67 +228,30 @@
 	.md code {
 		@apply text-[.9em] text-cyan;
 	}
+	.md-table code {
+		@apply whitespace-nowrap;
+	}
 	.md pre {
 		@apply mb-5 max-w-[80ch] overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
 	}
 	.md pre code {
 		@apply text-[1em] text-fg;
 	}
+	/* highlighted blocks: the button sits in the corner, the code scrolls clear of it */
+	.md .code {
+		@apply relative;
+	}
+	.md .code pre {
+		@apply pr-20;
+	}
+	.md .copy {
+		@apply absolute top-3 right-3 border border-line bg-bg px-2 py-0.5 font-mono text-[11px] text-dim transition-colors hover:border-edge hover:text-fg;
+	}
 	.md hr {
 		@apply my-10 border-line;
 	}
 	.md img {
 		@apply my-6 border border-line;
-	}
-
-	/* showcase screenshots: <picture> picks one file per figure, light or dark */
-	.shot {
-		@apply m-0 bg-surface p-5;
-	}
-	.shot img {
-		@apply block w-full border border-line;
-	}
-	.shot figcaption {
-		@apply mt-4 text-[.9rem]/[1.6] text-dim;
-	}
-	.shot figcaption b {
-		@apply block text-fg;
-	}
-
-	/* On a guide the reading measure applies to prose only: a compose file or a
-     wide table should use the column it has rather than scroll inside 80ch. */
-	.docs .md pre,
-	.docs .md img,
-	.docs .md blockquote {
-		@apply max-w-none;
-	}
-	/* the guide column is already a reading width, so prose uses all of it and
-     tables wrap instead of pushing past it */
-	.docs .md p,
-	.docs .md ul,
-	.docs .md ol {
-		@apply max-w-none;
-	}
-	.docs .md-table table {
-		@apply whitespace-normal;
-	}
-	/* guides are read end to end over the grid backdrop: dim is too faint for that */
-	.docs .md p,
-	.docs .md ul,
-	.docs .md ol,
-	.docs .md blockquote,
-	.docs .md-table td {
-		@apply text-fg/80;
-	}
-
-	/* the theme button shows which mode you are in; no attribute means system */
-	.theme-icon {
-		@apply hidden;
-	}
-	:root:not([data-theme]) .theme-system,
-	:root[data-theme="light"] .theme-light,
-	:root[data-theme="dark"] .theme-dark {
-		@apply block;
 	}
 
 	/* guides: tables, deeper headings and the odd nested list the blog never had */
@@ -297,11 +270,8 @@
 	.md-table td {
 		@apply border-b border-line px-3.5 py-2.5 align-top text-dim;
 	}
-	.md-table tr:last-child td {
-		@apply border-b-0;
-	}
-	.md-table code {
-		@apply whitespace-nowrap;
+	.md-table tr {
+		@apply last:*:border-b-0;
 	}
 	.md li > ul,
 	.md li > ol {
@@ -311,8 +281,109 @@
 		@apply mt-6;
 	}
 
-	/* feature tiles opt out of prose paragraph sizing */
-	.feat p {
-		@apply m-0 max-w-none text-[.9rem];
+	/* showcase screenshots: <picture> picks one file per figure, light or dark */
+	.shot {
+		@apply m-0 bg-surface p-5;
+	}
+	.shot img {
+		@apply block w-full border border-line;
+	}
+	.shot figcaption {
+		@apply mt-4 text-[.9rem]/[1.6] text-dim;
+	}
+	.shot figcaption b {
+		@apply block text-fg;
+	}
+
+	/* the theme button shows which mode you are in; no attribute means system */
+	.theme-icon {
+		@apply hidden;
+	}
+	:root:not([data-theme]) .theme-system,
+	:root[data-theme="light"] .theme-light,
+	:root[data-theme="dark"] .theme-dark {
+		@apply block;
+	}
+
+	.card:hover h3 {
+		@apply text-acid;
+	}
+
+	/* On a guide the reading measure applies to prose only: a compose file or a
+     wide table should use the column it has rather than scroll inside 80ch. */
+	.docs .md pre,
+	.docs .md blockquote {
+		@apply max-w-none;
+	}
+	/* screenshots are far wider than any column: never let them past it */
+	.docs .md img {
+		@apply h-auto max-w-full;
+	}
+	/* markdown wraps images in a <p>: that one takes the column, not the measure */
+	.docs .md p:has(> img) {
+		@apply max-w-none;
+	}
+	/* tables wrap instead of pushing past the column */
+	.docs .md-table table {
+		@apply whitespace-normal;
+	}
+	/* guides are read end to end over the grid backdrop: dim is too faint for that */
+	.docs .md p,
+	.docs .md ul,
+	.docs .md ol,
+	.docs .md blockquote,
+	.docs .md-table td {
+		@apply text-fg/80;
+	}
+}
+
+/* Shiki writes both themes' colours on every token; show the one that matches the page */
+.shiki span {
+	color: var(--shiki-light);
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) .shiki span {
+		color: var(--shiki-dark);
+	}
+}
+:root[data-theme="dark"] .shiki span {
+	color: var(--shiki-dark);
+}
+
+/* Drawers slide in from their edge and back out, over a fading backdrop. allow-discrete
+   keeps the <dialog> rendered until the closing slide ends; @starting-style gives the
+   opening slide somewhere to start from. */
+.drawer {
+	translate: var(--drawer-from) 0;
+	transition:
+		translate 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+		display 0.3s allow-discrete,
+		overlay 0.3s allow-discrete;
+}
+.drawer[open] {
+	translate: 0 0;
+}
+.drawer::backdrop {
+	background: rgb(0 0 0 / 0);
+	transition:
+		background-color 0.3s,
+		display 0.3s allow-discrete,
+		overlay 0.3s allow-discrete;
+}
+.drawer[open]::backdrop {
+	background: rgb(0 0 0 / 0.5);
+}
+@starting-style {
+	.drawer[open] {
+		translate: var(--drawer-from) 0;
+	}
+	.drawer[open]::backdrop {
+		background: rgb(0 0 0 / 0);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.drawer,
+	.drawer::backdrop {
+		transition: none;
 	}
 }

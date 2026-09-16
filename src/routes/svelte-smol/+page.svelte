@@ -53,10 +53,10 @@
 				<code>node_modules</code>, no JS files to ship. One binary plus its static assets.
 			</p>
 			<div class="mt-6.5 flex flex-wrap gap-2.5">
-				<a class="btn btn-primary" href="https://github.com/orochibraru/svelte-smol" rel="noopener"
+				<a class="btn btn-primary" href="https://github.com/orochibraru/svelte-smol" target="_blank" rel="noopener"
 					>Source on GitHub</a
 				>
-				<a class="btn" href="https://www.npmjs.com/package/@orochibraru/svelte-smol" rel="noopener"
+				<a class="btn" href="https://www.npmjs.com/package/@orochibraru/svelte-smol" target="_blank" rel="noopener"
 					>npm</a
 				>
 			</div>

@@ -106,10 +106,10 @@
 			<div class="mt-6.5 flex flex-wrap gap-2.5">
 				<a class="btn btn-primary" href={resolve("/homerun/docs")}>Read the docs</a>
 				<a class="btn" href="#showcase">Screenshots</a>
-				<a class="btn" href="https://github.com/orochibraru/homerun" rel="noopener"
+				<a class="btn" href="https://github.com/orochibraru/homerun" target="_blank" rel="noopener"
 					>Source on GitHub</a
 				>
-				<a class="btn" href={resolve("/homerun/docs/faq-and-limitations")} rel="noopener"
+				<a class="btn" href={resolve("/homerun/docs/faq-and-limitations")}
 					>FAQ &amp; limitations</a
 				>
 			</div>
@@ -291,7 +291,7 @@
 			</div>
 			<p class="mt-7">
 				Env vars, compute limits, revisions, users and signing in are in the
-				<a href={resolve("/homerun/docs/showcase")} rel="noopener">full showcase</a>, all of it
+				<a href={resolve("/homerun/docs/showcase")}>full showcase</a>, all of it
 				generated the same way.
 			</p>
 		</section>
@@ -666,7 +666,7 @@ docker compose -f compose.prod.yaml up -d</pre>
 				wizard, and after that the base domain, Docker, Traefik, email, sign-in methods and DNS
 				automation are all pages in the dashboard, stored in the database and applied live. Both
 				paths are covered properly in the
-				<a href={resolve("/homerun/docs/getting-started")} rel="noopener">getting started guide</a>.
+				<a href={resolve("/homerun/docs/getting-started")}>getting started guide</a>.
 			</p>
 		</section>
 
@@ -675,7 +675,7 @@ docker compose -f compose.prod.yaml up -d</pre>
 			<p>
 				Actively developed and running on real hardware, but still finding its shape. What&rsquo;s
 				solid and what isn&rsquo;t is written down honestly in
-				<a href={resolve("/homerun/docs/faq-and-limitations")} rel="noopener"
+				<a href={resolve("/homerun/docs/faq-and-limitations")}
 					>the FAQ and limitations doc</a
 				>. Read it before you point production at it.
 			</p>

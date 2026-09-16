@@ -13,6 +13,8 @@ export const GET = async ({ params }) => {
 	const guide = (await loadGuides()).find(
 		(guide) => guide.project.key === params.project && guide.slug === params.slug,
 	);
-	if (!guide) error(404);
+	if (!guide) {
+		throw error(404);
+	}
 	return markdownResponse(guideDoc(guide));
 };

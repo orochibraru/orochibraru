@@ -54,12 +54,14 @@
 				<a
 					class="btn btn-primary"
 					href="https://github.com/orochibraru/dokploy-to-pangolin"
+					target="_blank"
 					rel="noopener"
 					>Source on GitHub</a
 				>
 				<a
 					class="btn"
 					href="https://hub.docker.com/r/orochibraru/dokploy-to-pangolin"
+					target="_blank"
 					rel="noopener"
 					>Docker Hub</a
 				>
@@ -115,7 +117,7 @@
 				<em>through</em>
 				Dokploy and Pangolin works fine; running it separately just means making sure the configured
 				URL resolves. Full environment reference is in the
-				<a href="https://github.com/orochibraru/dokploy-to-pangolin" rel="noopener">README</a>.
+				<a href="https://github.com/orochibraru/dokploy-to-pangolin" target="_blank" rel="noopener">README</a>.
 			</p>
 		</section>
 	</article>

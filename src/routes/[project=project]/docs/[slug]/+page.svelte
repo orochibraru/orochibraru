@@ -22,14 +22,35 @@
 		let current = ids[0] ?? "";
 		for (const id of ids) {
 			const top = document.getElementById(id)?.getBoundingClientRect().top;
-			if (top === undefined || top > 120) break;
+			if (top === undefined || top > 120) {
+				break;
+			}
 			current = id;
 		}
-		if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2)
+		if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) {
 			current = ids.at(-1) ?? "";
+		}
 		active = current;
 	}
 	$effect(spy);
+
+	// Copy buttons are rendered with the guide, so one listener serves every block on it.
+	function copyButtons(node: HTMLElement) {
+		const onclick = async (event: MouseEvent) => {
+			const button = (event.target as Element).closest<HTMLButtonElement>(".copy");
+			const code = button?.parentElement?.querySelector("pre")?.textContent;
+			if (!button || !code) {
+				return;
+			}
+			await navigator.clipboard.writeText(code);
+			button.textContent = "Copied";
+			setTimeout(() => {
+				button.textContent = "Copy";
+			}, 1500);
+		};
+		node.addEventListener("click", onclick);
+		return () => node.removeEventListener("click", onclick);
+	}
 </script>
 
 <Meta
@@ -61,15 +82,14 @@
 
 <svelte:window onscroll={spy} onresize={spy} />
 
-<main class="px-6">
-	<div
-		class="mx-auto grid max-w-208 gap-x-16 gap-y-9 pt-12 pb-22.5 2xl:max-w-276 2xl:grid-cols-[minmax(0,1fr)_14rem]"
-	>
-		<article class="docs min-w-0">
+<main class="px-6 lg:px-10">
+	<!-- the article centres in what is left of the viewport; the contents rail pins to its right edge -->
+	<div class="grid gap-x-12 gap-y-9 pt-12 pb-22.5 xl:grid-cols-[minmax(0,1fr)_15rem]">
+		<article class="docs mx-auto w-full max-w-6xl min-w-0">
 			<h1 class="mb-7 text-[clamp(2rem,5vw,3rem)]/[1.05] font-extrabold tracking-tight">
 				{data.title}
 			</h1>
-			<div class="md">{@html data.html}</div>
+			<div class="md" {@attach copyButtons}>{@html data.html}</div>
 			<div class="mt-14 grid gap-3 sm:grid-cols-2">
 				{#each steps as step (step.label)}
 					{#if step.guide}
@@ -92,6 +112,7 @@
 				<a
 					class="border-b border-edge hover:border-cyan"
 					href="{project.repo}/blob/{project.branch}/docs/{data.slug}.md"
+					target="_blank"
 					rel="noopener"
 					>edit it there</a
 				>, and this page follows within a day.
@@ -99,7 +120,7 @@
 		</article>
 		{#if data.contents.length >= 2}
 			<nav
-				class="hidden text-[.85rem]/[1.5] text-fg/75 2xl:sticky 2xl:top-9 2xl:block 2xl:max-h-[calc(100vh-4.5rem)] 2xl:self-start 2xl:overflow-y-auto"
+				class="hidden text-[.85rem]/[1.5] text-fg/75 xl:sticky xl:top-9 xl:block xl:max-h-[calc(100vh-4.5rem)] xl:self-start xl:overflow-y-auto"
 			>
 				<p class="mb-3.5 text-[11px] tracking-[.18em] text-plasma uppercase">On this page</p>
 				<ul class="font-sans text-[.9rem]">
@@ -118,7 +139,7 @@
 				</ul>
 			</nav>
 		{:else}
-			<div class="hidden 2xl:block"></div>
+			<div class="hidden xl:block"></div>
 		{/if}
 	</div>
 </main>

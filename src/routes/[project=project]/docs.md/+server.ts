@@ -9,6 +9,8 @@ export const entries = () => PROJECTS.map((project) => ({ project: project.key }
 
 export const GET = async ({ params }) => {
 	const project = PROJECTS.find((project) => project.key === params.project);
-	if (!project) error(404);
+	if (!project) {
+		throw error(404);
+	}
 	return markdownResponse(projectDoc(project, await loadGuides()));
 };

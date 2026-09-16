@@ -16,7 +16,10 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"preset": "recommended"
+			"preset": "recommended",
+			"style": {
+				"useBlockStatements": "error"
+			}
 		}
 	},
 	"javascript": {
@@ -61,5 +64,6 @@
 				}
 			}
 		}
-	]
+	],
+	"plugins": ["./tools/throw-kit-errors.grit"]
 }

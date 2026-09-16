@@ -11,6 +11,8 @@ export const GET = async ({ params, fetch }) => {
 	const page = PAGES.find(
 		(page) => page.path === (params.page === "index" ? "/" : `/${params.page}`),
 	);
-	if (!page) error(404);
+	if (!page) {
+		throw error(404);
+	}
 	return markdownResponse(await pageDoc(fetch, page));
 };

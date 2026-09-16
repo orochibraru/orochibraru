@@ -9,6 +9,8 @@ export const entries = () =>
 
 export const GET = async ({ params }) => {
 	const post = (await loadPosts()).find((post) => post.slug === params.slug);
-	if (!post) error(404);
+	if (!post) {
+		throw error(404);
+	}
 	return markdownResponse(postDoc(post));
 };

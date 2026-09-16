@@ -63,7 +63,9 @@ export function markdown(html: string): string {
 			(_m, href: string, inner: string) => {
 				// a card is an <a> wrapped around a whole block: keep its structure and
 				// put the destination underneath, rather than mashing it into one link.
-				if (/<(h[1-6]|p|div|ul|ol)\b/i.test(inner)) return `${inner}\n\n[More &rarr;](${href})\n\n`;
+				if (/<(h[1-6]|p|div|ul|ol)\b/i.test(inner)) {
+					return `${inner}\n\n[More &rarr;](${href})\n\n`;
+				}
 				const text = flat(inner);
 				return text ? `[${text}](${href})` : "";
 			},
@@ -98,6 +100,10 @@ export function markdown(html: string): string {
 		// only now, so none of the tidying above could reach inside a code block
 		.replace(/@@PRE(\d+)@@/g, (_m, i: string) => `\`\`\`\n${pre[Number(i)]}\n\`\`\``)}\n`;
 }
+
+/** Rendered Markdown's links to other sites open in a new tab, like every external link on the site. */
+export const externalLinks = (html: string) =>
+	html.replace(/<a href="(https?:[^"]*)"/g, '<a href="$1" target="_blank" rel="noopener"');
 
 export const titleOf = (html: string) =>
 	unentity(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1] ?? "").trim();

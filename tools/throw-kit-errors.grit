@@ -1,0 +1,10 @@
+language js
+
+// SvelteKit's error() and redirect() throw on their own, so a bare call reads like a no-op.
+JsExpressionStatement(expression=$call) where {
+	$call <: or {
+		`error($args)`,
+		`redirect($args)`
+	},
+	register_diagnostic(span=$call, message="error() and redirect() throw: write `throw` (or `return`) so the exit is visible.", severity="error")
+}

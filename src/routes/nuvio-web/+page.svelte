@@ -48,18 +48,18 @@
 			</h1>
 			<p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">
 				An unofficial web implementation of the
-				<a href="https://nuvio.tv/" rel="noopener">Nuvio</a>
+				<a href="https://nuvio.tv/" target="_blank" rel="noopener">Nuvio</a>
 				API, because there isn&rsquo;t one yet. Sign in with your Nuvio account and get your
 				profiles, addons, library and watch progress in a browser tab.
 			</p>
 			<div class="mt-6.5 flex flex-wrap gap-2.5">
-				<a class="btn btn-primary" href="https://nuvio.orochibraru.com" rel="noopener"
+				<a class="btn btn-primary" href="https://nuvio.orochibraru.com" target="_blank" rel="noopener"
 					>Try the hosted instance</a
 				>
-				<a class="btn" href="https://github.com/orochibraru/nuvio-web" rel="noopener"
+				<a class="btn" href="https://github.com/orochibraru/nuvio-web" target="_blank" rel="noopener"
 					>Source on GitHub</a
 				>
-				<a class="btn" href="https://hub.docker.com/r/orochibraru/nuvio-web" rel="noopener"
+				<a class="btn" href="https://hub.docker.com/r/orochibraru/nuvio-web" target="_blank" rel="noopener"
 					>Docker Hub</a
 				>
 			</div>

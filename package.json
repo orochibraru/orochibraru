@@ -28,11 +28,12 @@
 		"@typescript/native": "npm:typescript@7",
 		"lighthouse": "^13.4.1",
 		"markdownlint-cli2": "^0.23.2",
-		"prettier": "^3.9.6",
+		"prettier": "^3.9.7",
+		"shiki": "^4.4.3",
 		"svelte": "^5.57.0",
 		"svelte-check": "^4.7.6",
 		"tailwindcss": "^4.3.3",
-		"tailwint": "^1.1.15",
+		"tailwint": "^1.1.16",
 		"typescript": "~6",
 		"vite": "^8.3.0"
 	}

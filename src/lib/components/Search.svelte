@@ -11,7 +11,9 @@
 
 	const results = $derived.by(() => {
 		const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-		if (!index || !terms.length) return [];
+		if (!index || !terms.length) {
+			return [];
+		}
 
 		const scored: { entry: Entry; score: number }[] = [];
 		for (const entry of index) {
@@ -34,7 +36,9 @@
 				}
 				score += hit + (heading.startsWith(term) ? 3 : 0);
 			}
-			if (score) scored.push({ entry, score });
+			if (score) {
+				scored.push({ entry, score });
+			}
 		}
 		return scored
 			.sort((a, b) => b.score - a.score)
@@ -43,7 +47,9 @@
 	});
 
 	export async function open() {
-		if (!dialog || dialog.open) return;
+		if (!dialog || dialog.open) {
+			return;
+		}
 		dialog.showModal();
 		field?.select();
 		if (!index) {
@@ -74,7 +80,9 @@
 			active = (active - 1 + count) % count;
 		} else if (event.key === "Enter") {
 			const result = results[active];
-			if (!result) return;
+			if (!result) {
+				return;
+			}
 			event.preventDefault();
 			goto(result.u);
 		}

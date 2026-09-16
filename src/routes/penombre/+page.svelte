@@ -93,10 +93,10 @@
 			<div class="mt-6.5 flex flex-wrap gap-2.5">
 				<a class="btn btn-primary" href={resolve("/penombre/docs")}>Read the docs</a>
 				<a class="btn" href="#showcase">Screenshots</a>
-				<a class="btn" href="https://github.com/orochibraru/penombre" rel="noopener"
+				<a class="btn" href="https://github.com/orochibraru/penombre" target="_blank" rel="noopener"
 					>Source on GitHub</a
 				>
-				<a class="btn" href="https://hub.docker.com/r/orochibraru/penombre" rel="noopener"
+				<a class="btn" href="https://hub.docker.com/r/orochibraru/penombre" target="_blank" rel="noopener"
 					>Docker Hub</a
 				>
 			</div>
@@ -244,7 +244,7 @@
 			</div>
 			<p class="mt-7">
 				Recent, shared, trash and the rest are in the
-				<a href={resolve("/penombre/docs/showcase")} rel="noopener">full showcase</a>, all of it
+				<a href={resolve("/penombre/docs/showcase")}>full showcase</a>, all of it
 				generated the same way.
 			</p>
 		</section>
@@ -449,7 +449,7 @@
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Dropbox alternative</h3>
 					<p>
 						Dropbox is sync first. Penombre has no sync client and isn&rsquo;t growing one: point
-						<a href={resolve("/penombre/docs/storage")} rel="noopener">Syncthing</a>
+						<a href={resolve("/penombre/docs/storage")}>Syncthing</a>
 						at the same directory the container mounts and you get the same result, free, with a web
 						drive on top.
 					</p>
@@ -479,7 +479,7 @@
 					<p>
 						Both are excellent thin browsers over a directory. Penombre does that too &mdash;
 						it&rsquo;s called
-						<a href={resolve("/penombre/docs/simple-mode")} rel="noopener">simple mode</a>
+						<a href={resolve("/penombre/docs/simple-mode")}>simple mode</a>
 						&mdash; and adds accounts, sharing, notes, thumbnails and an admin panel when you want
 						them.
 					</p>
@@ -491,7 +491,7 @@
 					<p>
 						One wants you to buy the NAS, the other wants a licence key. Penombre is MIT, runs on
 						whatever Linux box you have, and will happily mount the NAS share you already own as a
-						<a href={resolve("/penombre/docs/volumes")} rel="noopener">volume</a>.
+						<a href={resolve("/penombre/docs/volumes")}>volume</a>.
 					</p>
 				</div>
 			</div>
@@ -544,9 +544,9 @@ volumes:
 			</p>
 			<p class="mt-5">
 				The
-				<a href={resolve("/penombre/docs/getting-started")} rel="noopener">getting started guide</a>
+				<a href={resolve("/penombre/docs/getting-started")}>getting started guide</a>
 				walks through it properly, and
-				<a href={resolve("/penombre/docs/env")} rel="noopener">the env reference</a>
+				<a href={resolve("/penombre/docs/env")}>the env reference</a>
 				covers everything else: OAuth providers, SMTP, Redis, Postgres, mounted volumes, simple
 				mode.
 			</p>

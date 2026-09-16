@@ -7,6 +7,9 @@
 import { readFileSync } from "node:fs";
 import { Glob } from "bun";
 import { docsDir, docsUrl, PROJECTS, type Project } from "$lib/projects";
+import { SITE } from "$lib/seo";
+import { highlight } from "./highlight";
+import { externalLinks } from "./markdown";
 
 export type Section = { id: string; heading: string; text: string; level: number };
 
@@ -65,16 +68,22 @@ function rewrite(
 	slugs: Set<string>,
 	image: (name: string) => string,
 ): string {
-	if (/^(https?:|mailto:|#|\/)/.test(target)) return target;
+	if (/^(https?:|mailto:|#|\/)/.test(target)) {
+		return target;
+	}
 
 	const [path = "", hash] = target.split("#", 2);
 	const anchor = hash ? `#${hash}` : "";
 
-	const picture = path.match(/^images\/(.+)\.(?:png|jpe?g|webp)$/i);
-	if (picture) return image(picture[1]!);
+	const picture = path.match(/^images\/(.+)\.(?:png|jpe?g|webp)$/i)?.[1];
+	if (picture) {
+		return image(picture);
+	}
 
-	const guide = path.match(/^([\w-]+)\.md$/);
-	if (guide && slugs.has(guide[1]!)) return `${docsUrl(project, guide[1]!)}${anchor}`;
+	const guide = path.match(/^([\w-]+)\.md$/)?.[1];
+	if (guide && slugs.has(guide)) {
+		return `${docsUrl(project, guide)}${anchor}`;
+	}
 
 	// anything else is a repo file this site doesn't publish
 	const outsideDocs = path.startsWith("../");
@@ -109,7 +118,8 @@ function dimensions(file: string): { width: number; height: number } | null {
 		return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
 	}
 	if (fourCC === "VP8X") {
-		const read24 = (at: number) => bytes[at]! | (bytes[at + 1]! << 8) | (bytes[at + 2]! << 16);
+		const read24 = (at: number) =>
+			view.getUint8(at) | (view.getUint8(at + 1) << 8) | (view.getUint8(at + 2) << 16);
 		return { width: read24(24) + 1, height: read24(27) + 1 };
 	}
 	return null;
@@ -125,23 +135,27 @@ function sections(body: string, title: string): Section[] {
 			fenced = !fenced;
 			continue;
 		}
-		if (fenced) continue;
+		if (fenced) {
+			continue;
+		}
 
 		const heading = line.match(/^(#{2,4})\s+(.+?)\s*$/);
 		if (heading) {
-			found.push({
-				id: slugify(heading[2]!),
-				heading: plain(heading[2]!),
-				text: "",
-				level: heading[1]!.length,
-			});
+			const [, hashes = "", name = ""] = heading;
+			found.push({ id: slugify(name), heading: plain(name), text: "", level: hashes.length });
 			continue;
 		}
-		if (/^\s*\|/.test(line)) continue; // table rows read as noise out of context
+		// table rows read as noise out of context
+		if (/^\s*\|/.test(line)) {
+			continue;
+		}
 
 		// drop the markers a line carries into prose: blockquote arrows, bullets
 		const text = plain(line.replace(/^\s*>\s?/, "").replace(/^\s*(?:[-*]|\d+\.)\s+/, ""));
-		if (text) found[found.length - 1]!.text += `${text} `;
+		const last = found.at(-1);
+		if (text && last) {
+			last.text += `${text} `;
+		}
 	}
 
 	return found
@@ -169,8 +183,9 @@ async function readGuides(): Promise<Guide[]> {
 		const directory = docsDir(project);
 		const files = [...new Glob("*.md").scanSync(directory)];
 		const slugs = new Set(files.map((file) => file.replace(/\.md$/, "")));
-		if (!files.length)
+		if (!files.length) {
 			console.warn(`${directory} is empty: run \`bun run docs\` to vendor ${project.key}'s guides`);
+		}
 
 		// order[] first, then anything upstream added that nobody has placed yet
 		const ordered = [
@@ -185,39 +200,45 @@ async function readGuides(): Promise<Guide[]> {
 			const raw = await Bun.file(`${directory}/${slug}.md`).text();
 
 			const heading = raw.match(/^#\s+(.+?)\s*$/m);
-			const title = heading ? plain(heading[1]!) : slug;
+			const title = heading?.[1] ? plain(heading[1]) : slug;
 			const body = heading ? raw.replace(heading[0], "").trimStart() : raw;
 
 			const image = (name: string) => {
 				const url = IMAGES[`/${directory}/images/${name}.webp`];
-				if (!url) console.warn(`${directory}/images/${name}.webp is missing: run \`bun run docs\``);
+				if (!url) {
+					console.warn(`${directory}/images/${name}.webp is missing: run \`bun run docs\``);
+				}
 				return url ?? "";
 			};
 
 			const ids = new Map<string, number>();
-			const html = Bun.markdown
-				.html(body)
-				.replace(/<h([2-4])>([\s\S]*?)<\/h\1>/g, (_tag, level: string, inner: string) => {
-					const base = slugify(inner);
-					const seen = ids.get(base) ?? 0;
-					ids.set(base, seen + 1);
-					const id = seen ? `${base}-${seen}` : base;
-					return `<h${level} id="${id}">${inner}</h${level}>`;
-				})
-				.replace(
-					/<a href="([^"]*)"/g,
-					(_tag, href: string) => `<a href="${rewrite(href, project, slugs, image)}"`,
-				)
-				.replace(/<img src="([^"]*)"([^>]*?)\/?>/g, (_tag, src: string, rest: string) => {
-					const source = rewrite(src, project, slugs, image);
-					const name = src.match(/^images\/(.+)\.[a-z]+$/i)?.[1];
-					const size = name ? dimensions(`${directory}/images/${name}.webp`) : null;
-					const sized = size ? ` width="${size.width}" height="${size.height}"` : "";
-					return `<img src="${source}"${rest}${sized} loading="lazy" decoding="async">`;
-				})
-				// the env references are mostly tables, and some are wider than a phone
-				.replace(/<table>/g, '<div class="md-table"><table>')
-				.replace(/<\/table>/g, "</table></div>");
+			const html = await highlight(
+				externalLinks(
+					Bun.markdown
+						.html(body)
+						.replace(/<h([2-4])>([\s\S]*?)<\/h\1>/g, (_tag, level: string, inner: string) => {
+							const base = slugify(inner);
+							const seen = ids.get(base) ?? 0;
+							ids.set(base, seen + 1);
+							const id = seen ? `${base}-${seen}` : base;
+							return `<h${level} id="${id}">${inner}</h${level}>`;
+						})
+						.replace(
+							/<a href="([^"]*)"/g,
+							(_tag, href: string) => `<a href="${rewrite(href, project, slugs, image)}"`,
+						)
+						.replace(/<img src="([^"]*)"([^>]*?)\/?>/g, (_tag, src: string, rest: string) => {
+							const source = rewrite(src, project, slugs, image);
+							const name = src.match(/^images\/(.+)\.[a-z]+$/i)?.[1];
+							const size = name ? dimensions(`${directory}/images/${name}.webp`) : null;
+							const sized = size ? ` width="${size.width}" height="${size.height}"` : "";
+							return `<img src="${source}"${rest}${sized} loading="lazy" decoding="async">`;
+						})
+						// the env references are mostly tables, and some are wider than a phone
+						.replace(/<table>/g, '<div class="md-table"><table>')
+						.replace(/<\/table>/g, "</table></div>"),
+				),
+			);
 
 			const firstParagraph =
 				body.split(/\n\s*\n/).find((block) => !/^[#`|\-!]/.test(block.trim())) ?? "";
@@ -230,10 +251,11 @@ async function readGuides(): Promise<Guide[]> {
 				title,
 				intro,
 				html,
-				markdown: raw.replace(
-					/\]\(([^)]+)\)/g,
-					(_link, target: string) => `](${rewrite(target, project, slugs, image)})`,
-				),
+				// read away from this site, so every link and image has to be absolute
+				markdown: raw.replace(/\]\(([^)]+)\)/g, (_link, target: string) => {
+					const url = rewrite(target, project, slugs, image);
+					return `](${url.startsWith("/") ? `${SITE}${url}` : url})`;
+				}),
 				sections: sections(body, title),
 			});
 		}

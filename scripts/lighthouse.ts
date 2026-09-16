@@ -42,9 +42,13 @@ const built = [...new Glob("dist/**/*.html").scanSync(".")]
 const asked = Bun.argv.slice(2);
 const routes = asked.length ? asked : built;
 for (const route of routes) {
-	if (!built.includes(route)) throw new Error(`no page at ${route}. Built: ${built.join(", ")}`);
+	if (!built.includes(route)) {
+		throw new Error(`no page at ${route}. Built: ${built.join(", ")}`);
+	}
 }
-if (asked.length) out.info(`auditing ${asked.length} of ${built.length} built page(s), as asked`);
+if (asked.length) {
+	out.info(`auditing ${asked.length} of ${built.length} built page(s), as asked`);
+}
 
 // Close enough to nginx.conf to audit the same thing production serves: clean
 // URLs, gzip, and a long immutable cache on the hashed assets. Without those
@@ -63,11 +67,14 @@ const server = Bun.serve({
 			`dist${pathname}/index.html`,
 		]) {
 			const file = Bun.file(candidate);
-			if (!(await file.exists())) continue;
+			if (!(await file.exists())) {
+				continue;
+			}
 
 			const headers = new Headers({ "content-type": file.type });
-			if (CACHED.test(candidate))
+			if (CACHED.test(candidate)) {
 				headers.set("cache-control", "public, max-age=2592000, immutable");
+			}
 
 			if (/^(text|application\/(json|xml|rss))/.test(file.type)) {
 				headers.set("content-encoding", "gzip");
@@ -102,13 +109,16 @@ async function audit(route: string): Promise<Report> {
 
 	const [stdout] = await Promise.all([new Response(run.stdout).text(), run.exited]);
 	const json = stdout.slice(stdout.indexOf("{")); // lighthouse prints a banner first
-	if (!json)
+	if (!json) {
 		throw new Error(
 			`${route}: lighthouse produced nothing\n${await new Response(run.stderr).text()}`,
 		);
+	}
 
 	const report = JSON.parse(json) as Report & { runtimeError?: { message: string } };
-	if (report.runtimeError) throw new Error(`${route}: ${report.runtimeError.message}`);
+	if (report.runtimeError) {
+		throw new Error(`${route}: ${report.runtimeError.message}`);
+	}
 	return report;
 }
 
@@ -133,8 +143,12 @@ for (const route of routes) {
 
 	const scores = CATEGORIES.map((id) => {
 		const score = report.categories[id]?.score ?? null;
-		if (score === null) return "  --";
-		if (score < (FLOOR[id] ?? 1)) failed = true;
+		if (score === null) {
+			return "  --";
+		}
+		if (score < (FLOOR[id] ?? 1)) {
+			failed = true;
+		}
 		return `${Math.round(score * 100)}`.padStart(4);
 	});
 	console.log(
@@ -142,16 +156,24 @@ for (const route of routes) {
 	);
 
 	for (const [id, a] of Object.entries(report.audits)) {
-		if (a.score === null || a.score >= 1) continue;
-		if (["informative", "notApplicable", "manual"].includes(a.scoreDisplayMode)) continue;
+		if (a.score === null || a.score >= 1) {
+			continue;
+		}
+		if (["informative", "notApplicable", "manual"].includes(a.scoreDisplayMode)) {
+			continue;
+		}
 		(id.endsWith("-insight") ? insights : failures).push(`${pad(route, 26)} ${id}: ${a.title}`);
 	}
 }
 
 const list = (title: string, lines: string[]) => {
-	if (!lines.length) return;
+	if (!lines.length) {
+		return;
+	}
 	console.log(`\n${title}\n`);
-	for (const line of [...new Set(lines)].sort()) console.log(`  ${line}`);
+	for (const line of [...new Set(lines)].sort()) {
+		console.log(`  ${line}`);
+	}
 };
 
 list("failed audits", failures);
@@ -159,8 +181,10 @@ list("insights (advisory)", insights);
 
 server.stop(true);
 
-if (failed)
+if (failed) {
 	out.fail(`${routes.length} page(s) audited — below the floor, see the failed audits above`);
-else out.done(`${routes.length} page(s) audited, all above the floor`);
+} else {
+	out.done(`${routes.length} page(s) audited, all above the floor`);
+}
 
 process.exit(failed ? 1 : 0);

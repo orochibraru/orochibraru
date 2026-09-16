@@ -42,10 +42,14 @@ export function log(scope: string) {
 	const err = (mark: string, message: string) => console.error(`${tag} ${mark} ${message}`);
 
 	const step = (message: string) => {
-		if (!QUIET) out("▸", message);
+		if (!QUIET) {
+			out("▸", message);
+		}
 	};
 	const ok = (message: string) => {
-		if (!QUIET) out(green("✓"), message);
+		if (!QUIET) {
+			out(green("✓"), message);
+		}
 	};
 
 	return {
@@ -55,11 +59,15 @@ export function log(scope: string) {
 		ok,
 		/** Worth reading, indented under the phase it belongs to. */
 		info: (message: string) => {
-			if (!QUIET) out(" ", dim(message));
+			if (!QUIET) {
+				out(" ", dim(message));
+			}
 		},
 		/** Per-file chatter: only under VERBOSE. */
 		detail: (message: string) => {
-			if (VERBOSE) out(" ", dim(message));
+			if (VERBOSE) {
+				out(" ", dim(message));
+			}
 		},
 		/** Not fatal, but someone should look. Printed at every volume. */
 		warn: (message: string) => err(yellow("!"), yellow(message)),

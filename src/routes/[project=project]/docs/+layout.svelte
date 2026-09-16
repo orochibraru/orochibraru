@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { ArrowUpRight } from "@lucide/svelte";
+	import { ArrowUpRight, Menu } from "@lucide/svelte";
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
+	import Drawer from "$lib/components/Drawer.svelte";
 	import { guideIcon } from "$lib/docs-icons";
 
 	let { data, children } = $props();
@@ -24,14 +25,9 @@
 		})),
 	]);
 
-	// Scroll the strip rather than calling scrollIntoView, which could also move the page.
-	let strip = $state<HTMLElement>();
-	$effect(() => {
-		void current;
-		const link = strip?.querySelector<HTMLElement>("[aria-current=page]");
-		if (!strip || !link) return;
-		strip.scrollLeft += link.getBoundingClientRect().left - strip.getBoundingClientRect().left - 20;
-	});
+	const here = $derived(items.find((item) => item.active)?.title ?? "Overview");
+
+	let menu = $state<Drawer>();
 </script>
 
 {#snippet links()}
@@ -52,15 +48,7 @@
 	{/each}
 {/snippet}
 
-<aside
-	class="fixed inset-y-0 left-0 hidden w-72 flex-col overflow-y-auto border-r border-line bg-surface lg:flex"
->
-	<!-- same height as the docs header, so the two bottom borders meet -->
-	<a
-		class="flex h-22 shrink-0 items-center border-b border-line px-6 font-mono text-[17px] font-bold tracking-[-.02em]"
-		href={resolve("/")}
-		>orochi<span class="text-acid">braru</span></a
-	>
+{#snippet navigation()}
 	<div class="px-3.5 pt-5 pb-2">
 		<a
 			class="group flex items-center justify-between rounded-lg border border-line bg-bg px-3 py-2.5 transition hover:border-edge"
@@ -79,14 +67,55 @@
 	<nav class="flex flex-col gap-0.5 px-3.5 pt-2 pb-6 font-sans text-sm">
 		{@render links()}
 	</nav>
+	<!-- pinned to the bottom of the column, and stays in view when the guide list scrolls -->
+	<a
+		class="group sticky bottom-0 mt-auto flex items-center gap-2.5 border-t border-line bg-surface px-6 py-4 font-sans text-sm font-medium text-fg/80 transition-colors hover:text-fg"
+		href={project.repo}
+		target="_blank"
+		rel="noopener"
+	>
+		<svg viewBox="0 0 24 24" class="size-4 shrink-0" fill="currentColor" aria-hidden="true">
+			<path
+				d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"
+			/>
+		</svg>
+		{project.name} on GitHub
+		<ArrowUpRight
+			class="ml-auto size-4 text-dim transition group-hover:text-acid"
+			aria-hidden="true"
+		/>
+	</a>
+{/snippet}
+
+<aside
+	class="fixed inset-y-0 left-0 hidden w-72 flex-col overflow-y-auto border-r border-line bg-surface lg:flex"
+>
+	<!-- same height as the docs header, so the two bottom borders meet -->
+	<a
+		class="flex h-22 shrink-0 items-center border-b border-line px-6 font-mono text-[17px] font-bold tracking-[-.02em]"
+		href={resolve("/")}
+		>orochi<span class="text-acid">braru</span></a
+	>
+	{@render navigation()}
 </aside>
 
-<!-- below lg the sidebar folds into a scrolling strip above the page -->
-<nav
-	bind:this={strip}
-	class="mx-6 flex gap-1 overflow-x-auto rounded-xl border border-line bg-surface p-1.5 font-sans text-sm whitespace-nowrap lg:hidden"
->
-	{@render links()}
-</nav>
+<!-- below lg the sidebar becomes a drawer, opened from a bar saying where you are -->
+<div class="px-6 lg:hidden">
+	<button
+		type="button"
+		class="flex w-full items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-left font-sans text-sm transition hover:border-edge"
+		aria-label="Open the {project.name} docs menu"
+		onclick={() => menu?.open()}
+	>
+		<Menu class="size-4 shrink-0 text-dim" aria-hidden="true" />
+		<span class="shrink-0 text-dim">{project.name} docs</span>
+		<span class="text-edge" aria-hidden="true">/</span>
+		<span class="truncate font-medium">{here}</span>
+	</button>
+</div>
+
+<Drawer bind:this={menu} label="{project.name} docs" side="left">
+	{@render navigation()}
+</Drawer>
 
 {@render children()}

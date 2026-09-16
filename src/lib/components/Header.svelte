@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { Menu } from "@lucide/svelte";
 	import { onMount } from "svelte";
 	import { resolve } from "$app/paths";
+	import Drawer from "./Drawer.svelte";
 
 	let {
 		width,
@@ -12,26 +14,44 @@
 	const MODES = ["system", "light", "dark"] as const;
 	type Mode = (typeof MODES)[number];
 
+	let menu = $state<Drawer>();
 	let mode = $state<Mode>("system");
 	const next = $derived(MODES[(MODES.indexOf(mode) + 1) % MODES.length] ?? "system");
 
 	onMount(() => {
 		const stored = document.documentElement.dataset.theme;
-		if (stored === "light" || stored === "dark") mode = stored;
+		if (stored === "light" || stored === "dark") {
+			mode = stored;
+		}
 	});
 
 	// System stores nothing, so the stylesheet's prefers-color-scheme rules keep following the OS.
 	function cycleTheme() {
 		mode = next;
 		const root = document.documentElement;
-		if (mode === "system") delete root.dataset.theme;
-		else root.dataset.theme = mode;
+		if (mode === "system") {
+			delete root.dataset.theme;
+		} else {
+			root.dataset.theme = mode;
+		}
 		try {
-			if (mode === "system") localStorage.removeItem("theme");
-			else localStorage.setItem("theme", mode);
+			if (mode === "system") {
+				localStorage.removeItem("theme");
+			} else {
+				localStorage.setItem("theme", mode);
+			}
 		} catch {}
 	}
 </script>
+
+{#snippet links(style: string)}
+	<a class={style} href={resolve("/#projects")}>Projects</a>
+	<a class={style} href={resolve("/blog")}>Blog</a>
+	<a class={style} href={resolve("/about")}>About</a>
+	<a class={style} href={source ?? "https://github.com/orochibraru?tab=repositories"} target="_blank" rel="noopener"
+		>{source ? "Source" : "GitHub"}</a
+	>
+{/snippet}
 
 <header class="mx-auto {width} px-6 {docs ? "lg:border-b lg:border-line" : ""}">
 	<nav
@@ -41,16 +61,11 @@
 		<a class="font-mono text-[17px] font-bold tracking-[-.02em] {docs ? "lg:hidden" : ""}" href={resolve("/")}
 			>orochi<span class="text-acid">braru</span></a
 		>
-		<div class="ml-auto flex items-center gap-4 text-[15px] font-medium whitespace-nowrap text-fg/80 sm:gap-6">
-			<a class="hover:text-acid" href={resolve("/#projects")}>Projects</a>
-			<a class="hover:text-acid" href={resolve("/blog")}>Blog</a>
-			<a class="hover:text-acid" href={resolve("/about")}>About</a>
-			<a
-				class="hover:text-acid"
-				href={source ?? "https://github.com/orochibraru?tab=repositories"}
-				rel="noopener"
-				>{source ? "Source" : "GitHub"}</a
-			>
+		<div class="ml-auto flex items-center gap-3 text-[15px] font-medium whitespace-nowrap text-fg/80 md:gap-6">
+			<!-- below md the links move into the menu drawer -->
+			<div class="hidden items-center gap-6 md:flex">
+				{@render links("hover:text-acid")}
+			</div>
 			<button
 				type="button"
 				aria-label="Search the site"
@@ -68,8 +83,8 @@
 					<circle cx="11" cy="11" r="7" />
 					<path d="m20 20-3.5-3.5" />
 				</svg>
-				<span class="hidden sm:inline">Search</span>
-				<kbd class="hidden font-mono text-xs font-normal text-dim sm:inline">&#8984;K</kbd>
+				<span class="hidden md:inline">Search</span>
+				<kbd class="hidden font-mono text-xs font-normal text-dim md:inline">&#8984;K</kbd>
 			</button>
 			<button
 				type="button"
@@ -116,6 +131,20 @@
 					<path d="M20.2 14.8A8.6 8.6 0 0 1 9.2 3.8a8.6 8.6 0 1 0 11 11Z" />
 				</svg>
 			</button>
+			<button
+				type="button"
+				aria-label="Open the site menu"
+				class="grid size-9 place-items-center border border-edge transition hover:border-acid hover:text-acid md:hidden"
+				onclick={() => menu?.open()}
+			>
+				<Menu class="size-4" aria-hidden="true" />
+			</button>
 		</div>
 	</nav>
 </header>
+
+<Drawer bind:this={menu} label="Menu" side="right">
+	<nav class="flex flex-col p-3 text-base font-medium">
+		{@render links("px-3 py-3 text-fg/80 transition-colors hover:bg-fg/4 hover:text-acid")}
+	</nav>
+</Drawer>

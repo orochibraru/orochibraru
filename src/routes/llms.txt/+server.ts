@@ -38,6 +38,9 @@ ${PROJECTS.map(
 	(project) => `
 ## ${project.name} documentation
 
+Just ${project.name}: ${SITE}/${project.key}/llms.txt, or all of its guides in one file at
+${SITE}/${project.key}/llms-full.txt.
+
 ${group(`${project.name} docs`)}
 `,
 ).join("")}

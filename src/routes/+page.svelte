@@ -29,7 +29,7 @@
 		</p>
 		<div class="mt-9 flex flex-wrap gap-3">
 			<a class="btn btn-primary" href="#projects">See the projects</a>
-			<a class="btn" href="https://github.com/orochibraru?tab=repositories" rel="noopener"
+			<a class="btn" href="https://github.com/orochibraru?tab=repositories" target="_blank" rel="noopener"
 				>GitHub &rarr;</a
 			>
 		</div>

@@ -227,10 +227,10 @@
 			</div>
 			<div class="flex flex-wrap gap-2.5">
 				<a class="btn btn-primary" href={resolve("/#projects")}>See the projects</a>
-				<a class="btn" href="https://github.com/orochibraru?tab=repositories" rel="noopener"
+				<a class="btn" href="https://github.com/orochibraru?tab=repositories" target="_blank" rel="noopener"
 					>GitHub &rarr;</a
 				>
-				<a class="btn" href="https://hub.docker.com/u/orochibraru" rel="noopener"
+				<a class="btn" href="https://hub.docker.com/u/orochibraru" target="_blank" rel="noopener"
 					>Docker Hub &rarr;</a
 				>
 			</div>

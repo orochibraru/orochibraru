@@ -51,10 +51,10 @@
 				goes wrong, and again when it&rsquo;s fixed.
 			</p>
 			<div class="mt-6.5 flex flex-wrap gap-2.5">
-				<a class="btn btn-primary" href="https://github.com/orochibraru/baba" rel="noopener"
+				<a class="btn btn-primary" href="https://github.com/orochibraru/baba" target="_blank" rel="noopener"
 					>Source on GitHub</a
 				>
-				<a class="btn" href="https://github.com/orochibraru/baba/releases" rel="noopener"
+				<a class="btn" href="https://github.com/orochibraru/baba/releases" target="_blank" rel="noopener"
 					>Releases</a
 				>
 			</div>
@@ -110,7 +110,7 @@ baba setup    <span class="c"># interactive wizard: notifier credentials + thres
 baba install  <span class="c"># register as a background service</span></pre>
 			<p class="mt-5">
 				Or run it in the foreground with <code>baba start</code>, or in Docker with the
-				<a href="https://github.com/orochibraru/baba" rel="noopener">example compose file</a>.
+				<a href="https://github.com/orochibraru/baba" target="_blank" rel="noopener">example compose file</a>.
 				Binaries for every platform are on the releases page.
 			</p>
 		</section>

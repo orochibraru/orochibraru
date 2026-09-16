@@ -1,4 +1,5 @@
 import { Glob } from "bun";
+import { externalLinks } from "./markdown";
 
 export type Post = {
 	slug: string;
@@ -12,11 +13,15 @@ export type Post = {
 /** Minimal frontmatter: a leading `---` block of `key: value` scalars. */
 function frontmatter(raw: string): [Record<string, string>, string] {
 	const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
-	if (!match) return [{}, raw];
+	if (!match) {
+		return [{}, raw];
+	}
 	const meta: Record<string, string> = {};
 	for (const line of match[1]?.split("\n") ?? []) {
 		const colon = line.indexOf(":");
-		if (colon > 0) meta[line.slice(0, colon).trim()] = line.slice(colon + 1).trim();
+		if (colon > 0) {
+			meta[line.slice(0, colon).trim()] = line.slice(colon + 1).trim();
+		}
 	}
 	return [meta, raw.slice(match[0].length)];
 }
@@ -35,7 +40,7 @@ async function readPosts(): Promise<Post[]> {
 			title,
 			date,
 			description,
-			html: Bun.markdown.html(markdown),
+			html: externalLinks(Bun.markdown.html(markdown)),
 			markdown: markdown.trim(),
 		});
 	}

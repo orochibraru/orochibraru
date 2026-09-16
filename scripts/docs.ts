@@ -8,7 +8,7 @@
 // .github/workflows/docs.yml runs this daily and commits whatever moved.
 import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { Glob } from "bun";
 import { docsDir, PROJECTS, type Project } from "../src/lib/projects";
 import { log } from "./log";
@@ -40,7 +40,9 @@ async function writeIfChanged(path: string, bytes: Uint8Array, label: string) {
 	const before = await Bun.file(path)
 		.bytes()
 		.catch(() => null);
-	if (before && before.length === bytes.length && Buffer.from(before).equals(bytes)) return;
+	if (before && before.length === bytes.length && Buffer.from(before).equals(bytes)) {
+		return;
+	}
 	await Bun.write(path, bytes);
 	changed.push(`${before ? "updated" : "added  "} ${label}`);
 	out.detail(`${before ? "updated" : "added"} ${label} (${bytes.length} bytes)`);
@@ -78,7 +80,9 @@ const raw = (project: Project, path: string) =>
 async function fetchBytes(project: Project, path: string) {
 	out.detail(`GET ${path}`);
 	const response = await fetch(raw(project, path));
-	if (!response.ok) throw new Error(`${path}: ${response.status} ${response.statusText}`);
+	if (!response.ok) {
+		throw new Error(`${path}: ${response.status} ${response.statusText}`);
+	}
 	return new Uint8Array(await response.arrayBuffer());
 }
 
@@ -124,7 +128,7 @@ for (const project of PROJECTS) {
 		for (const path of inventory.images) {
 			const name = path.slice("docs/images/".length).replace(/\.[a-z]+$/i, "");
 			try {
-				const original = join(scratch, path.split("/").pop()!);
+				const original = join(scratch, basename(path));
 				await Bun.write(original, await fetchBytes(project, path));
 
 				const encoded = join(scratch, `${name}.webp`);
@@ -140,7 +144,9 @@ for (const project of PROJECTS) {
 					"-o",
 					encoded,
 				]);
-				if (run.exitCode !== 0) throw new Error(`${path}: cwebp exited ${run.exitCode}`);
+				if (run.exitCode !== 0) {
+					throw new Error(`${path}: cwebp exited ${run.exitCode}`);
+				}
 
 				await writeIfChanged(
 					`${directory}/images/${name}.webp`,
@@ -156,18 +162,22 @@ for (const project of PROJECTS) {
 
 	// a guide that exists upstream but isn't in the sidebar, or the other way round
 	for (const slug of slugs) {
-		if (!project.order.includes(slug))
+		if (!project.order.includes(slug)) {
 			notes.push(`${project.key}: ${slug} is not in its order[] — it will sort last`);
+		}
 	}
 	for (const slug of project.order) {
-		if (!slugs.includes(slug))
+		if (!slugs.includes(slug)) {
 			notes.push(`${project.key}: order[] lists ${slug}, which upstream no longer has`);
+		}
 	}
 
 	// drop guides and images that upstream deleted
 	for (const existing of new Glob("*.md").scanSync(directory)) {
 		const slug = existing.replace(/\.md$/, "");
-		if (slugs.includes(slug)) continue;
+		if (slugs.includes(slug)) {
+			continue;
+		}
 		await rm(`${directory}/${existing}`);
 		changed.push(`removed  ${project.key}/${existing}`);
 		out.detail(`removed ${project.key}/${existing}, gone upstream`);
@@ -176,7 +186,9 @@ for (const project of PROJECTS) {
 		inventory.images.map((p) => `${p.slice("docs/images/".length).replace(/\.[a-z]+$/i, "")}.webp`),
 	);
 	for (const existing of new Glob("*.webp").scanSync(`${directory}/images`)) {
-		if (keep.has(existing)) continue;
+		if (keep.has(existing)) {
+			continue;
+		}
 		await rm(`${directory}/images/${existing}`);
 		changed.push(`removed  ${project.key}/images/${existing}`);
 		out.detail(`removed ${project.key}/images/${existing}, gone upstream`);
@@ -185,12 +197,18 @@ for (const project of PROJECTS) {
 
 await rm(scratch, { recursive: true, force: true });
 
-for (const line of changed) out.info(line);
-for (const line of notes) out.warn(line);
+for (const line of changed) {
+	out.info(line);
+}
+for (const line of notes) {
+	out.warn(line);
+}
 
 if (failed.length) {
 	out.fail(`${failed.length} file(s) failed`);
-	for (const line of failed) out.fail(`  ${line}`);
+	for (const line of failed) {
+		out.fail(`  ${line}`);
+	}
 }
 
 out.done(

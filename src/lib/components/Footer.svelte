@@ -11,7 +11,7 @@
 	<div class="flex flex-wrap gap-4.5">
 		<a class="hover:text-acid" href={resolve("/")}>Home</a>
 		<a class="hover:text-acid" href={resolve("/feed.xml")} data-sveltekit-reload>RSS</a>
-		<a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" rel="noopener"
+		<a class="hover:text-acid" href="https://github.com/orochibraru?tab=repositories" target="_blank" rel="noopener"
 			>GitHub</a
 		>
 		<a class="hover:text-acid" href={resolve("/sitemap.xml")} data-sveltekit-reload>Sitemap</a>
