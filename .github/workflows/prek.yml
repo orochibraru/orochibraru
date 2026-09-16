@@ -1,0 +1,27 @@
+name: prek
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prek-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prek:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+
+      # the local hooks (biome, tailwint, svelte-check, prettier, markdownlint) run from node_modules
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - uses: j178/prek-action@v3.0.0

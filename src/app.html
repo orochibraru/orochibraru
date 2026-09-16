@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+		<meta name="theme-color" content="#060709" media="(prefers-color-scheme: dark)">
+		<meta property="og:site_name" content="orochibraru">
+		<meta property="og:locale" content="en_US">
+		<link
+			rel="icon"
+			href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060709'/><text y='24' x='6' font-size='22' fill='%23b4ff2e' font-family='monospace'>&#3647;</text></svg>"
+		>
+		<link rel="alternate" type="application/rss+xml" title="orochibraru" href="/feed.xml">
+		<script>
+		try {
+			const theme = localStorage.getItem("theme");
+			if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+		} catch {}
+		</script>
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@graph": [
+					{
+						"@type": "Person",
+						"@id": "https://orochibraru.com/#person",
+						"name": "orochibraru",
+						"url": "https://orochibraru.com/about",
+						"description": "Self-taught software engineer with ten years of experience, building free self-hosted tools for homelabs.",
+						"sameAs": ["https://github.com/orochibraru", "https://hub.docker.com/u/orochibraru"]
+					},
+					{
+						"@type": "WebSite",
+						"@id": "https://orochibraru.com/#website",
+						"name": "orochibraru",
+						"url": "https://orochibraru.com/",
+						"description": "Free, open-source, self-hosted software for homelabs: a cloud drive, a single-host PaaS, a server monitor, a media web client, a SvelteKit adapter and a webhook bridge.",
+						"inLanguage": "en",
+						"publisher": { "@id": "https://orochibraru.com/#person" },
+						"author": { "@id": "https://orochibraru.com/#person" }
+					}
+				]
+			}
+		</script>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

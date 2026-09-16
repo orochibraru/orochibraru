@@ -1,7 +1,3 @@
-# generated: written by scripts/build.ts and scripts/docs.ts
 dist
-src/blog/
-src/*/docs/
-
-# machine-written
+.svelte-kit
 bun.lock

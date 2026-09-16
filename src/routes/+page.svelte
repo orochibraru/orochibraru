@@ -1,0 +1,196 @@
+<script lang="ts">
+import { resolve } from "$app/paths";
+import Meta from "$lib/components/Meta.svelte";
+</script>
+
+<Meta
+	title="orochibraru: free, self-hosted software for your homelab"
+	description="Free and open-source homelab software: self-hosted drive, a Cloud Run alternative, server alerting, a Nuvio web client, a Bun SvelteKit adapter and Dokploy→Pangolin routing. No subscriptions, no seats, no paywalls."
+	path="/"
+/>
+
+<main class="mx-auto max-w-page px-6">
+	<div class="pt-15 pb-22.5">
+		<span class="tag">6 projects &middot; self-hosted &middot; MIT &amp; AGPL</span>
+		<h1
+			class="mt-6.5 text-[clamp(2.6rem,9vw,6.2rem)]/[.92] font-extrabold tracking-[-.045em] text-balance"
+		>
+			Software that<br>never grew<br>
+			<span class="bg-linear-to-r from-acid via-cyan to-plasma bg-clip-text text-transparent"
+				>a pricing page.</span
+			>
+		</h1>
+		<p class="mt-7 max-w-[68ch] text-[1.05rem] text-dim">
+			I run my own hardware. So I write the tools I need for it: storage, deploys, monitoring,
+			streaming, routing. Then I give them away.
+			<strong class="font-semibold text-fg"
+				>All of it free. All of it open. No seats, no tiers, no &ldquo;contact sales&rdquo;.</strong
+			>
+		</p>
+		<div class="mt-9 flex flex-wrap gap-3">
+			<a class="btn btn-primary" href="#projects">See the projects</a>
+			<a class="btn" href="https://github.com/orochibraru?tab=repositories" rel="noopener"
+				>GitHub &rarr;</a
+			>
+		</div>
+	</div>
+
+	<div
+		class="mb-20 overflow-hidden border-y border-line py-3 text-xs tracking-[.3em] whitespace-nowrap text-dim uppercase"
+	>
+		<div class="inline-block animate-marquee motion-reduce:animate-none">
+			FREE FOREVER &nbsp;&middot;&nbsp;
+			<b class="font-normal text-acid">NO SUBSCRIPTION</b>
+			&nbsp;&middot;&nbsp; SELF-HOSTED &nbsp;&middot;&nbsp;
+			<b class="font-normal text-acid">NO TELEMETRY</b>
+			&nbsp;&middot;&nbsp; YOUR HARDWARE &nbsp;&middot;&nbsp;
+			<b class="font-normal text-acid">YOUR DATA</b>
+			&nbsp;&middot;&nbsp; OPEN SOURCE &nbsp;&middot;&nbsp;
+			<b class="font-normal text-acid">NO PAYWALL</b>
+			&nbsp;&middot;&nbsp; FREE FOREVER &nbsp;&middot;&nbsp;
+			<b class="font-normal text-acid">NO SUBSCRIPTION</b>
+			&nbsp;&middot;&nbsp; SELF-HOSTED &nbsp;&middot;&nbsp;
+			<b class="font-normal text-acid">NO TELEMETRY</b>
+			&nbsp;&middot;&nbsp; YOUR HARDWARE &nbsp;&middot;&nbsp;
+			<b class="font-normal text-acid">YOUR DATA</b>
+			&nbsp;&middot;&nbsp; OPEN SOURCE &nbsp;&middot;&nbsp;
+			<b class="font-normal text-acid">NO PAYWALL</b>
+			&nbsp;&middot;&nbsp;
+		</div>
+	</div>
+
+	<section id="projects" class="mb-22.5">
+		<div class="mb-7 flex items-baseline gap-4">
+			<h2 class="text-2xl font-bold tracking-[-.02em]">The projects</h2>
+			<div class="h-px flex-1 bg-line"></div>
+			<span class="text-xs tracking-[.2em] text-dim">06</span>
+		</div>
+		<div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+			<a class="card" href={resolve("/penombre")}>
+				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Storage</span>
+				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
+					Penombre
+				</h3>
+				<p class="mb-4.5 text-[.92rem] text-dim">
+					A self-hosted drive. Upload, sync, share, trash, recover. SQLite by default: one
+					container, one volume, no database server to babysit.
+				</p>
+				<div class="flex flex-wrap gap-1.5">
+					<span class="chip">SvelteKit</span>
+					<span class="chip">SQLite</span>
+					<span class="chip">Docker</span>
+					<span class="chip">MIT</span>
+				</div>
+			</a>
+			<a class="card" href={resolve("/homerun")}>
+				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Deploys</span>
+				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
+					Homerun
+				</h3>
+				<p class="mb-4.5 text-[.92rem] text-dim">
+					A single-host PaaS. Point it at an image or a git repo, fill a form, hit deploy, and
+					Traefik routes it with TLS. No Kubernetes anywhere near it.
+				</p>
+				<div class="flex flex-wrap gap-1.5">
+					<span class="chip">Docker</span>
+					<span class="chip">Traefik</span>
+					<span class="chip">PaaS</span>
+					<span class="chip">Self-hosted</span>
+				</div>
+			</a>
+			<a class="card" href={resolve("/baba")}>
+				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Monitoring</span>
+				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
+					Baba
+				</h3>
+				<p class="mb-4.5 text-[.92rem] text-dim">
+					The lookout. Watches CPU, load, memory, disk, temps and GPU, then pings Discord or
+					Telegram when something breaks, and again when it heals.
+				</p>
+				<div class="flex flex-wrap gap-1.5">
+					<span class="chip">Single binary</span>
+					<span class="chip">Discord</span>
+					<span class="chip">Telegram</span>
+					<span class="chip">systemd</span>
+				</div>
+			</a>
+			<a class="card" href={resolve("/nuvio-web")}>
+				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Media</span>
+				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
+					Nuvio Web
+				</h3>
+				<p class="mb-4.5 text-[.92rem] text-dim">
+					An unofficial web client for Nuvio. Your profiles, addons, library and watch progress in a
+					browser, with a player that streams, casts, or hands off.
+				</p>
+				<div class="flex flex-wrap gap-1.5">
+					<span class="chip">Web player</span>
+					<span class="chip">HLS</span>
+					<span class="chip">Cast</span>
+					<span class="chip">AGPL-3.0</span>
+				</div>
+			</a>
+			<a class="card" href={resolve("/svelte-smol")}>
+				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Tooling</span>
+				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
+					svelte-smol
+				</h3>
+				<p class="mb-4.5 text-[.92rem] text-dim">
+					A SvelteKit adapter that compiles your app to one standalone binary with Bun. No
+					node_modules to ship, built-in healthcheck for Docker.
+				</p>
+				<div class="flex flex-wrap gap-1.5">
+					<span class="chip">Bun</span>
+					<span class="chip">SvelteKit</span>
+					<span class="chip">Adapter</span>
+					<span class="chip">npm</span>
+				</div>
+			</a>
+			<a class="card" href={resolve("/dokploy-to-pangolin")}>
+				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Networking</span>
+				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
+					dokploy-to-pangolin
+				</h3>
+				<p class="mb-4.5 text-[.92rem] text-dim">
+					A webhook bridge. Deploy in Dokploy, get the Pangolin resource and target created for you.
+					Stop hand-writing routes for every new app.
+				</p>
+				<div class="flex flex-wrap gap-1.5">
+					<span class="chip">Bun</span>
+					<span class="chip">Hono</span>
+					<span class="chip">Webhook</span>
+					<span class="chip">Pangolin</span>
+				</div>
+			</a>
+		</div>
+	</section>
+
+	<section id="free" class="mb-22.5">
+		<div class="border border-line bg-surface px-8 py-10">
+			<span class="tag">The deal</span>
+			<h2 class="mt-4 mb-4.5 text-[clamp(1.6rem,4vw,2.4rem)] font-bold tracking-[-.03em]">
+				Everything here is free. Actually free.
+			</h2>
+			<p class="max-w-[78ch] text-[1.1rem]">
+				I&rsquo;m sick of paying for everything. A monthly fee to store my own files. A seat licence
+				to deploy my own container. A &ldquo;pro&rdquo; tier to get an alert when my own disk fills
+				up. Every tool I liked eventually grew a pricing page and moved the feature I used behind
+				it.
+			</p>
+			<p class="mt-5 max-w-[78ch] text-dim">
+				So these are the ones I built instead.
+				<b class="font-normal text-acid"
+					>No subscription. No seats. No usage limits. No feature held back for an enterprise plan.
+					No telemetry phoning home.</b
+				>
+				Clone it, run it on the box in your closet, fork it if I stop caring. That&rsquo;s the whole
+				deal.
+			</p>
+			<p class="mt-5 max-w-[78ch] text-dim">
+				If something&rsquo;s broken, open an issue. If you fix it, open a PR. If you never talk to
+				me again and just run it forever. Perfect, that&rsquo;s the point.
+			</p>
+			<a class="btn mt-8" href={resolve("/about")}>The long version &rarr;</a>
+		</div>
+	</section>
+</main>

@@ -1,58 +1,113 @@
-# Hooks for prek, a drop-in pre-commit runner:
-#   prek install           wire them into .git/hooks
-#   prek run --all-files   run them over the whole repo
-#
-# A hook that rewrites a file fails the commit on purpose. Re-stage and commit
-# again, so whatever it changed is something you actually looked at.
+default_install_hook_types: [pre-commit, commit-msg, post-checkout]
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      - id: trailing-whitespace
-        # two trailing spaces are a line break in Markdown: leave posts alone
-        args: [--markdown-linebreak-ext=md]
-      - id: end-of-file-fixer
+      - id: check-merge-conflict
+
+      - id: check-case-conflict
+
+      - id: detect-private-key
+
+      - id: check-yaml
+
       - id: mixed-line-ending
         args: [--fix=lf]
-      - id: check-merge-conflict
-      - id: check-case-conflict
-      - id: check-added-large-files
-      - id: check-yaml
-      - id: check-json
-      - id: detect-private-key
+        # src/docs is vendored from the project repos and must stay byte-identical to upstream
+        exclude: &generated ^(bun\.lock|src/docs/)
+      - id: end-of-file-fixer
+        exclude: *generated
+
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude: *generated
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.50.1
+    hooks:
+      - id: typos
+        args: [--force-exclude]
+        exclude: *generated
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.15.1
+    hooks:
+      - id: hadolint-docker
 
   - repo: local
     hooks:
-      # Formatting first, so the linters below judge the file as it will land.
-      # --ignore-unknown lets it take every staged path and skip the ones it has
-      # no parser for; .prettierignore keeps it off the generated pages.
-      - id: prettier
-        name: prettier
-        entry: bun run prettier --write --ignore-unknown
+      - id: biome
+        name: biome check --write
+        entry: bun run biome check --write --no-errors-on-unmatched --files-ignore-unknown=true
         language: system
-        types: [text]
+        files: \.(ts|tsx|js|jsx|mjs|cjs|json|jsonc|css|svelte|html)$
 
-      # Pages get htmlhint's stock rules. The fragments in src/_partials can't
-      # pass those — no doctype, no <title> — which is the point of a fragment,
-      # so they are linted separately against a ruleset with those two dropped.
-      - id: htmlhint
-        name: htmlhint (pages)
-        entry: bun run htmlhint
-        language: system
-        types: [html]
-        exclude: ^src/_partials/
-
-      - id: htmlhint-partials
-        name: htmlhint (fragments)
-        entry: bun run htmlhint --config src/_partials/.htmlhintrc
-        language: system
-        types: [html]
-        files: ^src/_partials/
-
-      # the project's own linter: Tailwind classes written the canonical way
+      # tailwint needs app.css in the same run to resolve the project, so it gets the globs, not filenames
       - id: tailwint
-        name: tailwind classes
-        entry: bun run lint:fix
+        name: tailwint
+        entry: bun run tailwint 'src/**/*.{css,svelte}'
         language: system
-        types_or: [html, css]
         pass_filenames: false
+        files: ^src/.*\.(css|svelte)$
+
+      - id: svelte-check
+        name: svelte-check
+        entry: bun run check:app
+        language: system
+        pass_filenames: false
+        files: (\.(ts|js|svelte)$|^(tsconfig\.json|svelte\.config\.js|package\.json)$)
+
+      - id: prettier-md
+        name: prettier (markdown)
+        entry: bun run prettier --log-level warn --write
+        language: system
+        types: [markdown]
+        exclude: *generated
+
+      - id: markdownlint
+        name: markdownlint-cli2 --fix
+        entry: bun run markdownlint-cli2 --fix
+        language: system
+        types: [markdown]
+        exclude: ^(src/docs/|\.claude/skills/)
+
+      # node_modules and .svelte-kit aren't part of the checkout, so a branch switch leaves them stale
+      - id: bun-install
+        name: bun install
+        entry: sh -c 'bun install --ignore-scripts && bun run svelte-kit sync'
+        language: system
+        stages: [post-checkout]
+        always_run: true
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: no-manual-route-typing
+        name: "route files: no manual $props()/load/actions typing (./$types is inferred)"
+        language: pygrep
+        entry: |-
+          (: (PageData|PageProps|LayoutData|ActionData|LayoutProps|PageServerLoad|LayoutServerLoad|Actions|RequestHandler)\b|from "\./\$types")
+        files: ^src/routes/.*\.(ts|svelte)$
+
+      - id: internal-links-resolve
+        name: "internal links go through resolve() from $app/paths"
+        language: pygrep
+        entry: href="/
+        files: ^src/.*\.svelte$
