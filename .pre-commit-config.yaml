@@ -1,3 +1,5 @@
+default_install_hook_types: [pre-commit, commit-msg, post-checkout]
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -12,15 +14,8 @@ repos:
 
       - id: mixed-line-ending
         args: [--fix=lf]
-        exclude: &generated |-
-          (?x)^(
-            src/lib/api/v1\.(json|d\.ts)|
-            openapi.json|
-            \.example\.env|
-            drizzle/|
-            CHANGELOG\.md|
-            bun\.lock
-          )
+        # src/docs is vendored from the project repos and must stay byte-identical to upstream
+        exclude: &generated ^(bun\.lock|src/docs/)
       - id: end-of-file-fixer
         exclude: *generated
 
@@ -44,6 +39,7 @@ repos:
     hooks:
       - id: typos
         args: [--force-exclude]
+        exclude: *generated
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12
@@ -57,54 +53,42 @@ repos:
 
   - repo: local
     hooks:
-      # These run first: .example.env and the OpenAPI spec + its typed client
-      # are derived from source that may itself be part of this commit.
-      - id: gen-env
-        name: regenerate .example.env
-        entry: bun run gen:env
-        language: system
-        pass_filenames: false
-        files: ^(src/lib/server/config\.defaults\.ts|scripts/generate-env-example\.ts)$
-
       - id: biome
-        name: biome check --write --unsafe
-        entry: bun run biome format
+        name: biome check --write
+        entry: bun run biome check --write --no-errors-on-unmatched --files-ignore-unknown=true
         language: system
         files: \.(ts|tsx|js|jsx|mjs|cjs|json|jsonc|css|svelte|html)$
+
+      # tailwint needs app.css in the same run to resolve the project, so it gets the globs, not filenames
+      - id: tailwint
+        name: tailwint
+        entry: bun run tailwint 'src/**/*.{css,svelte}'
+        language: system
+        pass_filenames: false
+        files: ^src/.*\.(css|svelte)$
+
+      - id: svelte-check
+        name: svelte-check
+        entry: bun run check:app
+        language: system
+        pass_filenames: false
+        files: (\.(ts|js|svelte)$|^(tsconfig\.json|svelte\.config\.js|package\.json)$)
 
       - id: prettier-md
         name: prettier (markdown)
         entry: bun run prettier --log-level warn --write
         language: system
         types: [markdown]
+        exclude: *generated
 
       - id: markdownlint
         name: markdownlint-cli2 --fix
-        entry: bunx markdownlint-cli2 --fix
+        entry: bun run markdownlint-cli2 --fix
         language: system
         types: [markdown]
+        exclude: ^(src/docs/|\.claude/skills/)
 
-      - id: test-unit
-        name: bun test
-        entry: bun test
-        language: system
-        pass_filenames: false
-        files: ^(src/|test\.setup\.ts$|bunfig\.toml$)
-
-      # Switching branches changes bun.lock, and node_modules is not part of
-      # the checkout: without this, the first command after a branch switch
-      # runs against the previous branch's dependencies.
-      #
-      # `--ignore-scripts` plus an explicit sync, rather than a plain
-      # `bun install`: `prepare` runs `prek install`, which rewrites
-      # `.husky/_/*` — tracked files — from inside the hook prek is currently
-      # running. prek then sees a hook that modified the working tree, and
-      # every branch switch on a dirty tree ends in "Hook changes conflicted
-      # with the saved unstaged changes. Reverting the hook changes". The sync
-      # is the half of `prepare` that a checkout actually needs, since
-      # `.svelte-kit` is generated and branch-specific.
-      #
-      # `sh -c` because `entry` is exec'd, not run through a shell.
+      # node_modules and .svelte-kit aren't part of the checkout, so a branch switch leaves them stale
       - id: bun-install
         name: bun install
         entry: sh -c 'bun install --ignore-scripts && bun run svelte-kit sync'
@@ -121,12 +105,6 @@ repos:
         entry: |-
           (: (PageData|PageProps|LayoutData|ActionData|LayoutProps|PageServerLoad|LayoutServerLoad|Actions|RequestHandler)\b|from "\./\$types")
         files: ^src/routes/.*\.(ts|svelte)$
-
-      - id: no-raw-drizzle-in-routes
-        name: "route files: no raw Drizzle queries (go through a DTO)"
-        language: pygrep
-        entry: \bdb\.(select|insert|update|delete)\(
-        files: ^src/routes/.*\.ts$
 
       - id: internal-links-resolve
         name: "internal links go through resolve() from $app/paths"
