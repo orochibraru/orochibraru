@@ -1,7 +1,7 @@
 // The projects whose docs this site publishes. Order, titles, icons and
 // categories come from each repo's docs/config.json (see docs-config.ts).
 export type Project = {
-	key: "penombre" | "homerun";
+	key: "penombre" | "homerun" | "nuvio-web";
 	name: string;
 	blurb: string;
 	repo: string;
@@ -21,6 +21,13 @@ export const PROJECTS: Project[] = [
 		name: "Homerun",
 		blurb: "A single-host PaaS: deploy an image or a repo from a form, Traefik routes it with TLS.",
 		repo: "https://github.com/orochibraru/homerun",
+		branch: "main",
+	},
+	{
+		key: "nuvio-web",
+		name: "Nuvio Web",
+		blurb: "Unofficial implementation of the Nuvio API in a web UI (since there is none, yet).",
+		repo: "https://github.com/orochibraru/nuvio-web",
 		branch: "main",
 	},
 ];
