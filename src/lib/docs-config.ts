@@ -4,7 +4,7 @@
 // validation and autocomplete from a `$schema` line.
 import { Glob } from "bun";
 import { z } from "zod";
-import { SITE } from "./seo";
+import { SITE } from "$lib/seo";
 
 export const SCHEMA_URL = `${SITE}/docs-config.schema.json`;
 
