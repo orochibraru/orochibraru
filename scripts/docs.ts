@@ -68,12 +68,17 @@ async function listDocs(project: Project) {
 			.filter(
 				(path) => path.startsWith("docs/") && path.endsWith(".md") && !path.endsWith("/README.md"),
 			)
-			.filter((path) => path.split("/").length === 2),
+			.filter((path) => path.split("/").length === 2)
+			// the repo's contributing guide, published alongside as the `contributing` guide
+			.concat(files.filter((path) => path === CONTRIBUTING)),
 		images: files.filter(
 			(path) => path.startsWith("docs/images/") && /\.(png|jpe?g|webp)$/.test(path),
 		),
 	};
 }
+
+/** Lives at the repo root, not in docs/: guides.ts resolves its links from there. */
+const CONTRIBUTING = "CONTRIBUTING.md";
 
 const raw = (project: Project, path: string) =>
 	`https://raw.githubusercontent.com/${new URL(project.repo).pathname.slice(1)}/${project.branch}/${path}`;
@@ -110,7 +115,8 @@ for (const project of PROJECTS) {
 	const slugs: string[] = [];
 	await out.time(`${project.key}: fetch guides`, async () => {
 		for (const path of inventory.guides) {
-			const slug = path.slice("docs/".length).replace(/\.md$/, "");
+			const slug =
+				path === CONTRIBUTING ? "contributing" : path.slice("docs/".length).replace(/\.md$/, "");
 			slugs.push(slug);
 			try {
 				await writeIfChanged(

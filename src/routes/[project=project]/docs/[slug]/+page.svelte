@@ -111,7 +111,7 @@
 				This guide lives in the project repo:
 				<a
 					class="border-b border-edge hover:border-cyan"
-					href="{project.repo}/blob/{project.branch}/docs/{data.slug}.md"
+					href={data.source}
 					target="_blank"
 					rel="noopener"
 					>edit it there</a

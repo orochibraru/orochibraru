@@ -5,6 +5,7 @@
 // rewritten at sync time — src/docs stays diffable against upstream — so all of
 // that happens here, once, at build time.
 import { existsSync, readFileSync } from "node:fs";
+import { posix } from "node:path";
 import { Glob } from "bun";
 import { z } from "zod";
 import type { IconNode } from "$lib/components/LucideIcon.svelte";
@@ -29,6 +30,8 @@ export type Guide = {
 	intro: string;
 	/** Rendered body, with the leading <h1> removed — the layout prints the title. */
 	html: string;
+	/** The upstream file on GitHub. */
+	source: string;
 	/** The source with links rewritten, published at <url>.md. */
 	markdown: string;
 	sections: Section[];
@@ -62,8 +65,10 @@ const plain = (markdown: string) =>
 		.trim();
 
 /**
- * One link target, as this site should serve it:
+ * One link target, as this site should serve it. Targets resolve from the file's own
+ * folder: docs/ for guides, the repo root for the contributing guide.
  *   env.md, env.md#redis   another guide, here
+ *   ../CONTRIBUTING.md     the contributing guide, here
  *   #redis                 same page, left alone
  *   images/hero.png        the vendored WebP
  *   ../compose.yaml        a file only the repo has: send people to the repo
@@ -74,6 +79,7 @@ function rewrite(
 	project: Project,
 	slugs: Set<string>,
 	image: (name: string) => string,
+	folder: string,
 ): string {
 	if (/^(https?:|mailto:|#|\/)/.test(target)) {
 		return target;
@@ -81,22 +87,26 @@ function rewrite(
 
 	const [path = "", hash] = target.split("#", 2);
 	const anchor = hash ? `#${hash}` : "";
+	const inRepo = posix.join(folder, path);
 
-	const picture = path.match(/^images\/(.+)\.(?:png|jpe?g|webp)$/i)?.[1];
+	const picture = imageName(inRepo);
 	if (picture) {
 		return image(picture);
 	}
 
-	const guide = path.match(/^([\w-]+)\.md$/)?.[1];
+	const guide =
+		inRepo === "CONTRIBUTING.md" ? "contributing" : inRepo.match(/^docs\/([\w-]+)\.md$/)?.[1];
 	if (guide && slugs.has(guide)) {
 		return `${docsUrl(project, guide)}${anchor}`;
 	}
 
 	// anything else is a repo file this site doesn't publish
-	const outsideDocs = path.startsWith("../");
-	const cleaned = path.replace(/^\.\//, "").replace(/^\.\.\//, "");
-	return `${project.repo}/blob/${project.branch}/${outsideDocs ? "" : "docs/"}${cleaned}${anchor}`;
+	return `${project.repo}/blob/${project.branch}/${inRepo}${anchor}`;
 }
+
+/** docs/images/hero.png -> hero, the name its WebP is vendored under. */
+const imageName = (inRepo: string) =>
+	inRepo.match(/^docs\/images\/(.+)\.(?:png|jpe?g|webp)$/i)?.[1];
 
 /**
  * Width and height straight out of the WebP header, so images rendered from
@@ -259,6 +269,8 @@ async function readGuides() {
 
 		for (const slug of groups.flatMap((group) => group.slugs)) {
 			const raw = await Bun.file(`${directory}/${slug}.md`).text();
+			const folder = slug === "contributing" ? "" : "docs";
+			const file = slug === "contributing" ? "CONTRIBUTING.md" : `docs/${slug}.md`;
 
 			const heading = raw.match(/^#\s+(.+?)\s*$/m);
 			const title = heading?.[1] ? plain(heading[1]) : slug;
@@ -286,11 +298,11 @@ async function readGuides() {
 						})
 						.replace(
 							/<a href="([^"]*)"/g,
-							(_tag, href: string) => `<a href="${rewrite(href, project, slugs, image)}"`,
+							(_tag, href: string) => `<a href="${rewrite(href, project, slugs, image, folder)}"`,
 						)
 						.replace(/<img src="([^"]*)"([^>]*?)\/?>/g, (_tag, src: string, rest: string) => {
-							const source = rewrite(src, project, slugs, image);
-							const name = src.match(/^images\/(.+)\.[a-z]+$/i)?.[1];
+							const source = rewrite(src, project, slugs, image, folder);
+							const name = imageName(posix.join(folder, src));
 							const size = name ? dimensions(`${directory}/images/${name}.webp`) : null;
 							const sized = size ? ` width="${size.width}" height="${size.height}"` : "";
 							return `<img src="${source}"${rest}${sized} loading="lazy" decoding="async">`;
@@ -314,9 +326,10 @@ async function readGuides() {
 				icon: lucideIcon(pages.get(slug)?.icon ?? "file"),
 				intro,
 				html,
+				source: `${project.repo}/blob/${project.branch}/${file}`,
 				// read away from this site, so every link and image has to be absolute
 				markdown: raw.replace(/\]\(([^)]+)\)/g, (_link, target: string) => {
-					const url = rewrite(target, project, slugs, image);
+					const url = rewrite(target, project, slugs, image, folder);
 					return `](${url.startsWith("/") ? `${SITE}${url}` : url})`;
 				}),
 				sections: sections(body, title),

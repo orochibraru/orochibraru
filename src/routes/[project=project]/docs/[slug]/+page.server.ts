@@ -17,6 +17,7 @@ export const load = async ({ params }) => {
 		slug: guide.slug,
 		title: guide.title,
 		html: guide.html,
+		source: guide.source,
 		contents: guide.sections
 			.filter((section) => section.id && section.level <= 3)
 			.map(({ id, heading, level }) => ({ id, heading, level })),
