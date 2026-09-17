@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
+	import BrandIcon from "$lib/components/BrandIcon.svelte";
 	import Meta from "$lib/components/Meta.svelte";
+
+	let { data } = $props();
 
 	const structuredData = [
 		{
@@ -56,15 +59,17 @@
 					href="https://github.com/orochibraru/dokploy-to-pangolin"
 					target="_blank"
 					rel="noopener"
-					>Source on GitHub</a
 				>
+					<BrandIcon name="github" />Source on GitHub
+				</a>
 				<a
 					class="btn"
 					href="https://hub.docker.com/r/orochibraru/dokploy-to-pangolin"
 					target="_blank"
 					rel="noopener"
-					>Docker Hub</a
 				>
+					<BrandIcon name="docker" />Docker Hub
+				</a>
 			</div>
 		</div>
 		<section class="mb-22.5">
@@ -116,10 +121,7 @@
 
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Run it</h2>
-			<pre>docker run -p 3000:3000 \
-  -e WEBHOOK_SECRET=your-secret \
-  -e PANGOLIN_API_KEY=your-key \
-  orochibraru/dokploy-to-pangolin</pre>
+			{@html data.run}
 			<p class="mt-5">
 				It has to be reachable by Dokploy to receive webhooks. Deploying it
 				<em>through</em>

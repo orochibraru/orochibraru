@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { BookOpen, CircleQuestionMark, Images } from "@lucide/svelte";
 	import { resolve } from "$app/paths";
 	import deploy from "$docs/homerun/images/deploy.webp";
 	import deployDark from "$docs/homerun/images/deploy-dark.webp";
@@ -16,8 +17,11 @@
 	import stackDark from "$docs/homerun/images/stack-dark.webp";
 	import templates from "$docs/homerun/images/templates.webp";
 	import templatesDark from "$docs/homerun/images/templates-dark.webp";
+	import BrandIcon from "$lib/components/BrandIcon.svelte";
 	import Meta from "$lib/components/Meta.svelte";
 	import { SITE } from "$lib/seo";
+
+	let { data } = $props();
 
 	const structuredData = [
 		{
@@ -113,14 +117,16 @@
 				Kubernetes. No control plane. No pricing page.
 			</p>
 			<div class="mt-6.5 flex flex-wrap gap-2.5">
-				<a class="btn btn-primary" href={resolve("/homerun/docs")}>Read the docs</a>
-				<a class="btn" href="#showcase">Screenshots</a>
-				<a class="btn" href="https://github.com/orochibraru/homerun" target="_blank" rel="noopener"
-					>Source on GitHub</a
-				>
-				<a class="btn" href={resolve("/homerun/docs/faq-and-limitations")}
-					>FAQ &amp; limitations</a
-				>
+				<a class="btn btn-primary" href={resolve("/homerun/docs")}>
+					<BookOpen size={15} />Read the docs
+				</a>
+				<a class="btn" href="#showcase"><Images size={15} />Screenshots</a>
+				<a class="btn" href="https://github.com/orochibraru/homerun" target="_blank" rel="noopener">
+					<BrandIcon name="github" />Source on GitHub
+				</a>
+				<a class="btn" href={resolve("/homerun/docs/faq-and-limitations")}>
+					<CircleQuestionMark size={15} />FAQ &amp; limitations
+				</a>
 			</div>
 		</div>
 		<section class="mb-22.5">
@@ -735,14 +741,7 @@
 				if this host is only going to be a remote build server for another instance.
 			</p>
 			<p class="mt-8 mb-3 text-xs uppercase tracking-widest text-dim">Docker Compose</p>
-			<pre><span class="c"># already have Docker set up your way? just take the stack</span>
-curl -fsSLO https://raw.githubusercontent.com/orochibraru/homerun/main/compose.prod.yaml
-curl -fsSLO https://raw.githubusercontent.com/orochibraru/homerun/main/.env.example
-curl -fsSL https://raw.githubusercontent.com/orochibraru/homerun/main/homerun.example.yaml -o homerun.yaml
-
-mv .env.example .env    <span class="c"># set AUTH_SECRET at minimum</span>
-docker network create homerun
-docker compose -f compose.prod.yaml up -d</pre>
+			{@html data.install}
 			<p class="mt-5">
 				<code>compose.prod.yaml</code>
 				is self-contained and pulls Traefik, Postgres and the app from published images. No

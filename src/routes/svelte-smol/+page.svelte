@@ -1,6 +1,10 @@
 <script lang="ts">
+	import { Package } from "@lucide/svelte";
 	import { resolve } from "$app/paths";
+	import BrandIcon from "$lib/components/BrandIcon.svelte";
 	import Meta from "$lib/components/Meta.svelte";
+
+	let { data } = $props();
 
 	const structuredData = [
 		{
@@ -53,17 +57,27 @@
 				<code>node_modules</code>, no JS files to ship. One binary plus its static assets.
 			</p>
 			<div class="mt-6.5 flex flex-wrap gap-2.5">
-				<a class="btn btn-primary" href="https://github.com/orochibraru/svelte-smol" target="_blank" rel="noopener"
-					>Source on GitHub</a
+				<a
+					class="btn btn-primary"
+					href="https://github.com/orochibraru/svelte-smol"
+					target="_blank"
+					rel="noopener"
 				>
-				<a class="btn" href="https://www.npmjs.com/package/@orochibraru/svelte-smol" target="_blank" rel="noopener"
-					>npm</a
+					<BrandIcon name="github" />Source on GitHub
+				</a>
+				<a
+					class="btn"
+					href="https://www.npmjs.com/package/@orochibraru/svelte-smol"
+					target="_blank"
+					rel="noopener"
 				>
+					<Package size={15} />npm
+				</a>
 			</div>
 		</div>
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Use it</h2>
-			<pre>bun add -d @orochibraru/svelte-smol</pre>
+			{@html data.install}
 			<pre class="mt-4"><span class="c">// svelte.config.js</span>
 import adapter from "@orochibraru/svelte-smol";
 

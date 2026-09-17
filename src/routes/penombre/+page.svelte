@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { BookOpen, Images } from "@lucide/svelte";
 	import { resolve } from "$app/paths";
 	import admin from "$docs/penombre/images/admin.webp";
 	import adminDark from "$docs/penombre/images/admin-dark.webp";
@@ -12,8 +13,11 @@
 	import previewDark from "$docs/penombre/images/preview-dark.webp";
 	import settingsAppearance from "$docs/penombre/images/settings-appearance.webp";
 	import settingsAppearanceDark from "$docs/penombre/images/settings-appearance-dark.webp";
+	import BrandIcon from "$lib/components/BrandIcon.svelte";
 	import Meta from "$lib/components/Meta.svelte";
 	import { SITE } from "$lib/seo";
+
+	let { data } = $props();
 
 	const structuredData = [
 		{
@@ -91,14 +95,21 @@
 				of exactly zero.
 			</p>
 			<div class="mt-6.5 flex flex-wrap gap-2.5">
-				<a class="btn btn-primary" href={resolve("/penombre/docs")}>Read the docs</a>
-				<a class="btn" href="#showcase">Screenshots</a>
-				<a class="btn" href="https://github.com/orochibraru/penombre" target="_blank" rel="noopener"
-					>Source on GitHub</a
+				<a class="btn btn-primary" href={resolve("/penombre/docs")}>
+					<BookOpen size={15} />Read the docs
+				</a>
+				<a class="btn" href="#showcase"><Images size={15} />Screenshots</a>
+				<a class="btn" href="https://github.com/orochibraru/penombre" target="_blank" rel="noopener">
+					<BrandIcon name="github" />Source on GitHub
+				</a>
+				<a
+					class="btn"
+					href="https://hub.docker.com/r/orochibraru/penombre"
+					target="_blank"
+					rel="noopener"
 				>
-				<a class="btn" href="https://hub.docker.com/r/orochibraru/penombre" target="_blank" rel="noopener"
-					>Docker Hub</a
-				>
+					<BrandIcon name="docker" />Docker Hub
+				</a>
 			</div>
 		</div>
 		<section class="mb-22.5">
@@ -513,27 +524,9 @@
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Run it</h2>
 			<p class="mb-3 text-xs uppercase tracking-widest text-dim">Docker run</p>
-			<pre>docker run -d --name penombre \
-  -p 3000:3000 \
-  -v penombre_data:/data \
-  -e AUTH_SECRET=$(openssl rand -hex 32) \
-  -e ORIGIN=https://drive.example.com \
-  orochibraru/penombre:latest</pre>
+			{@html data.run}
 			<p class="mt-8 mb-3 text-xs uppercase tracking-widest text-dim">Docker Compose</p>
-			<pre>services:
-  penombre:
-image: orochibraru/penombre:latest
-restart: unless-stopped
-ports:
-  - 3000:3000
-volumes:
-  - penombre_data:/data
-environment:
-  AUTH_SECRET: a-long-random-string
-  ORIGIN: https://drive.example.com
-
-volumes:
-  penombre_data:</pre>
+			{@html data.compose}
 			<p class="mt-5">
 				Either way it comes up on <code>http://localhost:3000</code>. One volume holds the lot: the
 				SQLite database under <code>/data/db</code>, your files under

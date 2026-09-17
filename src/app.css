@@ -130,7 +130,7 @@
 @layer components {
 	/* the five atoms that repeat on every page */
 	.btn {
-		@apply inline-block border border-edge font-mono px-5.5 py-3 text-[13px] uppercase tracking-[.04em] transition duration-150 hover:border-acid hover:text-acid;
+		@apply inline-flex items-center gap-2.25 border border-edge font-mono px-5.5 py-3 text-[13px] uppercase tracking-[.04em] transition duration-150 hover:border-acid hover:text-acid;
 	}
 	.btn-primary {
 		@apply border-neon bg-neon font-bold text-onneon hover:border-neon hover:bg-neon hover:text-onneon hover:brightness-110;
@@ -187,6 +187,7 @@
 	.prose pre {
 		@apply overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
 	}
+	/* the hand-drawn blocks (svelte-smol's tree, the dokploy diagram) dim comments this way */
 	.prose pre .c {
 		@apply text-dim;
 	}

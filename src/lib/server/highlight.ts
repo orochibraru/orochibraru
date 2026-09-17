@@ -10,6 +10,16 @@ const ALIASES: Record<string, string> = { env: "dotenv", sh: "bash", ts: "typesc
 
 const highlighter = createHighlighter({ themes: ["github-light", "github-dark"], langs: LANGS });
 
+/** One snippet to a `<pre class="shiki">`; the project pages highlight theirs from a load. */
+export async function highlightCode(code: string, lang: string): Promise<string> {
+	const shiki = await highlighter;
+	return shiki.codeToHtml(code, {
+		lang: LANGS.includes(lang) ? lang : "text",
+		themes: { light: "github-light", dark: "github-dark" },
+		defaultColor: false,
+	});
+}
+
 export async function highlight(html: string): Promise<string> {
 	const shiki = await highlighter;
 	return html.replace(

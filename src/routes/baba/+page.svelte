@@ -1,6 +1,10 @@
 <script lang="ts">
+	import { Download } from "@lucide/svelte";
 	import { resolve } from "$app/paths";
+	import BrandIcon from "$lib/components/BrandIcon.svelte";
 	import Meta from "$lib/components/Meta.svelte";
+
+	let { data } = $props();
 
 	const structuredData = [
 		{
@@ -51,12 +55,22 @@
 				goes wrong, and again when it&rsquo;s fixed.
 			</p>
 			<div class="mt-6.5 flex flex-wrap gap-2.5">
-				<a class="btn btn-primary" href="https://github.com/orochibraru/baba" target="_blank" rel="noopener"
-					>Source on GitHub</a
+				<a
+					class="btn btn-primary"
+					href="https://github.com/orochibraru/baba"
+					target="_blank"
+					rel="noopener"
 				>
-				<a class="btn" href="https://github.com/orochibraru/baba/releases" target="_blank" rel="noopener"
-					>Releases</a
+					<BrandIcon name="github" />Source on GitHub
+				</a>
+				<a
+					class="btn"
+					href="https://github.com/orochibraru/baba/releases"
+					target="_blank"
+					rel="noopener"
 				>
+					<Download size={15} />Releases
+				</a>
 			</div>
 		</div>
 		<section class="mb-22.5">
@@ -103,11 +117,7 @@
 
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Install</h2>
-			<pre><span class="c"># Linux / macOS</span>
-curl -fsSL https://github.com/orochibraru/baba/releases/latest/download/install.sh | sh
-
-baba setup    <span class="c"># interactive wizard: notifier credentials + thresholds</span>
-baba install  <span class="c"># register as a background service</span></pre>
+			{@html data.install}
 			<p class="mt-5">
 				Or run it in the foreground with <code>baba start</code>, or in Docker with the
 				<a href="https://github.com/orochibraru/baba" target="_blank" rel="noopener">example compose file</a>.

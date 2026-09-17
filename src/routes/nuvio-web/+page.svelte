@@ -1,6 +1,10 @@
 <script lang="ts">
+	import { BookOpen, Globe } from "@lucide/svelte";
 	import { resolve } from "$app/paths";
+	import BrandIcon from "$lib/components/BrandIcon.svelte";
 	import Meta from "$lib/components/Meta.svelte";
+
+	let { data } = $props();
 
 	const structuredData = [
 		{
@@ -52,23 +56,28 @@
         addons, library and watch progress in a browser tab.
       </p>
       <div class="mt-6.5 flex flex-wrap gap-2.5">
-        <a class="btn btn-primary" href={resolve("/nuvio-web/docs")}>Read the docs</a>
-
-        <a class="btn" href="https://nuvio.orochibraru.com" target="_blank" rel="noopener"
-          >Try the hosted instance</a
-        >
+        <a class="btn btn-primary" href={resolve("/nuvio-web/docs")}>
+          <BookOpen size={15} />Read the docs
+        </a>
+        <a class="btn" href="https://nuvio.orochibraru.com" target="_blank" rel="noopener">
+          <Globe size={15} />Try the hosted instance
+        </a>
         <a
           class="btn"
           href="https://github.com/orochibraru/nuvio-web"
           target="_blank"
-          rel="noopener">Source on GitHub</a
+          rel="noopener"
         >
+          <BrandIcon name="github" />Source on GitHub
+        </a>
         <a
           class="btn"
           href="https://hub.docker.com/r/orochibraru/nuvio-web"
           target="_blank"
-          rel="noopener">Docker Hub</a
+          rel="noopener"
         >
+          <BrandIcon name="docker" />Docker Hub
+        </a>
       </div>
     </div>
     <section class="mb-22.5">
@@ -251,24 +260,9 @@
     <section class="mb-22.5">
       <h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Run it</h2>
       <p class="mb-3 text-xs uppercase tracking-widest text-dim">Docker run</p>
-      <pre>docker run -p 3000:3000 -e ORIGIN=http://localhost:3000 \
-  orochibraru/nuvio-web:latest</pre>
+      {@html data.run}
       <p class="mt-8 mb-3 text-xs uppercase tracking-widest text-dim">Docker Compose</p>
-      <pre>services:
-  nuvio:
-image: orochibraru/nuvio-web:latest
-restart: unless-stopped
-ports:
-  - 3000:3000
-environment:
-  <span class="c"># the URL you actually browse to</span>
-  ORIGIN: http://localhost:3000
-healthcheck:
-  test: ["CMD", "/app/dist/healthcheck"]
-  interval: 30s
-  timeout: 30s
-  retries: 3
-  start_period: 5s</pre>
+      {@html data.compose}
       <p class="mt-5">
         Then open <code>http://localhost:3000</code>, sign in with your Nuvio account, pick a
         profile, and add an addon from Settings if the account has none yet.
