@@ -16,5 +16,6 @@
 		>
 		<a class="hover:text-acid" href={resolve("/sitemap.xml")} data-sveltekit-reload>Sitemap</a>
 		<a class="hover:text-acid" href={resolve("/llms.txt")} data-sveltekit-reload>llms.txt</a>
+		<a class="hover:text-acid" href={resolve("/privacy")}>Privacy</a>
 	</div>
 </footer>

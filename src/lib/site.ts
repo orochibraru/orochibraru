@@ -9,6 +9,7 @@ export const PAGES = [
 	{ path: "/dokploy-to-pangolin", group: "Projects", priority: "0.8" },
 	{ path: "/blog", group: "Start here", priority: "0.9" },
 	{ path: "/about", group: "Start here", priority: "0.7" },
+	{ path: "/privacy", group: "Start here", priority: "0.3" },
 ] as const;
 
 /** A project page's first path segment is also its repository name. */
