@@ -63,6 +63,7 @@ async function listDocs(project: Project) {
 	const { tree } = (await response.json()) as { tree: { path: string; type: string }[] };
 	const files = tree.filter((entry) => entry.type === "blob").map((entry) => entry.path);
 	return {
+		config: files.includes("docs/config.json"),
 		guides: files
 			.filter(
 				(path) => path.startsWith("docs/") && path.endsWith(".md") && !path.endsWith("/README.md"),
@@ -160,15 +161,26 @@ for (const project of PROJECTS) {
 		}
 	});
 
-	// a guide that exists upstream but isn't in the sidebar, or the other way round
-	for (const slug of slugs) {
-		if (!project.order.includes(slug)) {
-			notes.push(`${project.key}: ${slug} is not in its order[] — it will sort last`);
+	// validated by the build, not here: that is what fails the docs workflow before it commits
+	const config = `${directory}/config.json`;
+	if (inventory.config) {
+		try {
+			await writeIfChanged(
+				config,
+				await fetchBytes(project, "docs/config.json"),
+				`${project.key}/config.json`,
+			);
+		} catch (error) {
+			out.fail(String(error));
+			failed.push(String(error));
 		}
-	}
-	for (const slug of project.order) {
-		if (!slugs.includes(slug)) {
-			notes.push(`${project.key}: order[] lists ${slug}, which upstream no longer has`);
+	} else {
+		notes.push(
+			`${project.key}: no docs/config.json upstream — guides sort alphabetically, uncategorised`,
+		);
+		if (await Bun.file(config).exists()) {
+			await rm(config);
+			changed.push(`removed  ${project.key}/config.json`);
 		}
 	}
 

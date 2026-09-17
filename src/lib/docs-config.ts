@@ -2,19 +2,25 @@
 // and the docs homepage show, under which category, in what order, with which
 // icon. Published as JSON Schema by `bun run schema`, so those repos get
 // validation and autocomplete from a `$schema` line.
+import { readFileSync } from "node:fs";
 import { Glob } from "bun";
 import { z } from "zod";
+import type { IconNode } from "$lib/components/LucideIcon.svelte";
 import { SITE } from "$lib/seo";
 
 export const SCHEMA_URL = `${SITE}/docs-config.schema.json`;
 
+const ICONS = "node_modules/@lucide/svelte/dist/icons";
+
 // every icon @lucide/svelte ships, by its kebab-case file name
-const ICON_NAMES = [...new Glob("*.svelte").scanSync("node_modules/@lucide/svelte/dist/icons")]
+const ICON_NAMES = [...new Glob("*.svelte").scanSync(ICONS)]
 	.map((file) => file.replace(/\.svelte$/, ""))
 	.sort();
 
 const Icon = z
-	.enum(ICON_NAMES as [string, ...string[]])
+	.enum(ICON_NAMES as [string, ...string[]], {
+		error: (issue) => `"${issue.input}" is not a Lucide icon: https://lucide.dev/icons`,
+	})
 	.meta({ id: "Icon", description: "A Lucide icon name, kebab-case: https://lucide.dev/icons" });
 
 const Page = z
@@ -63,3 +69,18 @@ export const DocsConfig = z
 	.describe("Order, titles, icons and categories for a project's docs on orochibraru.com");
 
 export type DocsConfig = z.infer<typeof DocsConfig>;
+
+/**
+ * An icon's SVG children, by name. Read from the component source, since @lucide/svelte
+ * exports no data-only entry; the schema only admits names that have a file here.
+ */
+// ponytail: parses @lucide/svelte's generated source; throws loudly if an upgrade changes it
+export function lucideIcon(name: string): IconNode {
+	const data = readFileSync(`${ICONS}/${name}.svelte`, "utf8").match(
+		/const iconData = (\{.*\});/,
+	)?.[1];
+	if (!data) {
+		throw new Error(`${ICONS}/${name}.svelte: no iconData, has @lucide/svelte changed format?`);
+	}
+	return JSON.parse(data).node;
+}

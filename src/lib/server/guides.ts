@@ -4,8 +4,11 @@
 // `images/hero.png`, and anchors assume GitHub's heading slugs. Nothing is
 // rewritten at sync time — src/docs stays diffable against upstream — so all of
 // that happens here, once, at build time.
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { Glob } from "bun";
+import { z } from "zod";
+import type { IconNode } from "$lib/components/LucideIcon.svelte";
+import { DocsConfig, lucideIcon } from "$lib/docs-config";
 import { docsDir, docsUrl, PROJECTS, type Project } from "$lib/projects";
 import { SITE } from "$lib/seo";
 import { highlight } from "./highlight";
@@ -17,7 +20,11 @@ export type Guide = {
 	project: Project;
 	slug: string;
 	url: string;
+	/** The guide's own # heading. */
 	title: string;
+	/** What the sidebar and cards call it: config.json's title, else the heading. */
+	label: string;
+	icon: IconNode;
 	/** First paragraph, as plain text: the meta description and the index blurb. */
 	intro: string;
 	/** Rendered body, with the leading <h1> removed — the layout prints the title. */
@@ -163,21 +170,49 @@ function sections(body: string, title: string): Section[] {
 		.filter((section) => section.heading && (section.text || section.id));
 }
 
+export type Category = {
+	title: string;
+	description?: string;
+	icon?: IconNode;
+	slugs: string[];
+};
+
 const IMAGES = import.meta.glob<string>("/src/docs/*/images/*.webp", {
 	eager: true,
 	query: "?url",
 	import: "default",
 });
 
-let loaded: Promise<Guide[]> | undefined;
+let loaded: Promise<{ guides: Guide[]; categories: Map<Project["key"], Category[]> }> | undefined;
 
-export const loadGuides = () => {
+const load = () => {
 	loaded ??= readGuides();
 	return loaded;
 };
 
-async function readGuides(): Promise<Guide[]> {
+/** Every guide, each project's in its config.json reading order. */
+export const loadGuides = () => load().then(({ guides }) => guides);
+
+/** A project's sidebar sections: config.json's categories, then anything it doesn't list. */
+export const loadCategories = (project: Project) =>
+	load().then(({ categories }) => categories.get(project.key) ?? []);
+
+/** docs/config.json, or null when the repo has none yet. Invalid config fails the build. */
+function readConfig(directory: string): DocsConfig | null {
+	const path = `${directory}/config.json`;
+	if (!existsSync(path)) {
+		return null;
+	}
+	const parsed = DocsConfig.safeParse(JSON.parse(readFileSync(path, "utf8")));
+	if (!parsed.success) {
+		throw new Error(`${path} is invalid:\n${z.prettifyError(parsed.error)}`);
+	}
+	return parsed.data;
+}
+
+async function readGuides() {
 	const guides: Guide[] = [];
+	const categories = new Map<Project["key"], Category[]>();
 
 	for (const project of PROJECTS) {
 		const directory = docsDir(project);
@@ -187,16 +222,42 @@ async function readGuides(): Promise<Guide[]> {
 			console.warn(`${directory} is empty: run \`bun run docs\` to vendor ${project.key}'s guides`);
 		}
 
-		// order[] first, then anything upstream added that nobody has placed yet
-		const ordered = [
-			...project.order.filter((slug) => slugs.has(slug)),
-			...[...slugs].filter((slug) => !project.order.includes(slug)).sort(),
-		];
-
-		for (const slug of ordered) {
-			if (!project.order.includes(slug)) {
-				console.warn(`${project.key}/${slug} is not in its order[] — it sorts last in the sidebar`);
+		const config = readConfig(directory);
+		if (!config) {
+			console.warn(
+				`${directory}/config.json is missing: guides sort alphabetically, uncategorised`,
+			);
+		}
+		const pages = new Map(
+			config?.categories.flatMap((category) => category.pages.map((page) => [page.slug, page])),
+		);
+		const groups: Category[] = (config?.categories ?? []).map((category) => ({
+			title: category.title,
+			description: category.description,
+			icon: category.icon ? lucideIcon(category.icon) : undefined,
+			slugs: category.pages.map((page) => page.slug).filter((slug) => slugs.has(slug)),
+		}));
+		for (const slug of pages.keys()) {
+			if (!slugs.has(slug)) {
+				console.warn(`${directory}/config.json lists ${slug}, which has no ${slug}.md`);
 			}
+		}
+		// never drop a guide config.json forgot: it gets a page, in a trailing section
+		const unlisted = [...slugs].filter((slug) => !pages.has(slug)).sort();
+		if (unlisted.length) {
+			if (config) {
+				console.warn(
+					`${directory}/config.json doesn't list ${unlisted.join(", ")}: they sort last`,
+				);
+			}
+			groups.push({ title: config ? "More" : "Guides", slugs: unlisted });
+		}
+		categories.set(
+			project.key,
+			groups.filter((group) => group.slugs.length),
+		);
+
+		for (const slug of groups.flatMap((group) => group.slugs)) {
 			const raw = await Bun.file(`${directory}/${slug}.md`).text();
 
 			const heading = raw.match(/^#\s+(.+?)\s*$/m);
@@ -249,6 +310,8 @@ async function readGuides(): Promise<Guide[]> {
 				slug,
 				url: docsUrl(project, slug),
 				title,
+				label: pages.get(slug)?.title ?? title,
+				icon: lucideIcon(pages.get(slug)?.icon ?? "file"),
 				intro,
 				html,
 				// read away from this site, so every link and image has to be absolute
@@ -261,5 +324,5 @@ async function readGuides(): Promise<Guide[]> {
 		}
 	}
 
-	return guides;
+	return { guides, categories };
 }

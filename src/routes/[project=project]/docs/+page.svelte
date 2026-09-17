@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { ArrowRight, ArrowUpRight } from "@lucide/svelte";
 	import { resolve } from "$app/paths";
+	import LucideIcon from "$lib/components/LucideIcon.svelte";
 	import Meta from "$lib/components/Meta.svelte";
-	import { guideIcon } from "$lib/docs-icons";
 	import { clip, PERSON, SITE, WEBSITE } from "$lib/seo";
 
 	let { data } = $props();
@@ -15,6 +15,7 @@
 		{ icon: "bg-cyan/10 text-cyan ring-cyan/20", card: "hover:border-cyan/50" },
 		{ icon: "bg-plasma/10 text-plasma ring-plasma/20", card: "hover:border-plasma/50" },
 	] as const;
+	const slugOf = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 	const start = $derived(
 		data.guides.find((guide) => guide.slug === "getting-started") ?? data.guides[0],
 	);
@@ -92,29 +93,43 @@
       </div>
     </header>
 
-    <section class="mt-14 grid gap-3 sm:grid-cols-2 xl:grid-cols-3" aria-label="Guides">
-      {#each data.guides as guide, index (guide.slug)}
-        {@const Icon = guideIcon(guide.slug)}
-        {@const tint = TINTS[index % TINTS.length] ?? TINTS[0]}
-        <a
-          class="group relative flex flex-col rounded-xl border border-line bg-surface p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-16px_rgb(0_0_0/0.25)] {tint.card}"
-          href={resolve("/[project=project]/docs/[slug]", {
-            project: project.key,
-            slug: guide.slug,
-          })}
-        >
-          <span
-            class="grid size-9 place-items-center rounded-lg ring-1 transition group-hover:scale-105 {tint.icon}"
-            ><Icon class="size-4.5" aria-hidden="true" /></span
-          >
-          <ArrowUpRight
-            class="absolute top-5 right-5 size-4 text-dim opacity-0 transition group-hover:opacity-100"
-            aria-hidden="true"
-          />
-          <h2 class="mt-4 text-base font-bold tracking-[-.02em]">{guide.title}</h2>
-          <p class="mt-1.5 line-clamp-2 font-sans text-sm/6 text-dim">{guide.intro}</p>
-        </a>
-      {/each}
-    </section>
+    {#each data.categories as category (category.title)}
+      <section class="mt-14" aria-labelledby="category-{slugOf(category.title)}">
+        <div class="flex items-center gap-3">
+          {#if category.icon}
+            <LucideIcon node={category.icon} class="size-5 text-acid" aria-hidden="true" />
+          {/if}
+          <h2 id="category-{slugOf(category.title)}" class="text-xl font-bold tracking-[-.02em]">
+            {category.title}
+          </h2>
+        </div>
+        {#if category.description}
+          <p class="mt-1.5 font-sans text-sm text-dim">{category.description}</p>
+        {/if}
+        <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {#each data.guides.filter((guide) => category.slugs.includes(guide.slug)) as guide, index (guide.slug)}
+            {@const tint = TINTS[index % TINTS.length] ?? TINTS[0]}
+            <a
+              class="group relative flex flex-col rounded-xl border border-line bg-surface p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-16px_rgb(0_0_0/0.25)] {tint.card}"
+              href={resolve("/[project=project]/docs/[slug]", {
+                project: project.key,
+                slug: guide.slug,
+              })}
+            >
+              <span
+                class="grid size-9 place-items-center rounded-lg ring-1 transition group-hover:scale-105 {tint.icon}"
+                ><LucideIcon node={guide.icon} class="size-4.5" aria-hidden="true" /></span
+              >
+              <ArrowUpRight
+                class="absolute top-5 right-5 size-4 text-dim opacity-0 transition group-hover:opacity-100"
+                aria-hidden="true"
+              />
+              <h3 class="mt-4 text-base font-bold tracking-[-.02em]">{guide.label}</h3>
+              <p class="mt-1.5 line-clamp-2 font-sans text-sm/6 text-dim">{guide.intro}</p>
+            </a>
+          {/each}
+        </div>
+      </section>
+    {/each}
   </div>
 </main>

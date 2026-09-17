@@ -3,48 +3,69 @@
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
 	import Drawer from "$lib/components/Drawer.svelte";
-	import { guideIcon } from "$lib/docs-icons";
+	import LucideIcon from "$lib/components/LucideIcon.svelte";
 
 	let { data, children } = $props();
 	const project = $derived(data.project);
 	const current = $derived(page.params.slug);
-	const items = $derived([
-		{
-			slug: "overview",
-			title: "Overview",
-			href: resolve("/[project=project]/docs", { project: project.key }),
-			active: !current,
-			Icon: guideIcon("overview"),
-		},
-		...data.guides.map((guide) => ({
-			slug: guide.slug,
-			title: guide.title,
-			href: resolve("/[project=project]/docs/[slug]", { project: project.key, slug: guide.slug }),
-			active: guide.slug === current,
-			Icon: guideIcon(guide.slug),
+	const overview = $derived({
+		slug: "overview",
+		title: "Overview",
+		href: resolve("/[project=project]/docs", { project: project.key }),
+		active: !current,
+		icon: data.overviewIcon,
+	});
+	const sections = $derived(
+		data.categories.map((category) => ({
+			title: category.title,
+			items: data.guides
+				.filter((guide) => category.slugs.includes(guide.slug))
+				.map((guide) => ({
+					slug: guide.slug,
+					title: guide.label,
+					href: resolve("/[project=project]/docs/[slug]", {
+						project: project.key,
+						slug: guide.slug,
+					}),
+					active: guide.slug === current,
+					icon: guide.icon,
+				})),
 		})),
-	]);
+	);
 
-	const here = $derived(items.find((item) => item.active)?.title ?? "Overview");
+	const here = $derived(
+		sections.flatMap((section) => section.items).find((item) => item.active)?.title ?? "Overview",
+	);
 
 	let menu = $state<Drawer>();
 </script>
 
+{#snippet link(item: typeof overview)}
+	<a
+		class={[
+			"flex items-center gap-2.5 rounded-md px-2.5 py-1.5 font-medium transition-colors",
+			item.active ? "bg-acid/10 text-fg" : "text-fg/80 hover:bg-fg/4 hover:text-fg",
+		]}
+		aria-current={item.active ? "page" : undefined}
+		href={item.href}
+		><LucideIcon
+			node={item.icon}
+			class={["size-4 shrink-0", item.active ? "text-acid" : "opacity-75"]}
+			aria-hidden="true"
+		/>
+		{item.title}</a
+	>
+{/snippet}
+
 {#snippet links()}
-	{#each items as item (item.slug)}
-		<a
-			class={[
-				"flex items-center gap-2.5 rounded-md px-2.5 py-1.5 font-medium transition-colors",
-				item.active ? "bg-acid/10 text-fg" : "text-fg/80 hover:bg-fg/4 hover:text-fg",
-			]}
-			aria-current={item.active ? "page" : undefined}
-			href={item.href}
-			><item.Icon
-				class={["size-4 shrink-0", item.active ? "text-acid" : "opacity-75"]}
-				aria-hidden="true"
-			/>
-			{item.title}</a
-		>
+	{@render link(overview)}
+	{#each sections as section (section.title)}
+		<h2 class="mt-5 mb-1 px-2.5 text-[10px] tracking-[.18em] text-dim uppercase">
+			{section.title}
+		</h2>
+		{#each section.items as item (item.slug)}
+			{@render link(item)}
+		{/each}
 	{/each}
 {/snippet}
 
