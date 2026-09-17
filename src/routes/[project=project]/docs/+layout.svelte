@@ -59,10 +59,12 @@
 
 {#snippet links()}
 	{@render link(overview)}
-	{#each sections as section (section.title)}
-		<h2 class="mt-5 mb-1 px-2.5 text-[10px] tracking-[.18em] text-dim uppercase">
-			{section.title}
-		</h2>
+	{#each sections as section, index (index)}
+		{#if section.title}
+			<h2 class="mt-5 mb-1 px-2.5 text-[10px] tracking-[.18em] text-dim uppercase">
+				{section.title}
+			</h2>
+		{/if}
 		{#each section.items as item (item.slug)}
 			{@render link(item)}
 		{/each}

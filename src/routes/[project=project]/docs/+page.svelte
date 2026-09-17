@@ -93,20 +93,27 @@
       </div>
     </header>
 
-    {#each data.categories as category (category.title)}
-      <section class="mt-14" aria-labelledby="category-{slugOf(category.title)}">
-        <div class="flex items-center gap-3">
-          {#if category.icon}
-            <LucideIcon node={category.icon} class="size-5 text-acid" aria-hidden="true" />
+    {#each data.categories as category, index (index)}
+      <!-- the README/CONTRIBUTING group has no title: its cards lead with no heading -->
+      <section
+        class="mt-14"
+        aria-labelledby={category.title ? `category-${slugOf(category.title)}` : undefined}
+        aria-label={category.title ? undefined : "Start here"}
+      >
+        {#if category.title}
+          <div class="mb-5 flex items-center gap-3">
+            {#if category.icon}
+              <LucideIcon node={category.icon} class="size-5 text-acid" aria-hidden="true" />
+            {/if}
+            <h2 id="category-{slugOf(category.title)}" class="text-xl font-bold tracking-[-.02em]">
+              {category.title}
+            </h2>
+          </div>
+          {#if category.description}
+            <p class="-mt-3.5 mb-5 font-sans text-sm text-dim">{category.description}</p>
           {/if}
-          <h2 id="category-{slugOf(category.title)}" class="text-xl font-bold tracking-[-.02em]">
-            {category.title}
-          </h2>
-        </div>
-        {#if category.description}
-          <p class="mt-1.5 font-sans text-sm text-dim">{category.description}</p>
         {/if}
-        <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {#each data.guides.filter((guide) => category.slugs.includes(guide.slug)) as guide, index (guide.slug)}
             {@const tint = TINTS[index % TINTS.length] ?? TINTS[0]}
             <a

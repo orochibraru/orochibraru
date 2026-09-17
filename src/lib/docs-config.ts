@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 import { Glob } from "bun";
 import { z } from "zod";
 import type { IconNode } from "$lib/components/LucideIcon.svelte";
+import { ROOT_GUIDES } from "$lib/projects";
 import { SITE } from "$lib/seo";
 
 export const SCHEMA_URL = `${SITE}/docs-config.schema.json`;
@@ -27,7 +28,10 @@ const Page = z
 	.object({
 		slug: z
 			.string()
-			.regex(/^[\w-]+$/)
+			// readme and contributing always lead the sidebar, so they can't be placed
+			.regex(new RegExp(`^(?!(?:${ROOT_GUIDES.map((guide) => guide.slug).join("|")})$)[\\w-]+$`), {
+				error: "readme and contributing are always first: leave them out of config.json",
+			})
 			.describe("The guide's file name in docs/, without .md"),
 		title: z
 			.string()

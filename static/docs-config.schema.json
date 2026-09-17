@@ -32,7 +32,7 @@
 							"properties": {
 								"slug": {
 									"type": "string",
-									"pattern": "^[\\w-]+$",
+									"pattern": "^(?!(?:readme|contributing)$)[\\w-]+$",
 									"description": "The guide's file name in docs/, without .md"
 								},
 								"title": {

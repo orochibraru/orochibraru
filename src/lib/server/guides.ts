@@ -10,7 +10,7 @@ import { Glob } from "bun";
 import { z } from "zod";
 import type { IconNode } from "$lib/components/LucideIcon.svelte";
 import { DocsConfig, lucideIcon } from "$lib/docs-config";
-import { docsDir, docsUrl, PROJECTS, type Project } from "$lib/projects";
+import { docsDir, docsUrl, PROJECTS, type Project, ROOT_GUIDES } from "$lib/projects";
 import { SITE } from "$lib/seo";
 import { highlight } from "./highlight";
 import { externalLinks } from "./markdown";
@@ -66,9 +66,9 @@ const plain = (markdown: string) =>
 
 /**
  * One link target, as this site should serve it. Targets resolve from the file's own
- * folder: docs/ for guides, the repo root for the contributing guide.
+ * folder: docs/ for guides, the repo root for README and CONTRIBUTING.
  *   env.md, env.md#redis   another guide, here
- *   ../CONTRIBUTING.md     the contributing guide, here
+ *   ../CONTRIBUTING.md     a root guide, here
  *   #redis                 same page, left alone
  *   images/hero.png        the vendored WebP
  *   ../compose.yaml        a file only the repo has: send people to the repo
@@ -95,7 +95,8 @@ function rewrite(
 	}
 
 	const guide =
-		inRepo === "CONTRIBUTING.md" ? "contributing" : inRepo.match(/^docs\/([\w-]+)\.md$/)?.[1];
+		ROOT_GUIDES.find((root) => root.file === inRepo)?.slug ??
+		inRepo.match(/^docs\/([\w-]+)\.md$/)?.[1];
 	if (guide && slugs.has(guide)) {
 		return `${docsUrl(project, guide)}${anchor}`;
 	}
@@ -181,7 +182,8 @@ function sections(body: string, title: string): Section[] {
 }
 
 export type Category = {
-	title: string;
+	/** Absent for the leading README/CONTRIBUTING group, which has no heading. */
+	title?: string;
 	description?: string;
 	icon?: IconNode;
 	slugs: string[];
@@ -252,8 +254,12 @@ async function readGuides() {
 				console.warn(`${directory}/config.json lists ${slug}, which has no ${slug}.md`);
 			}
 		}
+		const roots = ROOT_GUIDES.filter((root) => slugs.has(root.slug));
+		groups.unshift({ slugs: roots.map((root) => root.slug) });
 		// never drop a guide config.json forgot: it gets a page, in a trailing section
-		const unlisted = [...slugs].filter((slug) => !pages.has(slug)).sort();
+		const unlisted = [...slugs]
+			.filter((slug) => !pages.has(slug) && !roots.some((root) => root.slug === slug))
+			.sort();
 		if (unlisted.length) {
 			if (config) {
 				console.warn(
@@ -269,8 +275,9 @@ async function readGuides() {
 
 		for (const slug of groups.flatMap((group) => group.slugs)) {
 			const raw = await Bun.file(`${directory}/${slug}.md`).text();
-			const folder = slug === "contributing" ? "" : "docs";
-			const file = slug === "contributing" ? "CONTRIBUTING.md" : `docs/${slug}.md`;
+			const root = roots.find((root) => root.slug === slug);
+			const folder = root ? "" : "docs";
+			const file = root?.file ?? `docs/${slug}.md`;
 
 			const heading = raw.match(/^#\s+(.+?)\s*$/m);
 			const title = heading?.[1] ? plain(heading[1]) : slug;
@@ -314,7 +321,7 @@ async function readGuides() {
 			);
 
 			const firstParagraph =
-				body.split(/\n\s*\n/).find((block) => !/^[#`|\-!]/.test(block.trim())) ?? "";
+				body.split(/\n\s*\n/).find((block) => !/^(?:[#`|\-!<]|\[!)/.test(block.trim())) ?? "";
 			const intro = plain(firstParagraph);
 
 			guides.push({
@@ -322,8 +329,8 @@ async function readGuides() {
 				slug,
 				url: docsUrl(project, slug),
 				title,
-				label: pages.get(slug)?.title ?? title,
-				icon: lucideIcon(pages.get(slug)?.icon ?? "file"),
+				label: root?.label ?? pages.get(slug)?.title ?? title,
+				icon: lucideIcon(root?.icon ?? pages.get(slug)?.icon ?? "file"),
 				intro,
 				html,
 				source: `${project.repo}/blob/${project.branch}/${file}`,

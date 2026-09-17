@@ -25,6 +25,15 @@ export const PROJECTS: Project[] = [
 	},
 ];
 
+/**
+ * Repo-root files published as guides. They come first, in this order, whatever
+ * config.json says — which is why it may not list them.
+ */
+export const ROOT_GUIDES = [
+	{ slug: "readme", file: "README.md", label: "Introduction", icon: "book-text" },
+	{ slug: "contributing", file: "CONTRIBUTING.md", label: "Contributing", icon: "hand-heart" },
+] as const;
+
 /** Where a project's vendored Markdown lives. */
 export const docsDir = (project: Project) => `src/docs/${project.key}`;
 
