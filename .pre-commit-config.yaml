@@ -15,7 +15,7 @@ repos:
       - id: mixed-line-ending
         args: [--fix=lf]
         # src/docs is vendored from the project repos and must stay byte-identical to upstream
-        exclude: &generated ^(bun\.lock|src/docs/)
+        exclude: &generated ^(bun\.lock|src/docs/|static/docs-config\.schema\.json$)
       - id: end-of-file-fixer
         exclude: *generated
 

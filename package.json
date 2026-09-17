@@ -5,14 +5,15 @@
 	"scripts": {
 		"prepare": "svelte-kit sync && (prek install || echo 'prek not installed: skipping git hooks')",
 		"dev": "vite dev",
-		"build": "vite build",
+		"build": "bun run schema && vite build",
 		"preview": "vite preview",
 		"check:app": "rm -rf .svelte-kit/.svelte-check && svelte-kit sync && svelte-check --tsgo --tsconfig ./tsconfig.json --threshold error",
 		"lint": "biome check . && tailwint 'src/**/*.{css,svelte}'",
 		"lint:fix": "biome check --write . && tailwint --fix 'src/**/*.{css,svelte}'",
 		"format": "biome format --write . && prettier --write '**/*.md'",
 		"audit": "bun run scripts/lighthouse.ts",
-		"docs": "bun run scripts/docs.ts"
+		"docs": "bun run scripts/docs.ts",
+		"schema": "bun run scripts/schema.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.14",
@@ -35,6 +36,7 @@
 		"tailwindcss": "^4.3.3",
 		"tailwint": "^1.1.16",
 		"typescript": "~6",
-		"vite": "^8.3.0"
+		"vite": "^8.3.0",
+		"zod": "^4.6.5"
 	}
 }
