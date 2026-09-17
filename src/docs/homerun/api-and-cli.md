@@ -8,11 +8,19 @@ independently (a cookie session, or `x-api-key`/`Authorization: Bearer <key>`
 from your profile page), so the same handlers serve the dashboard's own requests
 and external API-key clients alike.
 
-- `GET/POST /api/v1/services`, `GET/PATCH/DELETE /api/v1/services/:id`
+- `GET/POST /api/v1/services`, `GET/PATCH/DELETE /api/v1/services/:id`: delete
+  takes `?force=true` to drop Homerun's record even when the container or swarm
+  service couldn't be removed, the API equivalent of the Settings tab's
+  [**Delete anyway**](services.md#the-services-list)
 - `POST /api/v1/services/:id/{deploy,start,stop,restart}`: `deploy` awaits the
   full pull-or-build → create → start pipeline and returns once it's done (no
   separate polling endpoint for API clients: that's dashboard-only, for its own
   progress UI)
+- `GET /api/v1/services/:id/webhook`: the
+  [push-to-deploy](services.md#deploy-on-push) payload URL and secret for that
+  service, a 404 when Deploy on push isn't on
+- `DELETE /api/v1/auth-token`: revokes the API key that authenticated the
+  request, what `homerun logout` calls (see [Logging in](#logging-in) below)
 - `GET/POST /api/v1/stacks`, `GET /api/v1/templates`
 - `GET/POST /api/v1/services/:id/scans`,
   `GET /api/v1/services/:id/scans/latest`,
@@ -38,7 +46,8 @@ A service's [image scans](services.md#image-scanning) are readable over the API:
 
 - `GET /api/v1/services/:id/scans` lists them newest first, without findings:
   `id`, `deploymentId` (null for an on-demand scan), `imageRef`, `digest`,
-  `status` (`ok`, `failed`, `skipped`), `counts` per severity, `totalFindings`,
+  `status` (`ok`, `failed`, `skipped`), `counts` per severity, `fixableCounts`
+  (findings with a fixed version, `null` on older scans), `totalFindings`,
   `scannedAt`, and `error` for a scan that didn't produce findings.
 - `GET /api/v1/services/:id/scans/latest` and
   `GET /api/v1/services/:id/scans/:scanId` return one scan with its `findings`
@@ -72,7 +81,8 @@ Only your own services' scans and jobs are visible; anything else is a 404.
 `PATCH /api/v1/services/:id` also takes `autoRollback`, `requireStatusChecks`
 and `requiredStatusChecks` (see
 [Required status checks](services.md#required-status-checks)), plus
-`healthcheckCommand` and `imageScanEnabled`.
+`healthcheckCommand`, `imageScanEnabled` and `uptimeEnabled` (turns the
+service's [uptime probes](services.md#uptime) on or off).
 
 ## OpenAPI spec & Swagger UI
 
@@ -120,8 +130,11 @@ the request, and the CLI picks up an API key of its own. It's saved to
 `~/.config/homerun/config.json` (mode `0600`) alongside the instance URL, so
 every later command just works with no flags.
 
-`homerun logout` clears that file. Approved CLI clients are also listed under
-**Profile → Authorized Clients** in the dashboard, where you can revoke one.
+`homerun logout` revokes that API key on the server, then clears the local file
+regardless of whether the server call succeeded (an unreachable instance or an
+already-invalid key never blocks logging out locally). Approved CLI clients are
+also listed under **Profile → Authorized Clients** in the dashboard, where you
+can revoke one directly.
 
 If you'd rather not use the device flow, generate an API key from your profile
 page and pass it per call or by environment:
@@ -155,6 +168,8 @@ homerun services deploy <id>
 homerun services start <id>
 homerun services stop <id>
 homerun services restart <id>
+homerun services delete <id> [--force]
+homerun services webhook <id>
 homerun services scans <id> [--json]
 homerun services scans get <id> [scanId] [--json]
 homerun services scan <id> [--wait] [--fail-on critical|high|medium|low] [--timeout <seconds>] [--json]
@@ -164,9 +179,17 @@ homerun stacks list [--json]
 homerun templates list [--json]
 ```
 
-No `create`/`update`/`delete` yet. Every `list` command also accepts `--page`,
-`--per-page` (default 100, max 100) and `--search <term>` for a large result
-set; if what's printed is only part of the total, a footer line tells you so
+No `create`/`update` yet (`homerun update` above is the CLI's own self-updater,
+unrelated). `homerun services delete <id>` is the same danger-zone action as the
+Settings tab's Delete button, and `--force` deletes Homerun's record even when
+the container or swarm service couldn't be removed (the API's `?force=true`,
+without it that case is a `409` and deletes nothing).
+`homerun services webhook <id>` prints a service's push-to-deploy payload URL
+and secret (a `404` when Deploy on push isn't turned on).
+
+Every `list` command also accepts `--page`, `--per-page` (default 100, max 100)
+and `--search <term>` for a large result set; if what's printed is only part of
+the total, a footer line tells you so
 (`Showing 10 of 60 (page 1 of 6). Use --page/--per-page for the rest.`) rather
 than letting a truncated table look complete.
 

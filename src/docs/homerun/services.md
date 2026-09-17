@@ -24,7 +24,11 @@ block the rest. Bulk delete, and the single-row delete on this page and the
 danger-zone delete on a service's own Settings tab, all require typing a
 confirmation phrase (the service's name for a single delete, `delete N services`
 for a bulk one) before the button unlocks, an irreversible action gets a real
-"are you sure" rather than a single click.
+"are you sure" rather than a single click. A delete removes the container or
+swarm service first: one that's already gone is fine, but if Docker fails to
+remove it, the service is kept and the error says why. The Settings tab's delete
+then offers **Delete anyway**, which removes only Homerun's record (the REST
+API's equivalent is `DELETE /api/v1/services/:id?force=true`).
 
 ## Deploy source: image or git repo
 
@@ -45,9 +49,30 @@ a repo-browsing picker instead of pasting a raw URL; a private repo can also
 fall back to a token embedded directly in the URL (`https://TOKEN@host/...`)
 without connecting a provider at all.
 
-There's no webhook / auto-deploy-on-push yet, redeploy a git-mode service the
-same way as an image-mode one: manually, or via its own cron schedule (below)
-for `:latest`-tracking-equivalent auto-rebuilds.
+### Deploy on push
+
+Turn on **Deploy on push** on the Source tab (or in the wizard) and every push
+to the service's branch deploys it, as its owner, without you touching the
+dashboard.
+
+- **Picked from a connected account**: Homerun adds the webhook to the repo
+  itself when you save, and removes it when you turn deploy-on-push off, switch
+  repos or delete the service. The Source tab says when it's registered.
+- **A pasted clone URL**, or when Homerun couldn't register it (the account
+  lacks webhook access, the provider couldn't be reached): the Source tab shows
+  a payload URL and a secret, with the reason. Add a webhook in the repository's
+  settings with those, sending push events as JSON. On GitLab the secret goes in
+  **Secret token**.
+
+Pushes to other branches, tags and pings are acknowledged and ignored, and a
+delivery with a wrong signature is refused. It needs the **Dashboard URL** set
+under Settings → General, and that address has to be reachable from the git
+provider: a GitHub or GitLab.com repo can't deliver to a dashboard only
+reachable on your LAN. `GET /api/v1/services/{id}/webhook` returns the same URL
+and secret.
+
+Without it, redeploy a git-mode service like an image-mode one: manually, or on
+its own cron schedule (below).
 
 ### Connecting a git provider
 
@@ -65,13 +90,20 @@ There are two steps, and they're done by different people:
    token is yours, and another user connecting to the same provider gets their
    own.
 
-Once connected, the **Browse repos** picker on a service's Source tab (and in
-the new-service wizard) lists the repositories that account can see, and checks
-the branch you pick for a `Dockerfile` before you commit to it. Tokens are
-stored encrypted, and disconnecting removes them.
+Once connected, a service's Source tab (and the new-service wizard) picks the
+repository and branch from that account instead of asking for a clone URL, and
+checks the repo for a `Dockerfile`. Picking one also turns on
+[Deploy on push](#deploy-on-push), with the webhook added for you. **Use a clone
+URL instead** is still there for any other repo. Tokens are stored encrypted,
+refreshed automatically when the provider issues short-lived ones, and
+disconnecting removes them.
 
-This is only about _browsing and access_. Cloning itself is provider-agnostic,
-so any public HTTPS git URL works with no provider connected at all.
+Cloning itself is provider-agnostic, so any public HTTPS git URL works with no
+provider connected at all.
+
+**Connections made before deploy-on-push existed** only allowed reading repos on
+GitLab, Gitea and Bitbucket. Disconnect and reconnect them once so Homerun can
+add webhooks; until then the Source tab shows the webhook to add by hand.
 
 ### Required status checks
 
@@ -305,16 +337,52 @@ notification channel subscribed to it. The same scans are in the
 Scanning is controlled in two places:
 
 - **Settings → Docker → Image scanning**, admin-only: turn it off for every
-  service, and set **Block deploys at severity** to `Off` (the default),
-  `Critical`, or `High and above`. A blocked deploy fails before its workload
-  starts, and with the mirror the image never reaches the host at all. A scanner
-  that can't run (no network for the database, a registry it can't read) never
-  blocks: the deploy goes ahead and the failed scan is recorded.
+  service, and set the deploy block policy (see below).
 - **Scan this service's image** on a service's Settings tab, to opt one service
-  out. An opted-out service pulls straight from its registry.
+  out. An opted-out service pulls straight from its registry, and the block
+  policy doesn't apply to it.
 
-Both apply to every deploy path: the Deploy button, the API and CLI, scheduled
-redeploys, and stack or template deploys.
+### Blocking deploys on findings
+
+**Block deploys at severity** turns scanning from a report into a gate. Pick
+`Off` (the default), `Critical`, `High and above`, `Medium and above` or
+`Low and above`: a deploy fails if the image has at least one finding at or
+above that severity. Findings of unknown severity never block. Tick **Only block
+on fixable vulnerabilities** to count only findings that have a fixed version,
+so a CVE with no upstream fix yet stays visible on the Security tab without
+stopping every deploy.
+
+When the policy blocks a deploy:
+
+- the image is checked before the new workload starts, so the container (or
+  swarm service) that was already running keeps running untouched. With the
+  mirror, a blocked image never reaches the host at all; a git-built image is
+  built (and, with a build server, pushed to the build cache registry) but never
+  started;
+- the deploy log gets the scan summary and a line naming the policy, the
+  blocking counts per severity and the full scan's counts:
+
+  ```text
+  Blocked by the image scan policy (block at HIGH or above):
+  3 vulnerabilities at or above the threshold (1 critical, 2 high).
+  Full scan: 1 critical, 2 high, 14 medium, 3 low, 0 unknown.
+  ```
+
+- the deployment is marked failed with that message, and the usual **Deploy
+  failed** bell notification and notification-channel event fire (plus
+  **Critical vulnerabilities** if any were critical).
+
+The policy applies to every deploy path that builds or pulls an image: the
+Deploy button, the API and CLI, scheduled redeploys, git pushes, and stack or
+template deploys. A scanner that can't run (no network for the database, a
+registry it can't read) never blocks: the deploy goes ahead and the failed scan
+is recorded. [Rollbacks](#revisions-and-rollback) aren't re-scanned or
+re-checked, since they redeploy an image that already ran here and auto-rollback
+has to be able to recover a broken service.
+
+The service's **Security** tab shows the current policy and whether its latest
+scan passes it, so you can see before the next deploy whether it would be
+blocked.
 
 ## The job queue
 
@@ -534,6 +602,11 @@ A probe that changes from up to down, or back, fires the **Service down** or
 [notification channel](operations.md#notifications) subscribed to it. Results
 are kept for a week; **Clear heartbeats** empties the history. Uptime also feeds
 [status pages](operations.md#status-pages).
+
+Probing is on for every service by default. **Turn off** in the Uptime panel's
+header stops both probes for that service (the panel then says so), **Turn on**
+resumes them; the REST API takes the same switch as `uptimeEnabled` on
+`PATCH /api/v1/services/:id`.
 
 ### Logs
 
