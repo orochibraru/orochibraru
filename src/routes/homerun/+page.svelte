@@ -36,10 +36,12 @@
 			keywords:
 				"Dokploy alternative, Coolify alternative, Dokku alternative, CapRover alternative, Cloud Run alternative, AWS alternative, Heroku alternative, self-hosted PaaS, homelab deploys",
 			featureList: [
-				"Deploy any Docker image or build from a git repository Dockerfile",
-				"Live streamed deploy progress that survives a page reload",
+				"Deploy any Docker image, or build a git repo with a Dockerfile, Docker Bake, Nixpacks, Railpack or Cloud Native Buildpacks",
+				"Deploy on push via a registered webhook, with branch polling when the git provider can't reach the dashboard",
+				"Pull request previews: one deployed service per open PR, redeployed on push and torn down on merge or close",
+				"Live streamed deploy progress that survives a page reload, with zero-downtime health-gated redeploys",
 				"Deployment history with logs, image digests and one-click rollback, with optional auto-rollback when a new revision comes up unhealthy",
-				"Automatic Trivy vulnerability scanning on every deploy",
+				"Automatic Trivy vulnerability scanning on every deploy, with an optional policy blocking deploys at or above a chosen severity",
 				"Required CI status checks from GitHub, GitLab, Gitea/Forgejo or Bitbucket before a build starts",
 				"Stacks grouping services on a shared Docker network",
 				"A catalog of ~70 one-click templates with Quick Deploy and linked companion containers",
@@ -53,17 +55,18 @@
 				"A ⌘K command palette that searches everything you own",
 				"Traefik TLS routing, custom domains and bring-your-own certificates",
 				"Remote build servers over TCP, SSH or the Homerun Agent, with a registry layer cache",
-				"Optional Docker Swarm mode for replica scaling",
+				"Docker Swarm mode by default for replica scaling, with a rootless standalone-only option",
 				"Scheduled jobs, auto-redeploy and S3 volume backups, on one Scheduling page",
-				"Reusable S3 destinations and a searchable backup history",
+				"Reusable S3 destinations, browsable restores and a searchable backup history",
 				"Traefik system logs, with restart and update from the dashboard",
 				"One-click self-update to the latest release from the dashboard",
-				"A per-account notification feed, plus Discord, webhook and email notification channels",
+				"A per-account notification feed, plus Discord, Slack, Telegram, webhook and email notification channels",
 				"Public or private status pages built from your uptime probes",
 				"Configured from the dashboard: a first-run wizard and live settings, no config file",
 				"REST API with OpenAPI and a CLI with device-code login",
-				"Users, roles, invites, sessions, API keys, passkeys, two-factor auth and OAuth/OIDC login",
-				"Cloudflare and Pangolin DNS automation",
+				"Admin, developer and read-only roles, invites, sessions, API keys, passkeys, two-factor auth and OAuth/OIDC login",
+				"Homerun as an OpenID Connect provider, so hosted apps get Sign in with Homerun",
+				"Cloudflare and Pangolin DNS automation, with Homerun able to run the Pangolin Newt tunnel client for you",
 			],
 			codeRepository: "https://github.com/orochibraru/homerun",
 			sameAs: ["https://hub.docker.com/r/orochibraru/homerun"],
@@ -311,8 +314,9 @@
 				<div class="feat">
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Image or git deploys</h3>
 					<p>
-						Any Docker image, or build from a git repo&rsquo;s Dockerfile. Env vars, CPU/memory
-						limits, restart policy, private registry auth.
+						Any Docker image, or build a git repo with a <code>Dockerfile</code>, Docker Bake,
+						Nixpacks, Railpack or Heroku/Paketo buildpacks &mdash; no Dockerfile required. Env vars,
+						CPU/memory limits, restart policy, private registry auth.
 					</p>
 				</div>
 				<div class="feat">
@@ -326,10 +330,21 @@
 					</p>
 				</div>
 				<div class="feat">
-					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Live deploy progress</h3>
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Deploy on push &amp; PR previews</h3>
+					<p>
+						Homerun registers a webhook on your repo so every push redeploys the service, and falls
+						back to polling the branch when the git provider can&rsquo;t reach the dashboard. Turn
+						on pull request previews and every open PR gets its own
+						<code>slug-pr-&lt;n&gt;</code>
+						service, redeployed on each push and deleted on merge or close; forks are never previewed.
+					</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Live, zero-downtime deploys</h3>
 					<p>
 						Pull, build, create and start streamed to the browser in real time, and it resumes
-						correctly if you reload mid-deploy.
+						correctly if you reload mid-deploy. The new container only takes traffic once it passes
+						its healthcheck; one that never comes up is removed and the old container keeps serving.
 					</p>
 				</div>
 				<div class="feat">
@@ -345,8 +360,9 @@
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Image scanning</h3>
 					<p>
 						Every deploy is scanned for known vulnerabilities with Trivy before the workload starts,
-						on by default and never enforced unless you ask for it. The Security tab shows the
-						findings by severity.
+						on by default and never enforced unless you ask for it &mdash; an admin policy can block
+						deploys at or above a chosen severity, optionally fixable findings only. The Security tab
+						shows the findings by severity.
 					</p>
 				</div>
 				<div class="feat">
@@ -439,10 +455,12 @@
 					</p>
 				</div>
 				<div class="feat">
-					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Swarm mode</h3>
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Swarm mode by default</h3>
 					<p>
-						Opt in to Docker Swarm for real replica scaling and load balancing, instead of the
-						default single-container model.
+						The installer sets the daemon up as a Docker Swarm manager, so every service gets real
+						replica scaling and load balancing out of the box, and more machines join as workers
+						with one command. <code>--docker=rootless</code> opts into the older, standalone-only
+						setup instead.
 					</p>
 				</div>
 				<div class="feat">
@@ -471,10 +489,12 @@
 					</p>
 				</div>
 				<div class="feat">
-					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Backup history</h3>
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Backup history &amp; restore</h3>
 					<p>
 						One row per attempt across every volume, scheduled or manual, with the uploaded size and
 						the error if it failed. Searchable, filterable by outcome, and paged all the way back.
+						Browse a volume&rsquo;s backups in the bucket and restore one from the dashboard,
+						optionally wiping the volume first.
 					</p>
 				</div>
 				<div class="feat">
@@ -502,11 +522,19 @@
 				<div class="feat">
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Users, roles &amp; invites</h3>
 					<p>
-						Admin and developer roles, email or direct-create invites, and optional OAuth/OIDC
-						login with one-click presets for Pocket ID, Keycloak, Authelia, Authentik, Logto,
-						Zitadel and Kanidm. Passkeys and two-factor authentication, either one required
+						Admin, developer and read-only roles, email or direct-create invites, and optional
+						OAuth/OIDC login with one-click presets for Pocket ID, Keycloak, Authelia, Authentik,
+						Logto, Zitadel and Kanidm. Passkeys and two-factor authentication, either one required
 						instance-wide if you want. Each account gets its own sessions list, revocable one by
 						one, and its own API keys.
+					</p>
+				</div>
+				<div class="feat">
+					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Sign in with Homerun</h3>
+					<p>
+						Homerun is also an OpenID Connect provider, so apps you host can offer &ldquo;Sign in with
+						Homerun&rdquo; on the same accounts as the dashboard &mdash; passkeys, two-factor and
+						sign-in methods included &mdash; instead of running Pocket ID or Keycloak just for that.
 					</p>
 				</div>
 				<div class="feat">
@@ -521,7 +549,8 @@
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">DNS automation</h3>
 					<p>
 						Optional Cloudflare or self-hosted Pangolin integration manages a deployed
-						service&rsquo;s DNS record for you.
+						service&rsquo;s DNS record for you, and Homerun can run the Pangolin Newt tunnel client
+						itself, set up straight from onboarding.
 					</p>
 				</div>
 				<div class="feat">
@@ -576,9 +605,9 @@
 					<p>
 						A per-account bell for deploy succeeded or failed, service created, started or stopped,
 						an auto-redeploy firing, and runtime errors attributed to one of your services. Click
-						through to the service it happened to. Discord, generic webhook and email notification
-						channels carry the same events outside the dashboard, each with its own event matrix
-						and a send-test button.
+						through to the service it happened to. Discord, Slack, Telegram, generic webhook and
+						email notification channels carry the same events outside the dashboard, each with its
+						own event matrix and a send-test button.
 					</p>
 				</div>
 				<div class="feat">
@@ -671,9 +700,9 @@
 				<div class="feat">
 					<h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Kubernetes alternative</h3>
 					<p>
-						No control plane, no YAML dialect, no 3am cluster archaeology. Opt into Docker Swarm if
-						you want real replica scaling; otherwise it is one container per service and that is the
-						whole model.
+						No control plane, no YAML dialect, no 3am cluster archaeology. Docker Swarm gives you
+						real replica scaling by default; drop to standalone, one container per service, if
+						you&rsquo;d rather not run rootful.
 					</p>
 				</div>
 			</div>
@@ -698,10 +727,11 @@
 			>curl -fsSL https://raw.githubusercontent.com/orochibraru/homerun/main/packages/installer/bootstrap.sh \
   | sudo bash -s -- --mode=full --domain=homerun.example.com</pre>
 			<p class="mt-5">
-				That installs Docker Engine, sets up a dedicated <strong>rootless</strong> Docker user so
-				nothing it deploys runs as root, writes a compose file, and brings up Traefik, Postgres and
-				the app from published images. Pass <code>--dry-run</code> first on a box that matters. Use
-				<code>--mode=agent</code>
+				That installs Docker Engine, sets it up as a <strong>Swarm manager</strong> so the instance
+				starts in swarm mode, writes a compose file, and brings up Traefik, Postgres and the app from
+				published images. Pass <code>--dry-run</code> first on a box that matters, or
+				<code>--docker=rootless</code> for a per-user rootless daemon instead &mdash; standalone only,
+				since rootless Docker can&rsquo;t run Swarm. Use <code>--mode=agent</code>
 				if this host is only going to be a remote build server for another instance.
 			</p>
 			<p class="mt-8 mb-3 text-xs uppercase tracking-widest text-dim">Docker Compose</p>
