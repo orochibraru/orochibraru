@@ -42,10 +42,13 @@ curl -fsSL https://raw.githubusercontent.com/orochibraru/homerun/main/packages/i
 This downloads the prebuilt `homerun-installer-<arch>` release binary for your
 host's architecture and runs it, which:
 
-1. Installs Docker Engine plus the host prerequisites for **rootless** Docker.
-2. Creates a dedicated system user (`homerun` by default) and installs rootless
-   Docker under that account, nothing this app deploys runs as root.
-3. Creates the `homerun` Docker network.
+1. Installs Docker Engine and enables the **system (rootful)** daemon.
+2. Creates a dedicated system user (`homerun` by default) that owns the install
+   directory, `/home/homerun/homerun`.
+3. Runs `docker swarm init`, advertising the address of the host's default route
+   (`--advertise-addr=<ip>` to pick another one on a multi-interface host), and
+   creates the `homerun` bridge network plus the attachable `homerun-swarm`
+   overlay that swarm services join.
 4. Asks what domain (or IP) this instance will be reached at, offering the
    host's own address as the default. It is never `localhost`: that address
    becomes the app's `ORIGIN`, and better-auth only trusts that one origin, so a
@@ -54,8 +57,49 @@ host's architecture and runs it, which:
    it up front, which a `curl | bash` install has to do (no terminal to prompt
    on, so it takes the detected address otherwise).
 5. Writes a standalone compose file and runs `docker compose up -d` against it
-   under that rootless daemon: Traefik, Postgres, and the app itself, all pulled
-   from published images, then prints the dashboard URL.
+   on the system daemon: Traefik (with both its docker and swarm providers on),
+   Postgres, and the app itself, all pulled from published images, then prints
+   the dashboard URL.
+
+The instance starts in [swarm mode](services.md#swarm-mode): every service
+deploys as a replicated swarm service, and more machines can join as workers.
+**The trade-off is that the Docker daemon runs as root**, so anything with
+access to its socket (Homerun itself, and any service you give the socket to) is
+effectively root on the host. Rootless Docker avoids that, but it can't create
+overlay networks, so it can't run a swarm.
+
+To keep the old rootless setup instead, add `--docker=rootless`: Docker runs
+under the `homerun` user (`get.docker.com/rootless`, a `systemd --user` unit,
+lingering enabled), nothing Homerun deploys runs as root, and the instance runs
+in standalone mode (one container per service, no replicas, no extra nodes).
+
+### Moving a rootless install to rootful + swarm
+
+An instance installed rootless (the installer's default before swarm became the
+default) can be moved in place:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/orochibraru/homerun/main/packages/installer/bootstrap.sh \
+  | sudo bash -s -- --migrate-to-rootful --yes
+```
+
+It stops everything on the rootless daemon (the stack and every deployed
+service), enables the system daemon, copies every named volume across with file
+ownership as the containers saw it, initialises the swarm and the networks,
+rewrites `compose.yaml` and `homerun.yaml` for the system socket (keeping
+`.env`, and a copy of the old compose file as `compose.rootless.yaml`), starts
+the stack, switches the instance to swarm mode and queues a redeploy of every
+service, which then come back as swarm services. Finally it stops and disables
+the rootless daemon, **without deleting its data**, and prints the commands that
+remove it once you're happy. If a step fails, fix the cause and run the same
+command again: finished volume copies and the instance switch are recorded in
+`/home/homerun/homerun/.rootful-migration` and skipped.
+
+Two things it can't do for you, and lists at the end: containers Homerun didn't
+create (not the stack, not a service) aren't moved, and host paths bind-mounted
+into services keep the ownership the rootless user's subuid mapping gave them,
+so a service running as a non-root user may need a `chown` there. Pass
+`--domain=` if the instance's address can't be read from the old compose file.
 
 The dashboard is routed through Traefik like any deployed service, so it's
 reachable at the domain you gave it, with a real certificate. Installing against
@@ -68,16 +112,15 @@ server for a different Homerun instance, not the full app. Add `--dry-run` to
 print every command without running anything, `--version=vX.Y.Z` to pin a
 release instead of the latest one, and see
 [`packages/installer/README.md`](../packages/installer/README.md) for the rest
-of the flags (`--user=`, `--port=`).
+of the flags (`--user=`, `--port=`, `--image=`).
 
-> The installer's mutating steps (package install, rootless Docker setup,
-> systemd units) are verified live for both `--mode=agent` and `--mode=full`
-> against real disposable VMs, see
+> The installer's mutating steps (package install, rootful and rootless Docker
+> setup, the swarm, systemd units, the rootless-to-rootful migration) are
+> verified live for both `--mode=agent` and `--mode=full` against real
+> disposable VMs, see
 > [`packages/installer/README.md`](../packages/installer/README.md) for what was
 > checked (and the real bugs that run found and fixed). `--dry-run` first is
-> still a good habit on a box that matters, and
-> `packages/installer/swarm-join.sh` specifically hasn't had the same
-> real-hardware pass yet.
+> still a good habit on a box that matters.
 
 ## Option B, Docker Compose
 
@@ -134,7 +177,7 @@ automatically.** After that there's no public sign-up: every other account is
 created by an admin from `/users`, either directly (name, email, temporary
 password) or by email invite once SMTP is configured.
 
-Signing in for the first time drops you into a five-step onboarding wizard:
+Signing in for the first time drops you into a six-step onboarding wizard:
 
 1. **Core**, your base domain (the DNS suffix deployed services are routed
    under, so a service lands at `<slug>.<your domain>`) and the dashboard URL.
@@ -143,7 +186,12 @@ Signing in for the first time drops you into a five-step onboarding wizard:
 3. **Traefik**, which entrypoint and certificate resolver your services' routes
    should use.
 4. **Email**, optional SMTP, only needed for invite emails.
-5. **Review**, confirm and finish.
+5. **DNS**, optional Cloudflare or Pangolin automation, so every service you
+   deploy gets its DNS record or tunnel route created for you. Each has a
+   **Test** button that checks the credentials before you finish. For Pangolin,
+   paste the site's Newt endpoint, ID and secret and Homerun runs the Newt
+   tunnel client for you.
+6. **Review**, confirm and finish.
 
 Everything it asks is also editable afterwards from `/settings`, and nothing it
 skips is hidden in a file, see [Configuration](configuration.md).

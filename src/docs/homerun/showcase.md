@@ -45,8 +45,8 @@ backs the tail on the overview page.
 ## Networking
 
 The public hostname, custom domains, the container port and protocol, bridge or
-host networking, and the per-service login wall. These are Traefik labels, so
-the tab tells you plainly that changing them needs a redeploy.
+host networking. Most of these are Traefik labels, so the tab tells you plainly
+that changing them needs a redeploy.
 
 ![The networking tab](images/networking.png)
 ![The networking tab, dark](images/networking-dark.png)
@@ -97,8 +97,8 @@ placeholder.
 
 ## Users
 
-Admins and developers, email invitations, and per-user cleanup that stops and
-removes the containers an account owns before deleting it.
+Admins and developers sharing every resource, email invitations, and account
+removal that hands what the account created over to an admin.
 
 ![The users page](images/users.png)
 ![The users page, dark](images/users-dark.png)
