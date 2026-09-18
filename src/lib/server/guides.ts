@@ -291,6 +291,11 @@ async function readGuides() {
 				return url ?? "";
 			};
 
+			const absolute = (target: string) => {
+				const url = rewrite(target, project, slugs, image, folder);
+				return url.startsWith("/") ? `${SITE}${url}` : url;
+			};
+
 			const ids = new Map<string, number>();
 			const html = await highlight(
 				externalLinks(
@@ -307,13 +312,22 @@ async function readGuides() {
 							/<a href="([^"]*)"/g,
 							(_tag, href: string) => `<a href="${rewrite(href, project, slugs, image, folder)}"`,
 						)
-						.replace(/<img src="([^"]*)"([^>]*?)\/?>/g, (_tag, src: string, rest: string) => {
-							const source = rewrite(src, project, slugs, image, folder);
-							const name = imageName(posix.join(folder, src));
-							const size = name ? dimensions(`${directory}/images/${name}.webp`) : null;
-							const sized = size ? ` width="${size.width}" height="${size.height}"` : "";
-							return `<img src="${source}"${rest}${sized} loading="lazy" decoding="async">`;
-						})
+						// raw HTML in a README puts src anywhere: <img alt="…" src="…">
+						.replace(
+							/<img ([^>]*?)src="([^"]*)"([^>]*?)\/?>/g,
+							(_tag, before: string, src: string, rest: string) => {
+								const source = rewrite(src, project, slugs, image, folder);
+								const name = imageName(posix.join(folder, src));
+								const size = name ? dimensions(`${directory}/images/${name}.webp`) : null;
+								const sized = size ? ` width="${size.width}" height="${size.height}"` : "";
+								return `<img ${before}src="${source}"${rest}${sized} loading="lazy" decoding="async">`;
+							},
+						)
+						// <picture><source srcset="docs/images/hero-dark.png"> for the dark variant
+						.replace(
+							/ srcset="([^"]*)"/g,
+							(_attr, src: string) => ` srcset="${rewrite(src, project, slugs, image, folder)}"`,
+						)
 						// the env references are mostly tables, and some are wider than a phone
 						.replace(/<table>/g, '<div class="md-table"><table>')
 						.replace(/<\/table>/g, "</table></div>"),
@@ -335,10 +349,12 @@ async function readGuides() {
 				html,
 				source: `${project.repo}/blob/${project.branch}/${file}`,
 				// read away from this site, so every link and image has to be absolute
-				markdown: raw.replace(/\]\(([^)]+)\)/g, (_link, target: string) => {
-					const url = rewrite(target, project, slugs, image, folder);
-					return `](${url.startsWith("/") ? `${SITE}${url}` : url})`;
-				}),
+				markdown: raw
+					.replace(/\]\(([^)]+)\)/g, (_link, target: string) => `](${absolute(target)})`)
+					.replace(
+						/ (src|srcset)="([^"]*)"/g,
+						(_attr, name: string, target: string) => ` ${name}="${absolute(target)}"`,
+					),
 				sections: sections(body, title),
 			});
 		}

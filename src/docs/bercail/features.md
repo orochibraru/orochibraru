@@ -1,5 +1,7 @@
 # Features
 
+![The dashboard](images/dashboard.png) ![The dashboard, dark](images/dashboard-dark.png)
+
 - **Links in groups.** Each link has a title, description, URL, target (same or new tab) and an
   icon, either an image URL or a name from [Dashboard Icons](https://dashboardicons.com/icons).
   Drag a link by its grip to reorder it or move it to another group.
@@ -16,3 +18,7 @@
 - **Light, dark and system themes.**
 
 The page refreshes its stats every 5 seconds.
+
+![The search palette](images/search.png) ![The search palette, dark](images/search-dark.png)
+
+![Settings](images/settings.png) ![Settings, dark](images/settings-dark.png)

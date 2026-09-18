@@ -3,6 +3,11 @@
 A self-hosted start page for your homelab. It shows the weather and your server's vitals at the
 top, and your links below, each with a live online/offline indicator.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/dashboard-dark.png">
+  <img alt="The Bercail dashboard" src="docs/images/dashboard.png">
+</picture>
+
 ## Features
 
 - **Links in groups.** Each link has a title, description, URL, target (same or new tab) and an
@@ -21,6 +26,9 @@ top, and your links below, each with a live online/offline indicator.
 - **Light, dark and system themes.**
 
 The page refreshes its stats every 5 seconds.
+
+![The search palette](docs/images/search.png)
+![Settings](docs/images/settings.png)
 
 ## Running with Docker Compose
 
@@ -114,14 +122,15 @@ bun install   # also installs the git hooks
 bun dev
 ```
 
-| Command            | What it does                                    |
-| ------------------ | ----------------------------------------------- |
-| `bun run check`    | Type check                                      |
-| `bun run lint`     | Lint with Biome                                 |
-| `bun run lint:fix` | Lint and apply fixes                            |
-| `bun run format`   | Format TypeScript, Svelte and Markdown          |
-| `bun run test`     | Run the test suite                              |
-| `prek run -a`      | Run every git hook against the whole repository |
+| Command               | What it does                                    |
+| --------------------- | ----------------------------------------------- |
+| `bun run check`       | Type check                                      |
+| `bun run lint`        | Lint with Biome                                 |
+| `bun run lint:fix`    | Lint and apply fixes                            |
+| `bun run format`      | Format TypeScript, Svelte and Markdown          |
+| `bun run test`        | Run the test suite                              |
+| `bun run screenshots` | Regenerate the screenshots in `docs/images/`    |
+| `prek run -a`         | Run every git hook against the whole repository |
 
 The hooks format, lint, type check and test on commit, scan for secrets and typos, and require
 [Conventional Commits](https://www.conventionalcommits.org/) messages.

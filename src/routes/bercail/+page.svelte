@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { BookOpen } from "@lucide/svelte";
 	import { resolve } from "$app/paths";
+	import dashboard from "$docs/bercail/images/dashboard.webp";
+	import dashboardDark from "$docs/bercail/images/dashboard-dark.webp";
 	import BrandIcon from "$lib/components/BrandIcon.svelte";
 	import Meta from "$lib/components/Meta.svelte";
+	import { SITE } from "$lib/seo";
 
 	let { data } = $props();
 
@@ -14,8 +17,11 @@
 			applicationCategory: "UtilitiesApplication",
 			operatingSystem: "Linux, macOS, Docker",
 			description:
-				"Bercail is a free, open-source, self-hosted start page for your homelab: your links with live online status, weather, host vitals, Umami analytics and a new tab extension.",
+				"Bercail is a free, open-source, self-hosted start page for your homelab, and a Homepage, Homarr, Dashy, Homer and Heimdall alternative: your links with live online status, weather, host vitals, Umami analytics and a new tab extension.",
 			url: "https://orochibraru.com/bercail",
+			screenshot: `${SITE}${dashboardDark}`,
+			keywords:
+				"Homepage alternative, Homarr alternative, Dashy alternative, Homer alternative, Heimdall alternative, Flame alternative, start.me alternative, self-hosted start page, homelab dashboard",
 			isAccessibleForFree: true,
 			codeRepository: "https://github.com/orochibraru/bercail",
 			author: { "@id": "https://orochibraru.com/#person" },
@@ -30,9 +36,10 @@
 </script>
 
 <Meta
-  title="Bercail: a free self-hosted start page for your homelab"
-  description="Bercail is a free, open-source, self-hosted start page for your homelab: your links with live online status, weather, host vitals, Umami analytics and a new tab extension."
+  title="Bercail: a free self-hosted homelab start page, and a Homepage and Homarr alternative"
+  description="Bercail is a free, open-source, self-hosted start page for your homelab, and a Homepage, Homarr, Dashy, Homer and Heimdall alternative: your links with live online status, weather, host vitals, Umami analytics and a new tab extension."
   path="/bercail"
+  image={{ url: `${SITE}${dashboardDark}`, width: 1200, height: 1095, alt: "The Bercail dashboard" }}
   trail={[["Bercail", "/bercail"]]}
   {structuredData}
 />
@@ -74,6 +81,24 @@
         </a>
       </div>
     </div>
+
+    <figure class="shot mb-22.5 border border-line">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset={dashboardDark}>
+        <img
+          src={dashboard}
+          width="1200"
+          height="1095"
+          decoding="async"
+          alt="The Bercail dashboard: weather, host gauges and analytics on top, groups of links below"
+        >
+      </picture>
+      <figcaption>
+        <b>The dashboard</b>
+        Weather and the host&rsquo;s vitals on top, links underneath, each with its status dot.
+        Straight out of the repo&rsquo;s Playwright run, in whichever theme your system uses.
+      </figcaption>
+    </figure>
 
     <section class="mb-22.5">
       <div class="mb-7 flex items-baseline gap-4">
@@ -155,6 +180,58 @@
         from the latest release, load it unpacked, point it at your instance. After the first visit
         the page comes out of a service worker cache, so a new tab doesn&rsquo;t wait on the server.
       </p>
+    </section>
+
+    <section id="alternatives" class="mb-22.5">
+      <div class="mb-7 flex items-baseline gap-4">
+        <h2 class="text-2xl font-bold tracking-[-.02em]">An alternative to what, exactly</h2>
+        <div class="h-px flex-1 bg-line"></div>
+      </div>
+      <p class="mb-7">
+        Homelab start pages are a crowded shelf. Here is where Bercail sits on it, including where it
+        loses.
+      </p>
+      <div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+        <div class="feat">
+          <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Homepage alternative</h3>
+          <p>
+            Homepage is configured in YAML and talks to more services than anyone runs. Bercail is
+            edited in the page itself and ships a handful of widgets. If you want a tile for every
+            *arr in your stack, keep Homepage.
+          </p>
+        </div>
+        <div class="feat">
+          <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Homarr &amp; Dashy alternative</h3>
+          <p>
+            Both do everything, and have the settings screens to prove it. Bercail is links, status,
+            weather, vitals and analytics, in one container with one SQLite file.
+          </p>
+        </div>
+        <div class="feat">
+          <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">Homer alternative</h3>
+          <p>
+            Homer is a static page, so anything live happens in your browser, where CORS and
+            self-signed certificates get in the way. Bercail checks your links from the server, and
+            doesn&rsquo;t mind either.
+          </p>
+        </div>
+        <div class="feat">
+          <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">
+            Heimdall &amp; Flame alternative
+          </h3>
+          <p>
+            The same idea &mdash; a tidy grid of your apps &mdash; with an up/down dot on every link, a
+            <code>&#8984;K</code> palette, and your server&rsquo;s gauges above them.
+          </p>
+        </div>
+        <div class="feat">
+          <h3 class="mb-1.5 text-base font-bold tracking-[-.01em]">start.me &amp; Momentum alternative</h3>
+          <p>
+            A new tab page without an account on someone else&rsquo;s server. The extension opens your
+            own instance, and it can see the machines on your LAN, which theirs can&rsquo;t.
+          </p>
+        </div>
+      </div>
     </section>
 
     <section class="mb-22.5">
