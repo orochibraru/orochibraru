@@ -12,6 +12,9 @@
 - **Analytics.** Live visitors, plus visitors and pageviews over 24 hours, 7, 30 and 365 days and
   all time per website from a self-hosted [Umami](https://umami.is/) v3 instance. Connect it in
   Settings with the instance URL and an API key.
+- **Tasks.** Your open tasks from [tasks.org](https://tasks.org/) or any CalDAV server (Nextcloud,
+  Radicale, ...), soonest due first, with overdue ones in red. Connect it in Settings with the
+  CalDAV URL, your username and an app password. Read-only.
 - **System stats.** CPU, RAM, disk, temperature and GPU gauges for the host the app runs on.
 - **Search.** `Cmd+K` / `Ctrl+K` opens a palette to jump to any link or search the web.
 - **Backup and restore.** Export your groups and links to JSON from Settings, and import them back.
