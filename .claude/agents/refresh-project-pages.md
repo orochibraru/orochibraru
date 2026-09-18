@@ -22,11 +22,12 @@ and it goes stale when a repo changes.
 | `src/routes/homerun/+page.svelte`             | `orochibraru/homerun`             |
 | `src/routes/baba/+page.svelte`                | `orochibraru/baba`                |
 | `src/routes/nuvio-web/+page.svelte`           | `orochibraru/nuvio-web`           |
+| `src/routes/bercail/+page.svelte`             | `orochibraru/bercail`             |
 | `src/routes/svelte-smol/+page.svelte`         | `orochibraru/svelte-smol`         |
 | `src/routes/dokploy-to-pangolin/+page.svelte` | `orochibraru/dokploy-to-pangolin` |
 
 Each project also has a card in `src/routes/+page.svelte`. Its blurb and tag
-must still match the page. Penombre and Homerun also have a `blurb` in
+must still match the page. Every project with docs also has a `blurb` in
 `src/lib/projects.ts`.
 
 If the caller names specific projects, do only those. A new route that links a

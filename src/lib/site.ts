@@ -5,6 +5,7 @@ export const PAGES = [
 	{ path: "/homerun", group: "Projects", priority: "0.8" },
 	{ path: "/baba", group: "Projects", priority: "0.8" },
 	{ path: "/nuvio-web", group: "Projects", priority: "0.8" },
+	{ path: "/bercail", group: "Projects", priority: "0.8" },
 	{ path: "/svelte-smol", group: "Projects", priority: "0.8" },
 	{ path: "/dokploy-to-pangolin", group: "Projects", priority: "0.8" },
 	{ path: "/blog", group: "Start here", priority: "0.9" },
