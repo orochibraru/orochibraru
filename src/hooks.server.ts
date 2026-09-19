@@ -2,6 +2,7 @@ import type { Handle, HandleServerError, ServerInit } from "@sveltejs/kit";
 import { building } from "$app/environment";
 import { unavailableAs503 } from "$lib/server/admin";
 import { getAuth } from "$lib/server/auth";
+import { getDataDir, getDb, migrateDatabase } from "$lib/server/db";
 import { reconcile } from "$lib/server/github/sync";
 import { canonical, isCrossSiteForm, withHeaders } from "$lib/server/http";
 
@@ -47,12 +48,22 @@ export const handleError: HandleServerError = ({ error, event, status }) => {
 
 const SIX_HOURS = 6 * 3600_000;
 
-// Webhooks get missed (the site was down, GitHub had a bad day): every six hours,
-// and a minute after boot, any project whose branch moved since its last sync syncs.
 export const init: ServerInit = () => {
 	if (building) {
 		return;
 	}
+	// Migrate before the first request, not during it: a schema that can't be brought
+	// up to date stops the process here, so the container never reports healthy on it.
+	try {
+		migrateDatabase(getDb());
+		console.log(`Database ready at ${getDataDir()}/site.db`);
+	} catch (cause) {
+		console.error("Could not migrate the database. Exiting.", cause);
+		process.exit(1);
+	}
+
+	// Webhooks get missed (the site was down, GitHub had a bad day): every six hours,
+	// and a minute after boot, any project whose branch moved since its last sync syncs.
 	const check = () => {
 		reconcile().catch((cause) => console.error("reconcile:", cause));
 	};

@@ -39,7 +39,6 @@ const app = Bun.spawn(["./build/server"], {
 		PORT: String(APP_PORT),
 		ORIGIN: `http://localhost:${PORT}`,
 		DATA_DIR: data,
-		MIGRATIONS_DIR: "drizzle",
 		OIDC_ISSUER: "",
 	},
 	stdout: "ignore",

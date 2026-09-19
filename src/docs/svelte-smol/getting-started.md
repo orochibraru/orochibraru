@@ -29,7 +29,7 @@ The compile step calls `Bun.build`, so the build must run on the Bun runtime,
 not Node. Either force it per command:
 
 ```bash
-bun --bun vite build
+bun run vite build
 ```
 
 or once for the project with a `bunfig.toml`, after which a plain

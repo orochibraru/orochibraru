@@ -1,11 +1,12 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { type DB, openDatabase, useDatabase } from "../src/lib/server/db";
+import { type DB, migrateDatabase, openDatabase, useDatabase } from "../src/lib/server/db";
 
 /** A throwaway DATA_DIR with a migrated database, made current for the app code. */
 export function freshSite(): { db: DB; dir: string; cleanup: () => void } {
 	const dir = mkdtempSync(`${tmpdir()}/site-`);
 	const db = openDatabase(dir);
+	migrateDatabase(db);
 	useDatabase(db, dir);
 	return {
 		db,

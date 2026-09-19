@@ -10,7 +10,7 @@ import { basename } from "node:path";
 import { Glob } from "bun";
 import { z } from "zod";
 import { ROOT_GUIDES } from "../src/lib/projects";
-import { openDatabase, useDatabase } from "../src/lib/server/db";
+import { migrateDatabase, openDatabase, useDatabase } from "../src/lib/server/db";
 import { guide, post, project } from "../src/lib/server/db/schema";
 import { env } from "../src/lib/server/env";
 import { storeImage } from "../src/lib/server/images";
@@ -31,6 +31,7 @@ const PostFields = z.object({
 
 export async function importContent(dir: string, root = ".") {
 	const db = openDatabase(dir);
+	migrateDatabase(db);
 	useDatabase(db, dir);
 	if (db.select().from(project).get() || db.select().from(post).get()) {
 		throw new Error(`${dir}/site.db already has content: import only fills an empty database`);

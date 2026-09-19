@@ -21,7 +21,7 @@ COPY --from=build --chown=app:app /app/build ./build
 COPY --from=build --chown=app:app /app/drizzle ./drizzle
 COPY --from=build --chown=app:app /app/seed ./seed
 USER 10001
-ENV HOST=0.0.0.0 PORT=3000 DATA_DIR=/data MIGRATIONS_DIR=/app/drizzle SEED_DIR=/app/seed
+ENV HOST=0.0.0.0 PORT=3000 DATA_DIR=/data
 VOLUME /data
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \

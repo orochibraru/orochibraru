@@ -4,9 +4,9 @@
 	"type": "module",
 	"scripts": {
 		"prepare": "svelte-kit sync && (prek install || echo 'prek not installed: skipping git hooks')",
-		"dev": "bun --bun vite dev",
+		"dev": "bun vite dev",
 		"build": "svelte-kit sync && bun run schema && vite build",
-		"preview": "bun --bun vite preview",
+		"preview": "bun vite preview",
 		"check:app": "rm -rf .svelte-kit/.svelte-check && svelte-kit sync && svelte-check --tsgo --tsconfig ./tsconfig.json --threshold error",
 		"lint": "biome check . && tailwint 'src/**/*.{css,svelte}'",
 		"lint:fix": "biome check --write . && tailwint --fix 'src/**/*.{css,svelte}'",

@@ -3,10 +3,13 @@
 //   --output src/lib/server/db/auth-schema.ts --adapter drizzle --dialect sqlite -y
 import { tmpdir } from "node:os";
 import { createAuth } from "../src/lib/server/auth";
-import { openDatabase } from "../src/lib/server/db";
+import { migrateDatabase, openDatabase } from "../src/lib/server/db";
 import { readEnv } from "../src/lib/server/env";
 
-export const auth = createAuth(openDatabase(`${tmpdir()}/auth-schema`, "drizzle"), {
+const db = openDatabase(`${tmpdir()}/auth-schema`);
+migrateDatabase(db);
+
+export const auth = createAuth(db, {
 	...readEnv({ AUTH_SECRET: "schema-only" }),
 	oidc: { issuer: "https://example.com", clientId: "x", clientSecret: "x" },
 });

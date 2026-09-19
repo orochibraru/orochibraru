@@ -3,3 +3,6 @@ dist
 .svelte-kit
 build
 data
+.env
+.env.*
+!.env.example

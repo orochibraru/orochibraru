@@ -1,5 +1,6 @@
 import { Database } from "bun:sqlite";
 import { cpSync, existsSync, mkdirSync } from "node:fs";
+import { join } from "node:path";
 import { type BunSQLiteDatabase, drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import { env } from "../env";
@@ -7,36 +8,37 @@ import * as schema from "./schema";
 
 export type DB = BunSQLiteDatabase<typeof schema> & { $client: Database };
 
-/**
- * Opens (creating if needed) DATA_DIR/site.db and brings it up to date. The
- * migrations folder ships next to the binary; MIGRATIONS_DIR overrides it.
- */
-export function openDatabase(dir: string, migrations = "drizzle", seed?: string): DB {
+// Both ship next to the binary: the image's WORKDIR, the repo root in development.
+const migrationsFolder = join(process.cwd(), "drizzle");
+const seedFolder = join(process.cwd(), "seed");
+
+/** Opens (creating if needed) DIR/site.db. Migrating is its own step: see migrateDatabase. */
+export function openDatabase(dir: string): DB {
 	// a brand-new volume starts from the content the image was built with
-	if (seed && existsSync(`${seed}/site.db`) && !existsSync(`${dir}/site.db`)) {
-		cpSync(seed, dir, { recursive: true });
+	if (existsSync(join(seedFolder, "site.db")) && !existsSync(join(dir, "site.db"))) {
+		cpSync(seedFolder, dir, { recursive: true });
 	}
-	mkdirSync(`${dir}/images`, { recursive: true });
-	const client = new Database(`${dir}/site.db`, { create: true, strict: true });
+	mkdirSync(join(dir, "images"), { recursive: true });
+	const client = new Database(join(dir, "site.db"), { create: true, strict: true });
 	client.run("PRAGMA journal_mode = WAL");
 	client.run("PRAGMA foreign_keys = ON");
 	client.run("PRAGMA busy_timeout = 5000");
-	const db = drizzle({ client, schema });
-	migrate(db, { migrationsFolder: migrations });
-	return db;
+	return drizzle({ client, schema });
+}
+
+/** Brings the schema up to date. The server does it once, at boot, before taking requests. */
+export function migrateDatabase(db: DB) {
+	migrate(db, { migrationsFolder });
 }
 
 let current: { db: DB; dir: string } | undefined;
 
 const open = () => {
-	current ??= {
-		db: openDatabase(env.dataDir, process.env.MIGRATIONS_DIR ?? "drizzle", process.env.SEED_DIR),
-		dir: env.dataDir,
-	};
+	current ??= { db: openDatabase(env.dataDir), dir: env.dataDir };
 	return current;
 };
 
-/** Opened on first use, so prerendering at build time never touches /data. */
+/** Opened on first use, so building never touches DATA_DIR. */
 export const getDb = () => open().db;
 
 /** Where site.db and images/ live: DATA_DIR, or whatever a test set. */
