@@ -382,6 +382,13 @@
 		content: "";
 		@apply h-px flex-1 bg-line;
 	}
+	/* admin forms: labels stacked over their fields */
+	.admin-form label {
+		@apply flex flex-col gap-1.5 text-[.85rem] text-dim;
+	}
+	.admin-form :is(input, textarea, select) {
+		@apply w-full border border-edge bg-surface px-3 py-2 text-[.95rem] text-fg focus:border-acid;
+	}
 	.card:hover h3 {
 		@apply text-acid;
 	}

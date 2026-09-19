@@ -7,17 +7,16 @@
 	import Header from "$lib/components/Header.svelte";
 	import Search from "$lib/components/Search.svelte";
 	import TopLoadingBar from "$lib/components/top-loading-bar.svelte";
-	import { REPOSITORIES } from "$lib/site";
 
 	let { children } = $props();
 
 	let search = $state<Search>();
 
-	const segment = $derived(page.url.pathname.split("/")[1] ?? "");
-	const docs = $derived(page.route.id?.startsWith("/[project=project]/docs") ?? false);
+	const docs = $derived(page.route.id?.startsWith("/[repo]/docs") ?? false);
 	const width = $derived(docs ? "max-w-none" : "max-w-page");
+	// project pages and their docs hand their repo over as page data
 	const source = $derived(
-		REPOSITORIES.has(segment) ? `https://github.com/orochibraru/${segment}` : undefined,
+		typeof page.data.source === "string" ? (page.data.source as string) : undefined,
 	);
 
 	onNavigate((navigation) => {

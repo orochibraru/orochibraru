@@ -1,8 +1,6 @@
 import { SITE } from "$lib/seo";
 import { loadPosts } from "$lib/server/posts";
 
-export const prerender = true;
-
 const escapeXml = (text: string) => Bun.escapeHTML(text);
 
 export const GET = async () => {

@@ -1,11 +1,9 @@
-import { PROJECTS } from "$lib/projects";
 import { mdPath, SITE } from "$lib/seo";
 import { allDocs } from "$lib/server/documents";
-
-export const prerender = true;
+import { loadDocProjects } from "$lib/server/guides";
 
 export const GET = async ({ fetch }) => {
-	const docs = await allDocs(fetch);
+	const [docs, projects] = await Promise.all([allDocs(fetch), loadDocProjects()]);
 	const group = (name: string) =>
 		docs
 			.filter((doc) => doc.group === name)
@@ -35,8 +33,9 @@ ${group("Start here")}
 ## Blog
 
 ${group("Blog")}
-${PROJECTS.map(
-	(project) => `
+${projects
+	.map(
+		(project) => `
 ## ${project.name} documentation
 
 Just ${project.name}: ${SITE}/${project.key}/llms.txt, or all of its guides in one file at
@@ -44,7 +43,8 @@ ${SITE}/${project.key}/llms-full.txt.
 
 ${group(`${project.name} docs`)}
 `,
-).join("")}
+	)
+	.join("")}
 ## Optional
 
 - [RSS feed](${SITE}/feed.xml): new posts, as they are written.

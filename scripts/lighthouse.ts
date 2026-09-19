@@ -1,16 +1,19 @@
-// `bun run audit`: build the site, serve dist/ the way nginx does, and run
-// Lighthouse over every page. Pass paths to audit only those:
+// `bun run audit`: build the site, run it the way production does, and run
+// Lighthouse over every page in its sitemap. Pass paths to audit only those:
 //
 //     bun run audit            every page
 //     bun run audit /penombre  just that one
 //
 // Exits non-zero if a category drops below its floor, so it can gate a deploy.
-import { Glob } from "bun";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { importContent } from "./import";
 import { dim, log, ms } from "./log";
 
 const out = log("audit");
 
 const PORT = 4173;
+const APP_PORT = 4174;
 const FLOOR: Record<string, number> = {
 	performance: 0.9,
 	accessibility: 1,
@@ -27,64 +30,75 @@ if (rebuild.exitCode !== 0) {
 	process.exit(1);
 }
 
-/** The routes nginx would serve, worked out from what the build produced. */
-const built = [...new Glob("dist/**/*.html").scanSync(".")]
-	.map(
-		(f) =>
-			f
-				.slice("dist".length)
-				.replace(/\.html$/, "")
-				.replace(/\/index$/, "") || "/",
-	)
-	.filter((route) => route !== "/404")
+// The server reads its pages from a database: give it today's content in a throwaway one.
+const data = mkdtempSync(`${tmpdir()}/audit-`);
+(await importContent(data)).$client.close();
+const app = Bun.spawn(["./build/server"], {
+	env: {
+		...process.env,
+		PORT: String(APP_PORT),
+		ORIGIN: `http://localhost:${PORT}`,
+		DATA_DIR: data,
+		MIGRATIONS_DIR: "drizzle",
+		OIDC_ISSUER: "",
+	},
+	stdout: "ignore",
+	stderr: "inherit",
+});
+for (let tries = 0; ; tries++) {
+	if ((await fetch(`http://localhost:${APP_PORT}/_health`).catch(() => null))?.ok) {
+		break;
+	}
+	if (tries > 50) {
+		throw new Error("the built server didn't come up");
+	}
+	await Bun.sleep(100);
+}
+
+// Production sits behind a proxy that compresses; without that here, Lighthouse
+// would report compression problems that only exist in this script.
+out.step(`serving the built app on http://localhost:${PORT}`);
+const server = Bun.serve({
+	port: PORT,
+	async fetch(request) {
+		const url = new URL(request.url);
+		const upstream = await fetch(`http://localhost:${APP_PORT}${url.pathname}${url.search}`, {
+			headers: request.headers,
+			redirect: "manual",
+			// pass precompressed bodies through as they are: decoding them here while
+			// keeping their content-encoding header would hand clients garbage
+			decompress: false,
+		});
+		const type = upstream.headers.get("content-type") ?? "";
+		if (
+			upstream.headers.has("content-encoding") ||
+			!/^(text|application\/(json|xml|rss))/.test(type)
+		) {
+			return upstream;
+		}
+		const headers = new Headers(upstream.headers);
+		headers.set("content-encoding", "gzip");
+		headers.delete("content-length");
+		return new Response(Bun.gzipSync(await upstream.bytes()), { status: upstream.status, headers });
+	},
+});
+
+/** Every page the sitemap lists: the routes production serves. */
+const sitemap = await (await fetch(`http://localhost:${PORT}/sitemap.xml`)).text();
+const built = [...sitemap.matchAll(/<loc>https:\/\/orochibraru\.com([^<]*)<\/loc>/g)]
+	.map((match) => match[1] || "/")
 	.sort();
 
 const asked = Bun.argv.slice(2);
 const routes = asked.length ? asked : built;
 for (const route of routes) {
 	if (!built.includes(route)) {
-		throw new Error(`no page at ${route}. Built: ${built.join(", ")}`);
+		throw new Error(`no page at ${route}. In the sitemap: ${built.join(", ")}`);
 	}
 }
 if (asked.length) {
-	out.info(`auditing ${asked.length} of ${built.length} built page(s), as asked`);
+	out.info(`auditing ${asked.length} of ${built.length} page(s), as asked`);
 }
-
-// Close enough to nginx.conf to audit the same thing production serves: clean
-// URLs, gzip, and a long immutable cache on the hashed assets. Without those
-// last two, Lighthouse reports compression and caching problems that only ever
-// existed in this script.
-const CACHED = /\.(css|js|svg|png|jpg|webp|woff2)$/;
-
-out.step(`serving dist/ on http://localhost:${PORT}`);
-const server = Bun.serve({
-	port: PORT,
-	async fetch(request) {
-		const { pathname } = new URL(request.url);
-		for (const candidate of [
-			`dist${pathname}`,
-			`dist${pathname}.html`,
-			`dist${pathname}/index.html`,
-		]) {
-			const file = Bun.file(candidate);
-			if (!(await file.exists())) {
-				continue;
-			}
-
-			const headers = new Headers({ "content-type": file.type });
-			if (CACHED.test(candidate)) {
-				headers.set("cache-control", "public, max-age=2592000, immutable");
-			}
-
-			if (/^(text|application\/(json|xml|rss))/.test(file.type)) {
-				headers.set("content-encoding", "gzip");
-				return new Response(Bun.gzipSync(await file.bytes()), { headers });
-			}
-			return new Response(file, { headers });
-		}
-		return new Response(Bun.file("dist/404.html"), { status: 404 });
-	},
-});
 
 type Audit = { title: string; score: number | null; scoreDisplayMode: string };
 type Report = {
@@ -180,6 +194,8 @@ list("failed audits", failures);
 list("insights (advisory)", insights);
 
 server.stop(true);
+app.kill();
+rmSync(data, { recursive: true, force: true });
 
 if (failed) {
 	out.fail(`${routes.length} page(s) audited — below the floor, see the failed audits above`);

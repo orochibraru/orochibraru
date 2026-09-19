@@ -1,17 +1,19 @@
 import { json } from "@sveltejs/kit";
-import { pageDoc } from "$lib/server/documents";
+import { listProjectPages } from "$lib/server/content";
+import { pageDoc, projectPageDoc } from "$lib/server/documents";
 import { loadGuides } from "$lib/server/guides";
 import { loadPosts } from "$lib/server/posts";
 import { PAGES } from "$lib/site";
-
-export const prerender = true;
 
 // A guide contributes a row per heading, so a result lands on the section that answers the question.
 export const GET = async ({ fetch }) => {
 	const [guides, posts, pages] = await Promise.all([
 		loadGuides(),
 		loadPosts(),
-		Promise.all(PAGES.map((page) => pageDoc(fetch, page))),
+		Promise.all(PAGES.map((page) => pageDoc(fetch, page))).then((pages) => [
+			...pages,
+			...listProjectPages().flatMap((page) => projectPageDoc(page.repo) ?? []),
+		]),
 	]);
 
 	return json([

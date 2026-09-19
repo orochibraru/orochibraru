@@ -4,29 +4,31 @@
 	"type": "module",
 	"scripts": {
 		"prepare": "svelte-kit sync && (prek install || echo 'prek not installed: skipping git hooks')",
-		"dev": "vite dev",
+		"dev": "bun --bun vite dev",
 		"build": "svelte-kit sync && bun run schema && vite build",
-		"preview": "vite preview",
+		"preview": "bun --bun vite preview",
 		"check:app": "rm -rf .svelte-kit/.svelte-check && svelte-kit sync && svelte-check --tsgo --tsconfig ./tsconfig.json --threshold error",
 		"lint": "biome check . && tailwint 'src/**/*.{css,svelte}'",
 		"lint:fix": "biome check --write . && tailwint --fix 'src/**/*.{css,svelte}'",
 		"format": "biome format --write . && prettier --write '**/*.md'",
 		"audit": "bun run scripts/lighthouse.ts",
-		"docs": "bun run scripts/docs.ts",
-		"schema": "bun run scripts/schema.ts"
+		"schema": "bun run scripts/schema.ts",
+		"import": "bun run scripts/import.ts",
+		"test": "bun test"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.14",
 		"@fontsource-variable/geist": "^5.3.0",
 		"@fontsource-variable/geist-mono": "^5.3.0",
 		"@lucide/svelte": "^1.46.0",
-		"@sveltejs/adapter-static": "^3.0.10",
+		"@orochibraru/svelte-smol": "1.8.1",
 		"@sveltejs/kit": "^2.70.3",
 		"@sveltejs/vite-plugin-svelte": "^7.3.0",
 		"@tailwindcss/language-server": "^0.16.0",
 		"@tailwindcss/vite": "^4.3.3",
 		"@types/bun": "^1.4.2",
 		"@typescript/native": "npm:typescript@7",
+		"drizzle-kit": "0.31.10",
 		"lighthouse": "^13.4.1",
 		"markdownlint-cli2": "^0.23.2",
 		"prettier": "^3.9.7",
@@ -38,5 +40,15 @@
 		"typescript": "~6",
 		"vite": "^8.3.0",
 		"zod": "^4.6.5"
+	},
+	"dependencies": {
+		"@better-auth/cimd": "1.7.5",
+		"@better-auth/mcp": "1.7.5",
+		"@better-auth/oauth-provider": "1.7.5",
+		"@milkdown/crepe": "7.22.1",
+		"@modelcontextprotocol/sdk": "1.30.0",
+		"better-auth": "1.7.5",
+		"drizzle-orm": "0.45.2",
+		"lucide": "1.47.0"
 	}
 }

@@ -33,6 +33,12 @@ schema:
   applicationCategory: DeveloperApplication
   operatingSystem: Linux, macOS, Docker
   license: https://www.gnu.org/licenses/agpl-3.0.html
+position: 3
+category: Media
+blurb:
+  "An unofficial web client for Nuvio. Your profiles, addons, library and watch
+  progress in a browser, with a player that streams, casts, or hands off."
+chips: ["Web player", "HLS", "Cast", "AGPL-3.0-or-later"]
 ---
 
 An unofficial web implementation of the [Nuvio](https://nuvio.tv/) API, because

@@ -1,4 +1,7 @@
-import { Glob } from "bun";
+import { desc, eq } from "drizzle-orm";
+import { getDb } from "./db";
+import { post as postTable } from "./db/schema";
+import { highlight } from "./highlight";
 import { externalLinks } from "./markdown";
 
 export type Post = {
@@ -10,6 +13,8 @@ export type Post = {
 	markdown: string;
 };
 
+export type PostRow = typeof postTable.$inferSelect;
+
 /** A leading `---` YAML block. Real YAML, because prettier folds long values onto several lines. */
 export function frontmatter(raw: string): [Record<string, unknown>, string] {
 	const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
@@ -20,30 +25,41 @@ export function frontmatter(raw: string): [Record<string, unknown>, string] {
 	return [meta ?? {}, raw.slice(match[0].length)];
 }
 
+/** Also what the admin preview shows, so a draft looks exactly as it will. */
+export async function renderPost(
+	row: Pick<PostRow, "slug" | "title" | "date" | "description" | "body">,
+): Promise<Post> {
+	return {
+		slug: row.slug,
+		title: row.title,
+		date: row.date,
+		description: row.description,
+		html: await highlight(externalLinks(Bun.markdown.html(row.body))),
+		markdown: row.body.trim(),
+	};
+}
+
 async function readPosts(): Promise<Post[]> {
-	const posts: Post[] = [];
-	for (const file of new Glob("src/posts/*.md").scanSync(".")) {
-		const slug = file.split("/").pop()?.replace(/\.md$/, "") ?? file;
-		const [meta, markdown] = frontmatter(await Bun.file(file).text());
-		const { title, date, description } = meta;
-		if (typeof title !== "string" || typeof date !== "string" || typeof description !== "string") {
-			throw new Error(`${file}: frontmatter needs title, date and description`);
-		}
-		posts.push({
-			slug,
-			title,
-			date,
-			description,
-			html: externalLinks(Bun.markdown.html(markdown)),
-			markdown: markdown.trim(),
-		});
-	}
-	return posts.sort((a, b) => b.date.localeCompare(a.date));
+	const rows = getDb()
+		.select()
+		.from(postTable)
+		.where(eq(postTable.status, "published"))
+		.orderBy(desc(postTable.date))
+		.all();
+	return Promise.all(rows.map(renderPost));
 }
 
 let loaded: Promise<Post[]> | undefined;
 
+/** Published posts, newest first. Drafts never leave the admin. */
 export const loadPosts = () => {
-	loaded ??= readPosts();
+	loaded ??= readPosts().catch((cause) => {
+		loaded = undefined;
+		throw cause;
+	});
 	return loaded;
+};
+
+export const invalidatePosts = () => {
+	loaded = undefined;
 };

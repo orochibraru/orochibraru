@@ -1,18 +1,21 @@
-// The vendored guides, turned into something this site can publish.
+// The synced guides, turned into something this site can publish.
 //
 // Upstream writes them to be read in a repo: links point at `env.md`, images at
 // `images/hero.png`, and anchors assume GitHub's heading slugs. Nothing is
-// rewritten at sync time — src/docs stays diffable against upstream — so all of
-// that happens here, once, at build time.
-import { existsSync, readFileSync } from "node:fs";
+// rewritten at sync time — the `guide` rows stay verbatim upstream — so all of
+// that happens here, when they are first rendered, and is cached until the next
+// sync or edit.
 import { posix } from "node:path";
-import { Glob } from "bun";
+import { and, asc, eq, isNotNull } from "drizzle-orm";
 import { z } from "zod";
 import type { IconNode } from "$lib/components/LucideIcon.svelte";
 import { DocsConfig, lucideIcon } from "$lib/docs-config";
-import { docsDir, docsUrl, PROJECTS, type Project, ROOT_GUIDES } from "$lib/projects";
+import { docsUrl, type Project, ROOT_GUIDES } from "$lib/projects";
 import { SITE } from "$lib/seo";
+import { getDb } from "./db";
+import { guide as guideTable, project as projectTable } from "./db/schema";
 import { highlight } from "./highlight";
+import { imageByName } from "./images";
 import { externalLinks } from "./markdown";
 
 export type Section = { id: string; heading: string; text: string; level: number };
@@ -109,40 +112,6 @@ function rewrite(
 const imageName = (inRepo: string) =>
 	inRepo.match(/^docs\/images\/(.+)\.(?:png|jpe?g|webp)$/i)?.[1];
 
-/**
- * Width and height straight out of the WebP header, so images rendered from
- * Markdown can carry the attributes that stop the page shifting as they load.
- * Covers the three chunk layouts cwebp emits; anything else gets no attributes
- * rather than wrong ones.
- */
-export function dimensions(file: string): { width: number; height: number } | null {
-	let bytes: Uint8Array;
-	try {
-		bytes = readFileSync(file);
-	} catch {
-		// No file means no width/height on the <img>, which means the page reflows
-		// as it loads and the audit marks it down. Usually a missed `bun run docs`.
-		console.warn(`${file} is missing: its <img> ships without dimensions`);
-		return null;
-	}
-	const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-	const fourCC = String.fromCharCode(...bytes.subarray(12, 16));
-
-	if (fourCC === "VP8 ") {
-		return { width: view.getUint16(26, true) & 0x3fff, height: view.getUint16(28, true) & 0x3fff };
-	}
-	if (fourCC === "VP8L") {
-		const bits = view.getUint32(21, true);
-		return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
-	}
-	if (fourCC === "VP8X") {
-		const read24 = (at: number) =>
-			view.getUint8(at) | (view.getUint8(at + 1) << 8) | (view.getUint8(at + 2) << 16);
-		return { width: read24(24) + 1, height: read24(27) + 1 };
-	}
-	return null;
-}
-
 /** Split the body by heading: one search result should land on a section. */
 function sections(body: string, title: string): Section[] {
 	const found: Section[] = [{ id: "", heading: title, text: "", level: 1 }];
@@ -189,18 +158,28 @@ export type Category = {
 	slugs: string[];
 };
 
-export const IMAGES = import.meta.glob<string>("/src/docs/*/images/*.webp", {
-	eager: true,
-	query: "?url",
-	import: "default",
-});
-
 let loaded: Promise<{ guides: Guide[]; categories: Map<Project["key"], Category[]> }> | undefined;
 
 const load = () => {
-	loaded ??= readGuides();
+	loaded ??= readGuides().catch((cause) => {
+		loaded = undefined;
+		throw cause;
+	});
 	return loaded;
 };
+
+/** Every save and sync calls this: the next request renders from the rows again. */
+export const invalidateGuides = () => {
+	loaded = undefined;
+};
+
+/** The projects with at least one guide, as the docs routes know them. */
+export const loadDocProjects = () =>
+	load().then(({ categories }) =>
+		[...categories.keys()].map((key) => projects.get(key) as Project),
+	);
+
+const projects = new Map<string, Project>();
 
 /** Every guide, each project's in its config.json reading order. */
 export const loadGuides = () => load().then(({ guides }) => guides);
@@ -209,15 +188,16 @@ export const loadGuides = () => load().then(({ guides }) => guides);
 export const loadCategories = (project: Project) =>
 	load().then(({ categories }) => categories.get(project.key) ?? []);
 
-/** docs/config.json, or null when the repo has none yet. Invalid config fails the build. */
-function readConfig(directory: string): DocsConfig | null {
-	const path = `${directory}/config.json`;
-	if (!existsSync(path)) {
+/** The synced docs/config.json, or null when the repo has none. */
+function readConfig(repo: string, json: unknown): DocsConfig | null {
+	if (!json) {
 		return null;
 	}
-	const parsed = DocsConfig.safeParse(JSON.parse(readFileSync(path, "utf8")));
+	const parsed = DocsConfig.safeParse(json);
 	if (!parsed.success) {
-		throw new Error(`${path} is invalid:\n${z.prettifyError(parsed.error)}`);
+		// the sync validates before it stores, so this means a hand edit gone wrong
+		console.warn(`${repo}: stored docs config is invalid:\n${z.prettifyError(parsed.error)}`);
+		return null;
 	}
 	return parsed.data;
 }
@@ -226,20 +206,38 @@ async function readGuides() {
 	const guides: Guide[] = [];
 	const categories = new Map<Project["key"], Category[]>();
 
-	for (const project of PROJECTS) {
-		const directory = docsDir(project);
-		const files = [...new Glob("*.md").scanSync(directory)];
-		const slugs = new Set(files.map((file) => file.replace(/\.md$/, "")));
-		if (!files.length) {
-			console.warn(`${directory} is empty: run \`bun run docs\` to vendor ${project.key}'s guides`);
-		}
+	const db = getDb();
+	const rows = db
+		.select()
+		.from(projectTable)
+		.where(and(eq(projectTable.published, true), isNotNull(projectTable.githubRepo)))
+		.orderBy(asc(projectTable.position))
+		.all();
+	projects.clear();
 
-		const config = readConfig(directory);
-		if (!config) {
-			console.warn(
-				`${directory}/config.json is missing: guides sort alphabetically, uncategorised`,
-			);
+	for (const row of rows) {
+		const files = new Map(
+			db
+				.select()
+				.from(guideTable)
+				.where(eq(guideTable.project, row.repo))
+				.all()
+				.map((file) => [file.slug, file]),
+		);
+		if (!files.size) {
+			continue;
 		}
+		const project: Project = {
+			key: row.repo,
+			name: row.name,
+			blurb: row.blurb || row.description,
+			repo: `https://github.com/${row.githubRepo}`,
+			branch: row.defaultBranch ?? "main",
+		};
+		projects.set(project.key, project);
+		const directory = `${row.repo} docs`;
+		const slugs = new Set(files.keys());
+		const config = readConfig(row.repo, row.docsConfig);
 		const pages = new Map(
 			config?.categories.flatMap((category) => category.pages.map((page) => [page.slug, page])),
 		);
@@ -274,21 +272,25 @@ async function readGuides() {
 		);
 
 		for (const slug of groups.flatMap((group) => group.slugs)) {
-			const raw = await Bun.file(`${directory}/${slug}.md`).text();
+			const stored = files.get(slug);
+			if (!stored) {
+				continue;
+			}
+			const raw = stored.markdown;
 			const root = roots.find((root) => root.slug === slug);
-			const folder = root ? "" : "docs";
-			const file = root?.file ?? `docs/${slug}.md`;
+			const file = stored.sourcePath;
+			const folder = posix.dirname(file) === "." ? "" : posix.dirname(file);
 
 			const heading = raw.match(/^#\s+(.+?)\s*$/m);
 			const title = heading?.[1] ? plain(heading[1]) : slug;
 			const body = heading ? raw.replace(heading[0], "").trimStart() : raw;
 
 			const image = (name: string) => {
-				const url = IMAGES[`/${directory}/images/${name}.webp`];
-				if (!url) {
-					console.warn(`${directory}/images/${name}.webp is missing: run \`bun run docs\``);
+				const found = imageByName(project.key, name);
+				if (!found) {
+					console.warn(`${directory}: image ${name} is missing, resync the project`);
 				}
-				return url ?? "";
+				return found?.url ?? "";
 			};
 
 			const absolute = (target: string) => {
@@ -318,7 +320,7 @@ async function readGuides() {
 							(_tag, before: string, src: string, rest: string) => {
 								const source = rewrite(src, project, slugs, image, folder);
 								const name = imageName(posix.join(folder, src));
-								const size = name ? dimensions(`${directory}/images/${name}.webp`) : null;
+								const size = name ? imageByName(project.key, name) : undefined;
 								const sized = size ? ` width="${size.width}" height="${size.height}"` : "";
 								return `<img ${before}src="${source}"${rest}${sized} loading="lazy" decoding="async">`;
 							},

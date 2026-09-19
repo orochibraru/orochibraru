@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
 	import Meta from "$lib/components/Meta.svelte";
+
+	let { data } = $props();
 </script>
 
 <Meta
@@ -11,7 +13,7 @@
 
 <main class="mx-auto max-w-page px-6">
 	<div class="pt-15 pb-22.5">
-		<span class="tag">8 projects &middot; self-hosted &middot; MIT &amp; AGPL</span>
+		<span class="tag">{data.projects.length} projects &middot; self-hosted &middot; MIT &amp; AGPL</span>
 		<h1
 			class="mt-6.5 text-[clamp(2.6rem,9vw,6.2rem)]/[.92] font-extrabold tracking-[-.03em] text-balance"
 		>
@@ -63,137 +65,25 @@
 		<div class="mb-7 flex items-baseline gap-4">
 			<h2 class="text-2xl font-bold tracking-[-.02em]">The projects</h2>
 			<div class="h-px flex-1 bg-line"></div>
-			<span class="text-xs tracking-[.2em] text-dim">08</span>
+			<span class="text-xs tracking-[.2em] text-dim"
+				>{String(data.projects.length).padStart(2, "0")}</span
+			>
 		</div>
 		<div class="grid gap-px border border-line bg-line sm:grid-cols-2">
-			<a class="card" href={resolve("/penombre")}>
-				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Storage</span>
-				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
-					Penombre
-				</h3>
-				<p class="mb-4.5 text-[.92rem] text-dim">
-					A self-hosted drive. Upload, sync, share, trash, recover. SQLite by default: one
-					container, one volume, no database server to babysit.
-				</p>
-				<div class="flex flex-wrap gap-1.5">
-					<span class="chip">SvelteKit</span>
-					<span class="chip">SQLite</span>
-					<span class="chip">Docker</span>
-					<span class="chip">MIT</span>
-				</div>
-			</a>
-			<a class="card" href={resolve("/homerun")}>
-				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Deploys</span>
-				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
-					Homerun
-				</h3>
-				<p class="mb-4.5 text-[.92rem] text-dim">
-					A single-host PaaS. Point it at an image or a git repo, fill a form, hit deploy, and
-					Traefik routes it with TLS. No Kubernetes anywhere near it.
-				</p>
-				<div class="flex flex-wrap gap-1.5">
-					<span class="chip">Docker</span>
-					<span class="chip">Traefik</span>
-					<span class="chip">PaaS</span>
-					<span class="chip">Self-hosted</span>
-				</div>
-			</a>
-			<a class="card" href={resolve("/baba")}>
-				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Monitoring</span>
-				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
-					Baba
-				</h3>
-				<p class="mb-4.5 text-[.92rem] text-dim">
-					The lookout. Watches CPU, load, memory, disk, temps and GPU, then pings Discord or
-					Telegram when something breaks, and again when it heals.
-				</p>
-				<div class="flex flex-wrap gap-1.5">
-					<span class="chip">Single binary</span>
-					<span class="chip">Discord</span>
-					<span class="chip">Telegram</span>
-					<span class="chip">systemd</span>
-				</div>
-			</a>
-			<a class="card" href={resolve("/nuvio-web")}>
-				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Media</span>
-				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
-					Nuvio Web
-				</h3>
-				<p class="mb-4.5 text-[.92rem] text-dim">
-					An unofficial web client for Nuvio. Your profiles, addons, library and watch progress in a
-					browser, with a player that streams, casts, or hands off.
-				</p>
-				<div class="flex flex-wrap gap-1.5">
-					<span class="chip">Web player</span>
-					<span class="chip">HLS</span>
-					<span class="chip">Cast</span>
-					<span class="chip">AGPL-3.0-or-later</span>
-				</div>
-			</a>
-			<a class="card" href={resolve("/bercail")}>
-				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Dashboard</span>
-				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
-					Bercail
-				</h3>
-				<p class="mb-4.5 text-[.92rem] text-dim">
-					A start page for your homelab. Your links with a live up/down dot, the weather and your
-					server&rsquo;s vitals on top, and a new tab extension to open it everywhere.
-				</p>
-				<div class="flex flex-wrap gap-1.5">
-					<span class="chip">SvelteKit</span>
-					<span class="chip">SQLite</span>
-					<span class="chip">Docker</span>
-					<span class="chip">OIDC</span>
-				</div>
-			</a>
-			<a class="card" href={resolve("/svelte-smol")}>
-				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Tooling</span>
-				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
-					svelte-smol
-				</h3>
-				<p class="mb-4.5 text-[.92rem] text-dim">
-					A SvelteKit adapter that compiles your app to one standalone binary with Bun. No
-					node_modules to ship, built-in healthcheck for Docker.
-				</p>
-				<div class="flex flex-wrap gap-1.5">
-					<span class="chip">Bun</span>
-					<span class="chip">SvelteKit</span>
-					<span class="chip">Adapter</span>
-					<span class="chip">npm</span>
-				</div>
-			</a>
-			<a class="card" href={resolve("/releaser")}>
-				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Tooling</span>
-				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
-					releaser
-				</h3>
-				<p class="mb-4.5 text-[.92rem] text-dim">
-					semantic-release without the plugins, the config or node_modules. Conventional commits
-					in; version, changelog, tag and GitHub release out. One static Go binary.
-				</p>
-				<div class="flex flex-wrap gap-1.5">
-					<span class="chip">Go</span>
-					<span class="chip">GitHub Actions</span>
-					<span class="chip">Semver</span>
-					<span class="chip">Docker</span>
-				</div>
-			</a>
-			<a class="card" href={resolve("/dokploy-to-pangolin")}>
-				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Networking</span>
-				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
-					dokploy-to-pangolin
-				</h3>
-				<p class="mb-4.5 text-[.92rem] text-dim">
-					A webhook bridge. Deploy in Dokploy, get the Pangolin resource and target created for you.
-					Stop hand-writing routes for every new app.
-				</p>
-				<div class="flex flex-wrap gap-1.5">
-					<span class="chip">Bun</span>
-					<span class="chip">Hono</span>
-					<span class="chip">Webhook</span>
-					<span class="chip">Pangolin</span>
-				</div>
-			</a>
+			{#each data.projects as project (project.repo)}
+				<a class="card" href={resolve("/[repo]", { repo: project.repo })}>
+					<span class="text-[11px] uppercase tracking-[.18em] text-plasma">{project.category}</span>
+					<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
+						{project.name}
+					</h3>
+					<p class="mb-4.5 text-[.92rem] text-dim">{project.blurb}</p>
+					<div class="flex flex-wrap gap-1.5">
+						{#each project.chips as chip (chip)}
+							<span class="chip">{chip}</span>{" "}
+						{/each}
+					</div>
+				</a>
+			{/each}
 		</div>
 	</section>
 

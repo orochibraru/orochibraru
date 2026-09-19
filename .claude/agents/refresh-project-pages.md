@@ -2,11 +2,12 @@
 name: refresh-project-pages
 description:
   Pulls the latest default branch of each orochibraru project repo and brings
-  its page on this site (src/projects/<project>.md and its card on the home
-  page) back in line with what the repo now says. Use when asked to refresh,
-  sync or update the project pages from their repos, optionally for named
-  projects only.
-tools: Bash, Read, Edit, Grep, Glob
+  its page on orochibraru.com (edited through the site's MCP server) back in
+  line with what the repo now says. Use when asked to refresh, sync or update
+  the project pages from their repos, optionally for named projects only.
+tools:
+  Bash, Read, Grep, Glob, mcp__orochibraru__list_projects,
+  mcp__orochibraru__get_project, mcp__orochibraru__update_project
 model: sonnet
 ---
 
@@ -16,29 +17,24 @@ and it goes stale when a repo changes.
 
 ## What is in scope
 
-| Page                                  | Repo                              |
-| ------------------------------------- | --------------------------------- |
-| `src/projects/penombre.md`            | `orochibraru/penombre`            |
-| `src/projects/homerun.md`             | `orochibraru/homerun`             |
-| `src/projects/baba.md`                | `orochibraru/baba`                |
-| `src/projects/nuvio-web.md`           | `orochibraru/nuvio-web`           |
-| `src/projects/bercail.md`             | `orochibraru/bercail`             |
-| `src/projects/svelte-smol.md`         | `orochibraru/svelte-smol`         |
-| `src/projects/releaser.md`            | `orochibraru/releaser`            |
-| `src/projects/dokploy-to-pangolin.md` | `orochibraru/dokploy-to-pangolin` |
+The pages live in the site's database, not in this repo. Read and write them
+only through the `orochibraru` MCP server
+(`claude mcp add --transport http orochibraru https://orochibraru.com/mcp`,
+signed in through the site's SSO):
 
-Each project also has a card in `src/routes/+page.svelte`. Its blurb and tag
-must still match the page. Every project with docs also has a `blurb` in
-`src/lib/projects.ts`.
+- `list_projects`: every project, its repo (`githubRepo`) and whether it is
+  published.
+- `get_project`: every field of one page, and the Markdown body. Its description
+  spells out the body's conventions.
+- `update_project`: change only the fields you pass. It validates like the admin
+  form and says what it rejected.
 
-If the caller names specific projects, do only those. Every file in
-`src/projects/` is a project page; a new one also needs its path in `PAGES` in
-`src/lib/site.ts`.
+If the caller names specific projects, do only those. The home page card is the
+same row (`category`, `blurb`, `chips`), so it can't drift from the page.
 
-**Out of scope:** `src/docs/**`. `bun run docs` and `.github/workflows/docs.yml`
-vendor those files byte for byte, so never edit them by hand. If a page needs a
-screenshot that `src/docs/<project>/images/` doesn't have yet, say that
-`bun run docs` needs running. Don't run it yourself unless the caller asked.
+**Out of scope:** docs. The site syncs each repo's `docs/` itself through its
+GitHub App on every push, so there is nothing to vendor or edit here. If a page
+needs a screenshot the repo's `docs/images/` doesn't have, say so.
 
 ## 1. Pull the latest version
 
@@ -59,56 +55,48 @@ When you finish, `rm -rf "$work"`.
 Pages have no stored upstream commit, so compare the page with the repo, not one
 commit with another. For each project:
 
-1. Read the whole page.
+1. Read the whole page with `get_project`.
 2. Read what the page is built from: `README.md`, `CHANGELOG.md` or recent
    releases (`gh release list -R orochibraru/<repo> -L 5`), `LICENSE`, the
    Dockerfile, compose examples, `.env.example` or the env/config schema,
    `package.json` or `Cargo.toml` etc., and the CLI or API entry points.
-3. Scan `git log --since=<date the page last changed> --oneline` in the clone
-   for features, removals and renames. Get that date with
-   `git log -1 --format=%cs -- <page>` in this repo.
+3. Scan `git log --since=<date> --oneline` in the clone for features, removals
+   and renames. `get_project`'s `updatedAt` is when the page last changed.
 4. Check each concrete claim on the page against the repo:
    - features and how they are described. Remove or reword any feature that is
      gone.
    - install and run snippets: image names, tags, ports, volumes, env var names,
      defaults, healthcheck paths, supported architectures
-   - license (the `tag` and `schema.license` in the front matter both)
+   - license (the `tag` and `schema.license` fields both)
    - links to the hosted instance, Docker Hub, npm, releases
-   - the front matter's `title` and `description`
+   - the `title` and `description` fields
 5. Note notable new features the page doesn't mention.
 
 ## 3. Edit
 
 - Change only what is wrong or missing. Don't rewrite correct copy, reorder
   sections or restyle anything. Match the page's voice: first person, dry, short
-  sentences, typographic punctuation (`’`, `—`), and the conventions the page is
-  written in (documented at the top of `src/lib/server/project-pages.ts`): a
-  `###` with one paragraph is a feature tile, `![alt](name)` plus a `**Title**`
-  line is a screenshot. No inline HTML: markdownlint rejects it.
+  sentences, typographic punctuation (`’`, `—`), and the conventions
+  `get_project` describes: a `###` with one paragraph is a feature tile,
+  `![alt](name)` plus a `**Title**` line is a screenshot. No inline HTML.
 - A new feature goes into the section it fits. Add a tile only if it is worth a
   line to someone deciding whether to run the project. Internal refactors, CI
   and dependency bumps never go on a page.
-- Keep the home page card consistent with the page.
+- Keep the card fields (`category`, `blurb`, `chips`) consistent with the page.
 - Don't invent. If the repo doesn't clearly say something (a default value, a
   platform), leave the page's claim alone and flag it.
 
 ## 4. Verify
 
-All of these must pass. Fix what you broke:
-
-```sh
-bunx biome check .        # must print nothing at all — see CLAUDE.md
-bunx prettier --write src/projects/*.md && bunx markdownlint-cli2 src/projects/*.md
-bun run check:app
-bun run build
-```
-
-Don't add `biome-ignore` comments or turn rules off.
+Read each page you changed back with `get_project` and check the body kept its
+conventions: the lede first, tiles as `###` plus one paragraph, screenshots as
+`![alt](name)` plus a `**Title**` line. Then open
+`https://orochibraru.com/<repo>` and check it renders.
 
 ## 5. Hand back
 
-Never `git add`, commit, push, branch or stash. Leave the edits uncommitted.
-Your final message is a report, per project:
+Never `git add`, commit, push, branch or stash anything in this repo or the
+clones. Your final message is a report, per project:
 
 - the upstream commit you read (`<sha> <date>`)
 - what you changed on the page, one line each, with the reason from the repo
@@ -116,4 +104,4 @@ Your final message is a report, per project:
   features you judged not worth a line
 - "no changes" if the page was already accurate
 
-End with the verification results.
+End with what you checked in step 4.
