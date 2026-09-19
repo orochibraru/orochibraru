@@ -159,6 +159,9 @@
 	.feat {
 		@apply bg-surface px-6.5 py-6;
 	}
+	.feat h3 {
+		@apply mb-1.5 text-base font-bold tracking-[-.01em];
+	}
 	.feat h3::before {
 		content: "// ";
 		@apply text-acid;
@@ -187,10 +190,11 @@
 	.prose pre {
 		@apply overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
 	}
-	/* the hand-drawn blocks (svelte-smol's tree, the dokploy diagram) dim comments this way */
+	/* the hand-drawn blocks (svelte-smol's tree) dim comments this way */
 	.prose pre .c {
 		@apply text-dim;
 	}
+
 	/* rendered Markdown: no classes on the tags, so style them here */
 	.md p {
 		@apply mb-5 max-w-[80ch] text-dim;
@@ -239,13 +243,16 @@
 		@apply text-[1em] text-fg;
 	}
 	/* highlighted blocks: the button sits in the corner, the code scrolls clear of it */
-	.md .code {
+	.md .code,
+	.project .code {
 		@apply relative;
 	}
-	.md .code pre {
+	.md .code pre,
+	.project .code pre {
 		@apply pr-20;
 	}
-	.md .copy {
+	.md .copy,
+	.project .copy {
 		@apply absolute top-3 right-3 border border-line bg-bg px-2 py-0.5 font-mono text-[11px] text-dim transition-colors hover:border-edge hover:text-fg;
 	}
 	.md hr {
@@ -306,10 +313,6 @@
 		@apply block;
 	}
 
-	.card:hover h3 {
-		@apply text-acid;
-	}
-
 	/* On a guide the reading measure applies to prose only: a compose file or a
      wide table should use the column it has rather than scroll inside 80ch. */
 	.docs .md pre,
@@ -335,6 +338,52 @@
 	.docs .md blockquote,
 	.docs .md-table td {
 		@apply text-fg/80;
+	}
+
+	/* project pages: rendered from src/projects/*.md, so no classes on the tags. The
+     spacing rules sit in :where so that order alone decides between them. */
+	:where(.project section > * + *) {
+		@apply mt-5;
+	}
+	:where(.project section > * + .tiles, .project section > .tiles + *) {
+		@apply mt-7;
+	}
+	:where(.project section > * + h3) {
+		@apply mt-8;
+	}
+	/* nothing is spaced away from the heading or label it sits under */
+	:where(.project section > h2 + *, .project section > h3 + *) {
+		@apply mt-0;
+	}
+	.tiles {
+		@apply grid gap-px border border-line bg-line;
+	}
+	.tiles:has(> :nth-child(2)) {
+		@apply sm:grid-cols-2;
+	}
+	.project small {
+		@apply text-[.85rem];
+	}
+	.project section {
+		@apply mb-22.5;
+	}
+	.project section > h2 {
+		@apply mb-5 text-2xl font-bold tracking-[-.02em];
+	}
+	/* the small label over a code block: "Docker Compose" */
+	.project section > h3 {
+		@apply mb-3 font-mono text-xs tracking-widest text-dim uppercase;
+	}
+	/* a section of tiles gets a rule running out from its heading */
+	.project section.ruled > h2 {
+		@apply mb-7 flex items-baseline gap-4;
+	}
+	.project section.ruled > h2::after {
+		content: "";
+		@apply h-px flex-1 bg-line;
+	}
+	.card:hover h3 {
+		@apply text-acid;
 	}
 }
 

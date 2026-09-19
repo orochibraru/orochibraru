@@ -16,7 +16,8 @@ export const GET = async ({ fetch }) => {
 
 > Free, open-source, self-hosted software for homelabs, written by one person and given away:
 > a cloud drive (Penombre), a single-host PaaS (Homerun), a server monitor (Baba), a media web
-> client (Nuvio Web), a homelab start page (Bercail), a SvelteKit adapter (svelte-smol) and a webhook bridge (dokploy-to-pangolin).
+> client (Nuvio Web), a homelab start page (Bercail), a SvelteKit adapter (svelte-smol),
+> a release tool for GitHub Actions (releaser) and a webhook bridge (dokploy-to-pangolin).
 > No subscriptions, no seats, no paywalled features, no telemetry.
 
 Every page here is also published as Markdown: append \`.md\` to any URL, for example

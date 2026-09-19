@@ -2,10 +2,10 @@
 name: refresh-project-pages
 description:
   Pulls the latest default branch of each orochibraru project repo and brings
-  its hand-written page on this site (src/routes/<project>/+page.svelte and its
-  card on the home page) back in line with what the repo now says. Use when
-  asked to refresh, sync or update the project pages from their repos,
-  optionally for named projects only.
+  its page on this site (src/projects/<project>.md and its card on the home
+  page) back in line with what the repo now says. Use when asked to refresh,
+  sync or update the project pages from their repos, optionally for named
+  projects only.
 tools: Bash, Read, Edit, Grep, Glob
 model: sonnet
 ---
@@ -16,23 +16,24 @@ and it goes stale when a repo changes.
 
 ## What is in scope
 
-| Page                                          | Repo                              |
-| --------------------------------------------- | --------------------------------- |
-| `src/routes/penombre/+page.svelte`            | `orochibraru/penombre`            |
-| `src/routes/homerun/+page.svelte`             | `orochibraru/homerun`             |
-| `src/routes/baba/+page.svelte`                | `orochibraru/baba`                |
-| `src/routes/nuvio-web/+page.svelte`           | `orochibraru/nuvio-web`           |
-| `src/routes/bercail/+page.svelte`             | `orochibraru/bercail`             |
-| `src/routes/svelte-smol/+page.svelte`         | `orochibraru/svelte-smol`         |
-| `src/routes/dokploy-to-pangolin/+page.svelte` | `orochibraru/dokploy-to-pangolin` |
+| Page                                  | Repo                              |
+| ------------------------------------- | --------------------------------- |
+| `src/projects/penombre.md`            | `orochibraru/penombre`            |
+| `src/projects/homerun.md`             | `orochibraru/homerun`             |
+| `src/projects/baba.md`                | `orochibraru/baba`                |
+| `src/projects/nuvio-web.md`           | `orochibraru/nuvio-web`           |
+| `src/projects/bercail.md`             | `orochibraru/bercail`             |
+| `src/projects/svelte-smol.md`         | `orochibraru/svelte-smol`         |
+| `src/projects/releaser.md`            | `orochibraru/releaser`            |
+| `src/projects/dokploy-to-pangolin.md` | `orochibraru/dokploy-to-pangolin` |
 
 Each project also has a card in `src/routes/+page.svelte`. Its blurb and tag
 must still match the page. Every project with docs also has a `blurb` in
 `src/lib/projects.ts`.
 
-If the caller names specific projects, do only those. A new route that links a
-`github.com/orochibraru/<repo>` counts as a project page too. Check with
-`grep -rlE 'github\.com/orochibraru/' src/routes/*/+page.svelte`.
+If the caller names specific projects, do only those. Every file in
+`src/projects/` is a project page; a new one also needs its path in `PAGES` in
+`src/lib/site.ts`.
 
 **Out of scope:** `src/docs/**`. `bun run docs` and `.github/workflows/docs.yml`
 vendor those files byte for byte, so never edit them by hand. If a page needs a
@@ -71,22 +72,23 @@ commit with another. For each project:
      gone.
    - install and run snippets: image names, tags, ports, volumes, env var names,
      defaults, healthcheck paths, supported architectures
-   - license (the tag chip and `structuredData.license` both)
+   - license (the `tag` and `schema.license` in the front matter both)
    - links to the hosted instance, Docker Hub, npm, releases
-   - the `Meta` title and description, and `structuredData.description`
+   - the front matter's `title` and `description`
 5. Note notable new features the page doesn't mention.
 
 ## 3. Edit
 
 - Change only what is wrong or missing. Don't rewrite correct copy, reorder
   sections or restyle anything. Match the page's voice: first person, dry, short
-  sentences, HTML entities (`&rsquo;`, `&mdash;`), and the existing class names
-  and markup patterns (`feat` grid cells, `tag`, `btn`).
-- A new feature goes into the section it fits. Add a `feat` cell only if it is
-  worth a line to someone deciding whether to run the project. Internal
-  refactors, CI and dependency bumps never go on a page.
-- Keep Meta description and `structuredData.description` identical where they
-  already are, and keep the home page card consistent with the page.
+  sentences, typographic punctuation (`’`, `—`), and the conventions the page is
+  written in (documented at the top of `src/lib/server/project-pages.ts`): a
+  `###` with one paragraph is a feature tile, `![alt](name)` plus a `**Title**`
+  line is a screenshot. No inline HTML: markdownlint rejects it.
+- A new feature goes into the section it fits. Add a tile only if it is worth a
+  line to someone deciding whether to run the project. Internal refactors, CI
+  and dependency bumps never go on a page.
+- Keep the home page card consistent with the page.
 - Don't invent. If the repo doesn't clearly say something (a default value, a
   platform), leave the page's claim alone and flag it.
 
@@ -96,6 +98,7 @@ All of these must pass. Fix what you broke:
 
 ```sh
 bunx biome check .        # must print nothing at all — see CLAUDE.md
+bunx prettier --write src/projects/*.md && bunx markdownlint-cli2 src/projects/*.md
 bun run check:app
 bun run build
 ```

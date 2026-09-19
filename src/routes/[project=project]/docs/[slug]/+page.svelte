@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
 	import Meta from "$lib/components/Meta.svelte";
+	import { copyButtons } from "$lib/copy";
 	import { clip, PERSON, SITE } from "$lib/seo";
 
 	let { data } = $props();
@@ -33,24 +34,6 @@
 		active = current;
 	}
 	$effect(spy);
-
-	// Copy buttons are rendered with the guide, so one listener serves every block on it.
-	function copyButtons(node: HTMLElement) {
-		const onclick = async (event: MouseEvent) => {
-			const button = (event.target as Element).closest<HTMLButtonElement>(".copy");
-			const code = button?.parentElement?.querySelector("pre")?.textContent;
-			if (!button || !code) {
-				return;
-			}
-			await navigator.clipboard.writeText(code);
-			button.textContent = "Copied";
-			setTimeout(() => {
-				button.textContent = "Copy";
-			}, 1500);
-		};
-		node.addEventListener("click", onclick);
-		return () => node.removeEventListener("click", onclick);
-	}
 </script>
 
 <Meta

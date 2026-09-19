@@ -11,7 +11,7 @@ export type Post = {
 };
 
 /** A leading `---` YAML block. Real YAML, because prettier folds long values onto several lines. */
-function frontmatter(raw: string): [Record<string, unknown>, string] {
+export function frontmatter(raw: string): [Record<string, unknown>, string] {
 	const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
 	if (!match) {
 		return [{}, raw];

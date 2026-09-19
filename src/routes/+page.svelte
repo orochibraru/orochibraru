@@ -5,13 +5,13 @@
 
 <Meta
 	title="orochibraru: free, self-hosted software for your homelab"
-	description="Free and open-source homelab software: self-hosted drive, a Cloud Run alternative, server alerting, a Nuvio web client, a homelab start page, a Bun SvelteKit adapter and Dokploy→Pangolin routing. No subscriptions, no seats, no paywalls."
+	description="Free and open-source homelab software: self-hosted drive, a Cloud Run alternative, server alerting, a Nuvio web client, a homelab start page, a Bun SvelteKit adapter, a semantic-release alternative and Dokploy→Pangolin routing. No subscriptions, no seats, no paywalls."
 	path="/"
 />
 
 <main class="mx-auto max-w-page px-6">
 	<div class="pt-15 pb-22.5">
-		<span class="tag">7 projects &middot; self-hosted &middot; MIT &amp; AGPL</span>
+		<span class="tag">8 projects &middot; self-hosted &middot; MIT &amp; AGPL</span>
 		<h1
 			class="mt-6.5 text-[clamp(2.6rem,9vw,6.2rem)]/[.92] font-extrabold tracking-[-.03em] text-balance"
 		>
@@ -63,7 +63,7 @@
 		<div class="mb-7 flex items-baseline gap-4">
 			<h2 class="text-2xl font-bold tracking-[-.02em]">The projects</h2>
 			<div class="h-px flex-1 bg-line"></div>
-			<span class="text-xs tracking-[.2em] text-dim">07</span>
+			<span class="text-xs tracking-[.2em] text-dim">08</span>
 		</div>
 		<div class="grid gap-px border border-line bg-line sm:grid-cols-2">
 			<a class="card" href={resolve("/penombre")}>
@@ -160,6 +160,22 @@
 					<span class="chip">SvelteKit</span>
 					<span class="chip">Adapter</span>
 					<span class="chip">npm</span>
+				</div>
+			</a>
+			<a class="card" href={resolve("/releaser")}>
+				<span class="text-[11px] uppercase tracking-[.18em] text-plasma">Tooling</span>
+				<h3 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
+					releaser
+				</h3>
+				<p class="mb-4.5 text-[.92rem] text-dim">
+					semantic-release without the plugins, the config or node_modules. Conventional commits
+					in; version, changelog, tag and GitHub release out. One static Go binary.
+				</p>
+				<div class="flex flex-wrap gap-1.5">
+					<span class="chip">Go</span>
+					<span class="chip">GitHub Actions</span>
+					<span class="chip">Semver</span>
+					<span class="chip">Docker</span>
 				</div>
 			</a>
 			<a class="card" href={resolve("/dokploy-to-pangolin")}>

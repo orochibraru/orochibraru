@@ -115,7 +115,7 @@ const imageName = (inRepo: string) =>
  * Covers the three chunk layouts cwebp emits; anything else gets no attributes
  * rather than wrong ones.
  */
-function dimensions(file: string): { width: number; height: number } | null {
+export function dimensions(file: string): { width: number; height: number } | null {
 	let bytes: Uint8Array;
 	try {
 		bytes = readFileSync(file);
@@ -189,7 +189,7 @@ export type Category = {
 	slugs: string[];
 };
 
-const IMAGES = import.meta.glob<string>("/src/docs/*/images/*.webp", {
+export const IMAGES = import.meta.glob<string>("/src/docs/*/images/*.webp", {
 	eager: true,
 	query: "?url",
 	import: "default",

@@ -7,6 +7,7 @@ export const PAGES = [
 	{ path: "/nuvio-web", group: "Projects", priority: "0.8" },
 	{ path: "/bercail", group: "Projects", priority: "0.8" },
 	{ path: "/svelte-smol", group: "Projects", priority: "0.8" },
+	{ path: "/releaser", group: "Projects", priority: "0.8" },
 	{ path: "/dokploy-to-pangolin", group: "Projects", priority: "0.8" },
 	{ path: "/blog", group: "Start here", priority: "0.9" },
 	{ path: "/about", group: "Start here", priority: "0.7" },

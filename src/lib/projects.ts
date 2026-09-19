@@ -1,7 +1,7 @@
 // The projects whose docs this site publishes. Order, titles, icons and
 // categories come from each repo's docs/config.json (see docs-config.ts).
 export type Project = {
-	key: "penombre" | "homerun" | "nuvio-web" | "bercail" | "svelte-smol";
+	key: "penombre" | "homerun" | "nuvio-web" | "bercail" | "svelte-smol" | "releaser";
 	name: string;
 	blurb: string;
 	repo: string;
@@ -42,6 +42,14 @@ export const PROJECTS: Project[] = [
 		name: "svelte-smol",
 		blurb: "A SvelteKit adapter that compiles your whole app into one standalone Bun executable.",
 		repo: "https://github.com/orochibraru/svelte-smol",
+		branch: "main",
+	},
+	{
+		key: "releaser",
+		name: "releaser",
+		blurb:
+			"semantic-release without the plugins, the config or node_modules: one static Go binary.",
+		repo: "https://github.com/orochibraru/releaser",
 		branch: "main",
 	},
 ];
