@@ -2,7 +2,7 @@
 
 The extension in `extension/` shows your Bercail instance on every new tab.
 
-1. Download `bercail-extension.zip` from the latest release and unzip it. To build it yourself,
+1. Download `bercail-extension-X.Y.Z.zip` from the latest release and unzip it. To build it yourself,
    run `bun run package:extension`, which writes `dist/bercail-extension.zip`.
 2. In Chrome, open `chrome://extensions`, turn on Developer mode, then **Load unpacked** and pick
    the unzipped folder.

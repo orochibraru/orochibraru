@@ -101,7 +101,7 @@ A metric that can't be read shows `N/A` without affecting the others.
 
 The extension in `extension/` shows your Bercail instance on every new tab.
 
-1. Download `bercail-extension.zip` from the latest release and unzip it. To build it yourself,
+1. Download `bercail-extension-X.Y.Z.zip` from the latest release and unzip it. To build it yourself,
    run `bun run package:extension`, which writes `dist/bercail-extension.zip`.
 2. In Chrome, open `chrome://extensions`, turn on Developer mode, then **Load unpacked** and pick
    the unzipped folder.
@@ -147,7 +147,7 @@ SvelteKit 3 (prerelease) on Bun with [remote functions](https://svelte.dev/docs/
 
 Every merge to `main` goes through [semantic-release](https://semantic-release.gitbook.io/). A
 `feat`, `fix`, `perf`, `refactor` or `docs` commit cuts a patch release: it updates
-`CHANGELOG.md`, tags `vX.Y.Z`, creates the GitHub release with `bercail-extension.zip` attached,
+`CHANGELOG.md`, tags `vX.Y.Z`, creates the GitHub release with `bercail-extension-X.Y.Z.zip` attached,
 and publishes the image under that tag and `latest`. Pull requests publish a `pr-<number>` image,
 and their titles must be Conventional Commits because the squash merge uses them as the commit
 message.
