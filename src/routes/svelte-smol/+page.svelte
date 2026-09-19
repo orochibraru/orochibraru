@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Package } from "@lucide/svelte";
+	import { BookOpen, Package } from "@lucide/svelte";
 	import { resolve } from "$app/paths";
 	import BrandIcon from "$lib/components/BrandIcon.svelte";
 	import Meta from "$lib/components/Meta.svelte";
@@ -57,8 +57,11 @@
 				<code>node_modules</code>, no JS files to ship. One binary plus its static assets.
 			</p>
 			<div class="mt-6.5 flex flex-wrap gap-2.5">
+				<a class="btn btn-primary" href={resolve("/svelte-smol/docs")}>
+					<BookOpen size={15} />Read the docs
+				</a>
 				<a
-					class="btn btn-primary"
+					class="btn"
 					href="https://github.com/orochibraru/svelte-smol"
 					target="_blank"
 					rel="noopener"
