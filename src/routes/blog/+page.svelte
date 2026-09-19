@@ -53,8 +53,8 @@
 			>
 		</h1>
 		<p class="mt-7 max-w-[68ch] text-[1.05rem] text-dim">
-			Written in Markdown, in the repo, built with the rest of the site. No CMS, no database,
-			nothing to log in to.
+			Write-ups on self-hosting and homelab software: what broke, why it broke, and what I built
+			instead, so the next person hitting the same wall skips the weekend I lost.
 		</p>
 	</div>
 	<section class="mb-22.5">
