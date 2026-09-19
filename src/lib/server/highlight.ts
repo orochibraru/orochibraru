@@ -4,9 +4,33 @@
 import { createHighlighter } from "shiki";
 import { unentity } from "./markdown";
 
-/** Every fence language the vendored guides use; anything else renders as plain text. */
-const LANGS = ["bash", "dotenv", "http", "ini", "json", "nginx", "typescript", "yaml"];
-const ALIASES: Record<string, string> = { env: "dotenv", sh: "bash", ts: "typescript" };
+/** Every fence language we highlight; anything else renders as plain text. */
+const LANGS = [
+	"bash",
+	"dockerfile",
+	"dotenv",
+	"go",
+	"http",
+	"ini",
+	"javascript",
+	"json",
+	"nginx",
+	"python",
+	"rust",
+	"typescript",
+	"yaml",
+];
+const ALIASES: Record<string, string> = {
+	docker: "dockerfile",
+	env: "dotenv",
+	golang: "go",
+	js: "javascript",
+	py: "python",
+	rs: "rust",
+	sh: "bash",
+	ts: "typescript",
+	yml: "yaml",
+};
 
 const highlighter = createHighlighter({ themes: ["github-light", "github-dark"], langs: LANGS });
 

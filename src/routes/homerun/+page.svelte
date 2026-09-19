@@ -729,9 +729,7 @@
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Run it</h2>
 			<p class="mb-3 text-xs uppercase tracking-widest text-dim">One-liner, fresh Linux server</p>
-			<pre
-			>curl -fsSL https://raw.githubusercontent.com/orochibraru/homerun/main/packages/installer/bootstrap.sh \
-  | sudo bash -s -- --mode=full --domain=homerun.example.com</pre>
+			{@html data.bootstrap}
 			<p class="mt-5">
 				That installs Docker Engine, sets it up as a <strong>Swarm manager</strong> so the instance
 				starts in swarm mode, writes a compose file, and brings up Traefik, Postgres and the app from

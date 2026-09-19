@@ -81,12 +81,7 @@
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Use it</h2>
 			{@html data.install}
-			<pre class="mt-4"><span class="c">// svelte.config.js</span>
-import adapter from "@orochibraru/svelte-smol";
-
-{`export default {
-  kit: { adapter: adapter() },
-};`}</pre>
+			<div class="mt-4">{@html data.config}</div>
 			<p class="mt-5">
 				The compile step runs under the Bun runtime, so build with
 				<code>bun run vite build</code>.
