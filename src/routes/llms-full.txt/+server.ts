@@ -1,8 +1,6 @@
 import { SITE } from "$lib/seo";
 import { allDocs, twin } from "$lib/server/documents";
 
-export const prerender = true;
-
 export const GET = async ({ fetch }) => {
 	const docs = await allDocs(fetch);
 	return new Response(

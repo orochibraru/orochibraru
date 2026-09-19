@@ -21,6 +21,12 @@ buttons:
 schema:
   applicationCategory: DeveloperApplication
   operatingSystem: Linux, macOS, Docker
+position: 2
+category: Monitoring
+blurb:
+  "The lookout. Watches CPU, load, memory, disk, temps and GPU, then pings
+  Discord or Telegram when something breaks, and again when it heals."
+chips: ["Single binary", "Discord", "Telegram", "systemd"]
 ---
 
 Named after the lookout pirate in _Astérix_, always watching the horizon for

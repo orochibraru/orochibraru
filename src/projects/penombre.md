@@ -60,6 +60,12 @@ schema:
     - OpenAPI-documented REST API with API-key auth
     - SQLite by default, PostgreSQL optional
   sameAs: ["https://hub.docker.com/r/orochibraru/penombre"]
+position: 0
+category: Storage
+blurb:
+  "A self-hosted drive. Upload, sync, share, trash, recover. SQLite by default:
+  one container, one volume, no database server to babysit."
+chips: ["SvelteKit", "SQLite", "Docker", "MIT"]
 ---
 
 A self-hosted drive. All the convenience of cloud storage, on hardware you own,

@@ -32,6 +32,13 @@ schema:
   keywords:
     semantic-release alternative, release automation, conventional commits,
     changelog generator, GitHub Actions, semver
+position: 6
+category: Tooling
+blurb:
+  "semantic-release without the plugins, the config or node_modules.
+  Conventional commits in; version, changelog, tag and GitHub release out. One
+  static Go binary."
+chips: ["Go", "GitHub Actions", "Semver", "Docker"]
 ---
 
 semantic-release without the plugins, the config or `node_modules`. **One static

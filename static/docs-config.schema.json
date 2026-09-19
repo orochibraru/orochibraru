@@ -62,6 +62,7 @@
 	"$defs": {
 		"Icon": {
 			"type": "string",
+			"description": "A Lucide icon name, kebab-case: https://lucide.dev/icons",
 			"enum": [
 				"a-arrow-down",
 				"a-arrow-up",
@@ -1901,8 +1902,7 @@
 				"zodiac-virgo",
 				"zoom-in",
 				"zoom-out"
-			],
-			"description": "A Lucide icon name, kebab-case: https://lucide.dev/icons"
+			]
 		}
 	},
 	"$id": "https://orochibraru.com/docs-config.schema.json",

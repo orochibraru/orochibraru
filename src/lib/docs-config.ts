@@ -2,8 +2,7 @@
 // and the docs homepage show, under which category, in what order, with which
 // icon. Published as JSON Schema by `bun run schema`, so those repos get
 // validation and autocomplete from a `$schema` line.
-import { readFileSync } from "node:fs";
-import { Glob } from "bun";
+import { icons } from "lucide";
 import { z } from "zod";
 import type { IconNode } from "$lib/components/LucideIcon.svelte";
 import { ROOT_GUIDES } from "$lib/projects";
@@ -11,15 +10,23 @@ import { SITE } from "$lib/seo";
 
 export const SCHEMA_URL = `${SITE}/docs-config.schema.json`;
 
-const ICONS = "node_modules/@lucide/svelte/dist/icons";
+// lucide keys its icons by the PascalCase of their kebab-case names, exactly:
+// grid-2x2 -> Grid2x2, a-arrow-up -> AArrowUp. The reverse isn't unambiguous.
+const pascal = (name: string) =>
+	name
+		.split("-")
+		.map((part) => (part[0] ?? "").toUpperCase() + part.slice(1))
+		.join("");
 
-// every icon @lucide/svelte ships, by its kebab-case file name
-const ICON_NAMES = [...new Glob("*.svelte").scanSync(ICONS)]
-	.map((file) => file.replace(/\.svelte$/, ""))
-	.sort();
+const iconData = icons as unknown as Record<string, IconNode | undefined>;
 
+export const isIconName = (name: string) =>
+	/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name) && iconData[pascal(name)] !== undefined;
+
+// the enum of every name, for autocomplete in the project repos, is added by `bun run schema`
 const Icon = z
-	.enum(ICON_NAMES as [string, ...string[]], {
+	.string()
+	.refine(isIconName, {
 		error: (issue) => `"${issue.input}" is not a Lucide icon: https://lucide.dev/icons`,
 	})
 	.meta({ id: "Icon", description: "A Lucide icon name, kebab-case: https://lucide.dev/icons" });
@@ -74,17 +81,11 @@ export const DocsConfig = z
 
 export type DocsConfig = z.infer<typeof DocsConfig>;
 
-/**
- * An icon's SVG children, by name. Read from the component source, since @lucide/svelte
- * exports no data-only entry; the schema only admits names that have a file here.
- */
-// ponytail: parses @lucide/svelte's generated source; throws loudly if an upgrade changes it
+/** An icon's SVG children, by name, bundled with the server rather than read from disk. */
 export function lucideIcon(name: string): IconNode {
-	const data = readFileSync(`${ICONS}/${name}.svelte`, "utf8").match(
-		/const iconData = (\{.*\});/,
-	)?.[1];
-	if (!data) {
-		throw new Error(`${ICONS}/${name}.svelte: no iconData, has @lucide/svelte changed format?`);
+	const node = iconData[pascal(name)];
+	if (!node) {
+		throw new Error(`"${name}" is not a Lucide icon`);
 	}
-	return JSON.parse(data).node;
+	return node;
 }

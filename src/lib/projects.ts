@@ -1,58 +1,15 @@
-// The projects whose docs this site publishes. Order, titles, icons and
-// categories come from each repo's docs/config.json (see docs-config.ts).
+// A project whose docs this site publishes, as the docs routes see it. The rows
+// live in the database; order, titles, icons and categories come from each
+// repo's docs/config.json (see docs-config.ts).
 export type Project = {
-	key: "penombre" | "homerun" | "nuvio-web" | "bercail" | "svelte-smol" | "releaser";
+	/** The URL segment, and the repo name. */
+	key: string;
 	name: string;
 	blurb: string;
+	/** https://github.com/owner/name */
 	repo: string;
 	branch: string;
 };
-
-export const PROJECTS: Project[] = [
-	{
-		key: "penombre",
-		name: "Penombre",
-		blurb: "A self-hosted drive: previews, notes, sharing and an admin panel, in one container.",
-		repo: "https://github.com/orochibraru/penombre",
-		branch: "main",
-	},
-	{
-		key: "homerun",
-		name: "Homerun",
-		blurb: "A single-host PaaS: deploy an image or a repo from a form, Traefik routes it with TLS.",
-		repo: "https://github.com/orochibraru/homerun",
-		branch: "main",
-	},
-	{
-		key: "nuvio-web",
-		name: "Nuvio Web",
-		blurb: "Unofficial implementation of the Nuvio API in a web UI (since there is none, yet).",
-		repo: "https://github.com/orochibraru/nuvio-web",
-		branch: "main",
-	},
-	{
-		key: "bercail",
-		name: "Bercail",
-		blurb: "A self-hosted start page for your homelab.",
-		repo: "https://github.com/orochibraru/bercail",
-		branch: "main",
-	},
-	{
-		key: "svelte-smol",
-		name: "svelte-smol",
-		blurb: "A SvelteKit adapter that compiles your whole app into one standalone Bun executable.",
-		repo: "https://github.com/orochibraru/svelte-smol",
-		branch: "main",
-	},
-	{
-		key: "releaser",
-		name: "releaser",
-		blurb:
-			"semantic-release without the plugins, the config or node_modules: one static Go binary.",
-		repo: "https://github.com/orochibraru/releaser",
-		branch: "main",
-	},
-];
 
 /**
  * Repo-root files published as guides. They come first, in this order, whatever
@@ -63,9 +20,6 @@ export const ROOT_GUIDES = [
 	{ slug: "contributing", file: "CONTRIBUTING.md", label: "Contributing", icon: "hand-heart" },
 ] as const;
 
-/** Where a project's vendored Markdown lives. */
-export const docsDir = (project: Project) => `src/docs/${project.key}`;
-
 /** The URL a guide is published at. */
-export const docsUrl = (project: Project, slug?: string) =>
+export const docsUrl = (project: Pick<Project, "key">, slug?: string) =>
 	slug ? `/${project.key}/docs/${slug}` : `/${project.key}/docs`;

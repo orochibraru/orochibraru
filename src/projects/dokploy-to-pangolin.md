@@ -23,6 +23,12 @@ buttons:
 schema:
   applicationCategory: DeveloperApplication
   operatingSystem: Linux, macOS, Docker
+position: 7
+category: Networking
+blurb:
+  "A webhook bridge. Deploy in Dokploy, get the Pangolin resource and target
+  created for you. Stop hand-writing routes for every new app."
+chips: ["Bun", "Hono", "Webhook", "Pangolin"]
 ---
 
 A webhook service that registers new Dokploy applications with Pangolin

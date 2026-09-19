@@ -34,6 +34,13 @@ schema:
     Homepage alternative, Homarr alternative, Dashy alternative, Homer
     alternative, Heimdall alternative, Flame alternative, start.me alternative,
     self-hosted start page, homelab dashboard
+position: 4
+category: Dashboard
+blurb:
+  "A start page for your homelab. Your links with a live up/down dot, the
+  weather and your server’s vitals on top, and a new tab extension to open it
+  everywhere."
+chips: ["SvelteKit", "SQLite", "Docker", "OIDC"]
 ---
 
 A start page for your homelab. The weather and your server’s vitals at the top,

@@ -1,0 +1,7 @@
+# Rule exemptions and their reasons, kept alongside the Dockerfile.
+ignored:
+  # Debian's archive drops superseded package versions as bookworm point
+  # releases roll forward, so a pinned `webp=…` routinely stops resolving a few
+  # weeks later and breaks the build for reasons unrelated to this repo. The
+  # install is `--no-install-recommends` and the lists are removed after.
+  - DL3008

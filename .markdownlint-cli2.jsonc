@@ -5,5 +5,5 @@
 		// agent and skill files open with front matter whose `name` is the title
 		"MD041": { "front_matter_title": "^\\s*(title|name)\\s*[:=]" }
 	},
-	"ignores": ["node_modules", "dist", ".svelte-kit", "src/docs", ".claude/skills"]
+	"ignores": ["node_modules", "dist", "build", ".svelte-kit", "src/docs", ".claude/skills"]
 }

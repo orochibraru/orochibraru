@@ -92,6 +92,12 @@ schema:
     - Cloudflare and Pangolin DNS automation, with Homerun able to run the
       Pangolin Newt tunnel client for you
   sameAs: ["https://hub.docker.com/r/orochibraru/homerun"]
+position: 1
+category: Deploys
+blurb:
+  "A single-host PaaS. Point it at an image or a git repo, fill a form, hit
+  deploy, and Traefik routes it with TLS. No Kubernetes anywhere near it."
+chips: ["Docker", "Traefik", "PaaS", "Self-hosted"]
 ---
 
 A single-host PaaS for your own hardware. Point it at an image or a git repo,

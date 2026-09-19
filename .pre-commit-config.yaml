@@ -1,25 +1,40 @@
-default_install_hook_types: [pre-commit, commit-msg, post-checkout]
+default_install_hook_types: [pre-commit, commit-msg, pre-push, post-checkout]
+default_stages: [pre-commit]
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: check-merge-conflict
+        name: Look for Merge Conflicts
 
       - id: check-case-conflict
-
-      - id: detect-private-key
+        name: Look for case conflicts
 
       - id: check-yaml
+        name: Validate Yaml
+
+      - id: check-added-large-files
+        name: Look for large files
 
       - id: mixed-line-ending
+        name: Fix line endings
         args: [--fix=lf]
         # src/docs is vendored from the project repos and must stay byte-identical to upstream
-        exclude: &generated ^(bun\.lock|src/docs/|static/docs-config\.schema\.json$)
+        exclude: &generated |-
+          (?x)^(
+            src/docs/|
+            static/docs-config\.schema\.json|
+            drizzle/|
+            bun\.lock
+          )
+
       - id: end-of-file-fixer
+        name: Fix end of files
         exclude: *generated
 
       - id: trailing-whitespace
+        name: Fix trailing whitespaces
         args: [--markdown-linebreak-ext=md]
         exclude: *generated
 
@@ -27,17 +42,20 @@ repos:
     rev: v4.4.0
     hooks:
       - id: conventional-pre-commit
+        name: Ensure conventional commits
         stages: [commit-msg]
 
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.1
     hooks:
       - id: gitleaks
+        name: Look for hardcoded secrets
 
   - repo: https://github.com/crate-ci/typos
     rev: v1.50.1
     hooks:
       - id: typos
+        name: Look for typos
         args: [--force-exclude]
         exclude: *generated
 
@@ -45,52 +63,65 @@ repos:
     rev: v1.7.12
     hooks:
       - id: actionlint
+        name: Lint Github Actions
 
   - repo: https://github.com/hadolint/hadolint
     rev: v2.15.1
     hooks:
       - id: hadolint-docker
+        name: Lint Docker
 
   - repo: local
     hooks:
       - id: biome
-        name: biome check --write
-        entry: bun run biome check --write --no-errors-on-unmatched --files-ignore-unknown=true
+        name: Format and sort imports (Biome)
+        entry: node_modules/.bin/biome check --write --error-on-warnings --no-errors-on-unmatched --files-ignore-unknown=true
         language: system
+        require_serial: true
         files: \.(ts|tsx|js|jsx|mjs|cjs|json|jsonc|css|svelte|html)$
 
-      # tailwint needs app.css in the same run to resolve the project, so it gets the globs, not filenames
-      - id: tailwint
-        name: tailwint
-        entry: bun run tailwint --fix 'src/**/*.{css,svelte}'
-        language: system
-        pass_filenames: false
-        files: ^src/.*\.(css|svelte)$
-
-      - id: svelte-check
-        name: svelte-check
-        entry: bun run check:app
-        language: system
-        pass_filenames: false
-        files: (\.(ts|js|svelte)$|^(tsconfig\.json|svelte\.config\.js|package\.json)$)
-
-      - id: prettier-md
-        name: prettier (markdown)
+      - id: format-md
+        name: Formatting (MD)
         entry: bun run prettier --log-level warn --write
         language: system
-        types: [markdown]
+        files: \.(md|mdx)$
         exclude: *generated
 
       - id: markdownlint
-        name: markdownlint-cli2 --fix
+        name: Markdown Lint
         entry: bun run markdownlint-cli2 --fix
         language: system
         types: [markdown]
         exclude: ^(src/docs/|\.claude/skills/)
 
+      # tailwint needs app.css in the same run to resolve the project, so it gets the globs, not filenames
+      - id: lint-tailwind
+        name: Lint (Tailwind)
+        entry: bun run tailwint --fix 'src/**/*.{css,svelte}'
+        language: system
+        require_serial: true
+        pass_filenames: false
+        files: ^src/.*\.(svelte|css)$
+
+      - id: check
+        name: Type Check
+        entry: bun run check:app
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+        files: ^(src/|scripts/|tests/|svelte\.config\.js$|tsconfig.*\.json$|package\.json$)
+
+      - id: test-unit
+        name: Unit Tests
+        entry: bun test
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+        files: ^(src/|tests/|drizzle/)
+
       # node_modules and .svelte-kit aren't part of the checkout, so a branch switch leaves them stale
       - id: bun-install
-        name: bun install
+        name: Install dependencies
         entry: sh -c 'bun install --ignore-scripts && bun run svelte-kit sync'
         language: system
         stages: [post-checkout]
@@ -100,14 +131,20 @@ repos:
   - repo: local
     hooks:
       - id: no-manual-route-typing
-        name: "route files: no manual $props()/load/actions typing (./$types is inferred)"
+        name: "Look for injected inferred types in routes"
         language: pygrep
         entry: |-
           (: (PageData|PageProps|LayoutData|ActionData|LayoutProps|PageServerLoad|LayoutServerLoad|Actions|RequestHandler)\b|from "\./\$types")
         files: ^src/routes/.*\.(ts|svelte)$
 
+      - id: no-raw-drizzle-in-routes
+        name: "Make sure DTOs are used in routes, not drizzle directly"
+        language: pygrep
+        entry: \bdb\.(select|insert|update|delete)\(
+        files: ^src/routes/.*\.ts$
+
       - id: internal-links-resolve
-        name: "internal links go through resolve() from $app/paths"
+        name: "Make sure all paths are resolved"
         language: pygrep
         entry: href="/
         files: ^src/.*\.svelte$

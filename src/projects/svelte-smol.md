@@ -28,6 +28,12 @@ schema:
   applicationCategory: DeveloperApplication
   operatingSystem: Linux, macOS, Docker
   license: https://opensource.org/licenses/MIT
+position: 5
+category: Tooling
+blurb:
+  "A SvelteKit adapter that compiles your app to one standalone binary with Bun.
+  No node_modules to ship, built-in healthcheck for Docker."
+chips: ["Bun", "SvelteKit", "Adapter", "npm"]
 ---
 
 A SvelteKit adapter that compiles your whole app into a **single standalone

@@ -1,7 +1,8 @@
-import { docsUrl, PROJECTS, type Project } from "$lib/projects";
+import { docsUrl, type Project } from "$lib/projects";
 import { clip, mdPath, readable, SITE } from "$lib/seo";
 import { PAGES } from "$lib/site";
-import { type Guide, loadGuides } from "./guides";
+import { getPublishedProjectRow, listProjectPages, projectMarkdown } from "./content";
+import { type Guide, loadDocProjects, loadGuides } from "./guides";
 import { descriptionOf, markdown, titleOf } from "./markdown";
 import { loadPosts, type Post } from "./posts";
 
@@ -19,6 +20,20 @@ export async function pageDoc(fetch: Fetch, page: (typeof PAGES)[number]): Promi
 		description: descriptionOf(html),
 		body: markdown(html),
 	};
+}
+
+/** A project page, from its stored Markdown rather than its HTML. */
+export function projectPageDoc(repo: string): Doc | undefined {
+	const row = getPublishedProjectRow(repo);
+	return (
+		row && {
+			path: `/${row.repo}`,
+			group: "Projects",
+			title: row.title,
+			description: row.description,
+			body: projectMarkdown(row),
+		}
+	);
 }
 
 export const projectDoc = (project: Project, guides: Guide[]): Doc => ({
@@ -54,10 +69,15 @@ export const postDoc = (post: Post): Doc => ({
 });
 
 export async function allDocs(fetch: Fetch): Promise<Doc[]> {
-	const [guides, posts] = await Promise.all([loadGuides(), loadPosts()]);
+	const [guides, posts, projects] = await Promise.all([
+		loadGuides(),
+		loadPosts(),
+		loadDocProjects(),
+	]);
 	return [
 		...(await Promise.all(PAGES.map((page) => pageDoc(fetch, page)))),
-		...PROJECTS.map((project) => projectDoc(project, guides)),
+		...listProjectPages().flatMap((page) => projectPageDoc(page.repo) ?? []),
+		...projects.map((project) => projectDoc(project, guides)),
 		...guides.map(guideDoc),
 		...posts.map(postDoc),
 	];
