@@ -1,90 +1,101 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
 import { eq } from "drizzle-orm";
-import { importContent } from "../scripts/import";
 import {
 	getProjectPage,
 	invalidate,
 	listProjectCards,
 	projectMarkdown,
 } from "../src/lib/server/content";
-import type { DB } from "../src/lib/server/db";
 import { post, project } from "../src/lib/server/db/schema";
-import { loadDocProjects, loadGuides } from "../src/lib/server/guides";
+import { storeImage } from "../src/lib/server/images";
 import { loadPosts } from "../src/lib/server/posts";
+import { freshSite, SAMPLE_IMAGE } from "./helpers";
 
-let dir: string;
-let db: DB;
+const site = freshSite();
+afterAll(() => site.cleanup());
+
+const BODY = `A start page for your homelab.
+
+![The dashboard](dashboard)
+**The dashboard** Links and vitals.
+
+## Alternatives {#alternatives}
+
+### Homepage
+
+YAML files instead of a UI.
+
+See the [showcase](/demo/docs/showcase).`;
+
+const row = (repo: string, position: number, body: string) => ({
+	repo,
+	name: repo,
+	title: repo,
+	description: repo,
+	image: body === BODY ? { src: "dashboard", alt: "The dashboard" } : null,
+	body,
+	position,
+	published: true,
+});
+
 beforeAll(async () => {
-	dir = mkdtempSync(`${tmpdir()}/site-content-`);
-	db = await importContent(dir);
-});
-afterAll(() => {
-	db.$client.close();
-	rmSync(dir, { recursive: true, force: true });
-});
-
-describe("import", () => {
-	test("brings in every project, guide and post", async () => {
-		expect(listProjectCards().map((card) => card.repo)).toEqual([
-			"penombre",
-			"homerun",
-			"baba",
-			"nuvio-web",
-			"bercail",
-			"svelte-smol",
-			"releaser",
-			"dokploy-to-pangolin",
-		]);
-		expect((await loadGuides()).length).toBe(112);
-		expect((await loadDocProjects()).map((project) => project.key)).not.toContain("baba");
-		expect((await loadPosts()).length).toBeGreaterThan(0);
-	});
-
-	test("refuses a database that already has content", async () => {
-		await expect(importContent(dir)).rejects.toThrow(/already has content/);
-	});
+	site.db
+		.insert(project)
+		.values([row("demo", 0, BODY), row("other", 1, "Another one.")])
+		.run();
+	const bytes = await Bun.file(SAMPLE_IMAGE).bytes();
+	for (const name of ["dashboard", "dashboard-dark"]) {
+		await storeImage(bytes, { source: "sync", project: "demo", name });
+	}
+	site.db
+		.insert(post)
+		.values({ slug: "hello", title: "Hello", date: "2026-01-01", body: "x", status: "published" })
+		.run();
+	invalidate();
 });
 
 describe("project pages", () => {
+	test("cards follow the admin's order", () => {
+		expect(listProjectCards().map((card) => card.repo)).toEqual(["demo", "other"]);
+	});
+
 	test("render tiles, screenshots from the image store, and the lede", async () => {
-		const page = await getProjectPage("bercail");
-		expect(page?.lede).toContain("A start page for your homelab");
-		expect(page?.html).toContain('<div class="tiles"><div class="feat">');
+		const page = await getProjectPage("demo");
+		expect(page?.lede).toBe("A start page for your homelab.");
 		expect(page?.html).toMatch(
 			/<figure class="shot"><picture><source [^>]*srcset="\/images\/[0-9a-f]{64}\.webp"/,
 		);
 		expect(page?.html).toContain('<section id="alternatives" class="ruled">');
+		expect(page?.html).toContain('<div class="tiles"><div class="feat">');
 		expect(page?.image?.url).toMatch(/^https:\/\/orochibraru\.com\/images\/[0-9a-f]{64}\.webp$/);
 	});
 
-	test("an unpublished project is not there, and invalidate() makes that true at once", async () => {
-		expect(getProjectPage("baba")).toBeDefined();
-		db.update(project).set({ published: false }).where(eq(project.repo, "baba")).run();
+	test("an unpublished project is not there, and invalidate() makes that true at once", () => {
+		expect(getProjectPage("other")).toBeDefined();
+		site.db.update(project).set({ published: false }).where(eq(project.repo, "other")).run();
 		invalidate();
-		expect(getProjectPage("baba")).toBeUndefined();
-		expect(listProjectCards().map((card) => card.repo)).not.toContain("baba");
-		db.update(project).set({ published: true }).where(eq(project.repo, "baba")).run();
-		invalidate();
+		expect(getProjectPage("other")).toBeUndefined();
+		expect(listProjectCards().map((card) => card.repo)).not.toContain("other");
 	});
 
 	test("the Markdown twin has absolute image URLs and no anchor syntax", () => {
-		const row = db.select().from(project).where(eq(project.repo, "penombre")).get();
-		const twin = projectMarkdown(row as NonNullable<typeof row>);
-		expect(twin).toStartWith("# Penombre\n");
+		const twin = projectMarkdown({ repo: "demo", name: "Demo", body: BODY });
+		expect(twin).toStartWith("# Demo\n");
 		expect(twin).toMatch(/\]\(https:\/\/orochibraru\.com\/images\/[0-9a-f]{64}\.webp\)/);
-		expect(twin).toContain("](https://orochibraru.com/penombre/docs/showcase)");
+		expect(twin).toContain("](https://orochibraru.com/demo/docs/showcase)");
 		expect(twin).not.toContain("{#alternatives}");
 	});
 });
 
 describe("posts", () => {
 	test("drafts never reach the public list", async () => {
-		db.insert(post)
+		site.db
+			.insert(post)
 			.values({ slug: "secret", title: "Secret", date: "2099-01-01", body: "x", status: "draft" })
 			.run();
 		invalidate();
-		expect((await loadPosts()).map((item) => item.slug)).not.toContain("secret");
+		const slugs = (await loadPosts()).map((item) => item.slug);
+		expect(slugs).toContain("hello");
+		expect(slugs).not.toContain("secret");
 	});
 });

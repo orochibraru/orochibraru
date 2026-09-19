@@ -1,6 +1,4 @@
 dist
 .svelte-kit
 bun.lock
-# vendored byte for byte from the project repos by `bun run docs`
-src/docs
 .claude/skills

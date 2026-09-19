@@ -18,9 +18,8 @@ Two rules here are stricter than the recommended preset:
 
 Posts, project pages and project docs are rows in SQLite (`DATA_DIR/site.db`),
 not files. Edit them in `/admin`, over the MCP server, or through
-`src/lib/server/editor.ts`, which every write goes through. `src/projects/`,
-`src/posts/` and `src/docs/` only seed a fresh database (`bun run import`, run
-by the Docker build) until production has been seeded.
+`src/lib/server/editor.ts`, which every write goes through. Nothing in the repo
+seeds it: a fresh database starts empty.
 
 - Routes never query Drizzle directly: public reads go through
   `src/lib/server/content.ts`, writes through `editor.ts` (a pre-commit hook

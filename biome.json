@@ -6,14 +6,7 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"includes": [
-			"**",
-			"!!**/dist",
-			"!!**/build",
-			"!!**/.svelte-kit",
-			"!src/docs",
-			"!.claude/skills"
-		]
+		"includes": ["**", "!!**/dist", "!!**/build", "!!**/.svelte-kit", "!.claude/skills"]
 	},
 	"formatter": {
 		"enabled": true,

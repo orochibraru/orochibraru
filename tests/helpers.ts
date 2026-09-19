@@ -18,5 +18,5 @@ export function freshSite(): { db: DB; dir: string; cleanup: () => void } {
 	};
 }
 
-/** A real screenshot from the vendored docs: cwebp reads WebP as happily as PNG. */
-export const SAMPLE_IMAGE = "src/docs/bercail/images/dashboard.webp";
+/** A real screenshot: cwebp reads WebP as happily as PNG. */
+export const SAMPLE_IMAGE = "tests/fixtures/screenshot.webp";

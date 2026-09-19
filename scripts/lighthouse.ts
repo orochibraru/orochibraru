@@ -5,9 +5,8 @@
 //     bun run audit /penombre  just that one
 //
 // Exits non-zero if a category drops below its floor, so it can gate a deploy.
-import { mkdtempSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { importContent } from "./import";
 import { dim, log, ms } from "./log";
 
 const out = log("audit");
@@ -30,9 +29,14 @@ if (rebuild.exitCode !== 0) {
 	process.exit(1);
 }
 
-// The server reads its pages from a database: give it today's content in a throwaway one.
+// The server reads its pages from a database: audit a throwaway copy of the local one.
+const source = process.env.DATA_DIR ?? "data";
+if (!existsSync(`${source}/site.db`)) {
+	out.fail(`no ${source}/site.db: nothing to audit. Point DATA_DIR at a database with content`);
+	process.exit(1);
+}
 const data = mkdtempSync(`${tmpdir()}/audit-`);
-(await importContent(data)).$client.close();
+cpSync(source, data, { recursive: true });
 const app = Bun.spawn(["./build/server"], {
 	env: {
 		...process.env,

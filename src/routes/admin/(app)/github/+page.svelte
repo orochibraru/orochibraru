@@ -1,5 +1,8 @@
 <script lang="ts">
+	import { X } from "@lucide/svelte";
+	import { tick } from "svelte";
 	import { enhance } from "$app/forms";
+	import { invalidateAll } from "$app/navigation";
 
 	let { data, form } = $props();
 	let organization = $state("");
@@ -8,6 +11,42 @@
 			? data.orgTarget.replace("ORG", encodeURIComponent(organization))
 			: data.target,
 	);
+
+	let dialog = $state<HTMLDialogElement>();
+	let output = $state<HTMLPreElement>();
+	let lines = $state<string[]>([]);
+	let syncing = $state(false);
+
+	async function syncAll() {
+		lines = [];
+		syncing = true;
+		dialog?.showModal();
+		const say = async (line: string) => {
+			lines.push(line);
+			await tick();
+			output?.scrollTo({ top: output.scrollHeight });
+		};
+		try {
+			const response = await fetch("/admin/github/sync", { method: "POST" });
+			if (!response.ok || !response.body) {
+				await say(`✗ ${response.status} ${response.statusText}`);
+				return;
+			}
+			let pending = "";
+			for await (const chunk of response.body.pipeThrough(new TextDecoderStream())) {
+				const parts = (pending + chunk).split("\n");
+				pending = parts.pop() ?? "";
+				for (const line of parts) {
+					await say(line);
+				}
+			}
+		} catch (cause) {
+			await say(`✗ the connection dropped: ${cause}`);
+		} finally {
+			syncing = false;
+			await invalidateAll();
+		}
+	}
 </script>
 
 <svelte:head>
@@ -42,15 +81,40 @@
 		<form method="POST" action="?/refresh" use:enhance>
 			<button class="btn" type="submit">Refresh the repo list</button>
 		</form>
-		<form method="POST" action="?/reconcile" use:enhance>
-			<button class="btn" type="submit">Sync every project now</button>
-		</form>
+		<button class="btn" type="button" onclick={syncAll} disabled={syncing}>
+			{syncing ? "Syncing…" : "Sync every project now"}
+		</button>
 	</div>
 	{#if form?.message}
 		<p class="mb-5 text-plasma" role="alert">{form.message}</p>
-	{:else if form?.reconciled}
-		<p class="mb-5 text-acid" role="status">Checked every project; see the overview for runs.</p>
 	{/if}
+	<!-- a modal <dialog> already traps focus, closes on Escape and draws the backdrop -->
+	<dialog
+		bind:this={dialog}
+		aria-labelledby="sync-title"
+		class="w-[min(48rem,calc(100vw-2rem))] max-w-none border border-line bg-surface p-0 text-fg backdrop:bg-black/50"
+	>
+		<div class="flex h-14 items-center justify-between border-b border-line pr-3 pl-5">
+			<h2 id="sync-title" class="text-[11px] tracking-[.18em] text-plasma uppercase">
+				{syncing ? "Syncing every project…" : "Sync finished"}
+			</h2>
+			<button
+				type="button"
+				aria-label="Close"
+				class="grid size-9 place-items-center border border-edge transition hover:border-acid hover:text-acid"
+				onclick={() => dialog?.close()}
+			>
+				<X class="size-4" aria-hidden="true" />
+			</button>
+		</div>
+		<pre
+			bind:this={output}
+			class="h-[min(28rem,60dvh)] overflow-auto p-5 font-mono text-[.8rem] leading-relaxed whitespace-pre-wrap"
+			aria-live="polite">{#each lines as line, index (index)}<span
+					class={line.includes("✗") ? "text-plasma" : line.includes("✓") ? "text-acid" : ""}
+					>{line}</span
+				>{"\n"}{/each}</pre>
+	</dialog>
 	<h2 class="mb-3 text-xl font-bold">Repos not yet a project</h2>
 	{#each data.repos as repo (repo)}
 		<p class="font-mono text-[.9rem]">{repo}</p>

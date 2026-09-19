@@ -6,8 +6,7 @@ WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile --ignore-scripts
 COPY . .
-RUN bun run build \
-	&& DATA_DIR=/app/seed bun run import
+RUN bun run build
 
 # The binary needs only libc; cwebp re-encodes every uploaded and synced image.
 FROM debian:bookworm-slim
@@ -19,7 +18,6 @@ RUN apt-get update \
 WORKDIR /app
 COPY --from=build --chown=app:app /app/build ./build
 COPY --from=build --chown=app:app /app/drizzle ./drizzle
-COPY --from=build --chown=app:app /app/seed ./seed
 USER 10001
 ENV HOST=0.0.0.0 PORT=3000 DATA_DIR=/data
 VOLUME /data

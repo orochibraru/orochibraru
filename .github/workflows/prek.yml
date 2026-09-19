@@ -10,7 +10,8 @@ permissions:
 
 concurrency:
   group: prek-${{ github.ref }}
-  cancel-in-progress: true
+  # never cancel a release halfway through (image pushed, tag not)
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   prek:
@@ -25,3 +26,19 @@ jobs:
         run: bun install --frozen-lockfile --ignore-scripts
 
       - uses: j178/prek-action@v3.0.0
+
+  release:
+    needs: prek
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      # the release commit goes over SSH with a deploy key: the main ruleset lets deploy keys bypass it
+      - uses: actions/checkout@v7
+        with:
+          ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
+      - uses: orochibraru/releaser@v1
+        with:
+          docker: true

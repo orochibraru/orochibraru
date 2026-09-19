@@ -340,7 +340,7 @@
 		@apply text-fg/80;
 	}
 
-	/* project pages: rendered from src/projects/*.md, so no classes on the tags. The
+	/* project pages: rendered from Markdown, so no classes on the tags. The
      spacing rules sit in :where so that order alone decides between them. */
 	:where(.project section > * + *) {
 		@apply mt-5;

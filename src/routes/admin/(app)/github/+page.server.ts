@@ -9,7 +9,6 @@ import {
 	recordInstallation,
 	refreshInstalledRepos,
 } from "$lib/server/github/app";
-import { reconcile } from "$lib/server/github/sync";
 
 export const load = async ({ url, cookies }) => {
 	const app = await getGithubApp();
@@ -51,10 +50,6 @@ export const actions = {
 		} catch (cause) {
 			return fail(502, { message: cause instanceof Error ? cause.message : "GitHub failed" });
 		}
-	},
-	reconcile: async () => {
-		await reconcile();
-		return { reconciled: true };
 	},
 	forget: () => {
 		forgetGithubApp();

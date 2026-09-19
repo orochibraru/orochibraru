@@ -13,7 +13,6 @@
 		"format": "biome format --write . && prettier --write '**/*.md'",
 		"audit": "bun run scripts/lighthouse.ts",
 		"schema": "bun run scripts/schema.ts",
-		"import": "bun run scripts/import.ts",
 		"test": "bun test"
 	},
 	"devDependencies": {

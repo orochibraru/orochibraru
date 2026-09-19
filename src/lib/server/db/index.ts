@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { cpSync, existsSync, mkdirSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { type BunSQLiteDatabase, drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
@@ -8,16 +8,11 @@ import * as schema from "./schema";
 
 export type DB = BunSQLiteDatabase<typeof schema> & { $client: Database };
 
-// Both ship next to the binary: the image's WORKDIR, the repo root in development.
+// Ships next to the binary: the image's WORKDIR, the repo root in development.
 const migrationsFolder = join(process.cwd(), "drizzle");
-const seedFolder = join(process.cwd(), "seed");
 
 /** Opens (creating if needed) DIR/site.db. Migrating is its own step: see migrateDatabase. */
 export function openDatabase(dir: string): DB {
-	// a brand-new volume starts from the content the image was built with
-	if (existsSync(join(seedFolder, "site.db")) && !existsSync(join(dir, "site.db"))) {
-		cpSync(seedFolder, dir, { recursive: true });
-	}
 	mkdirSync(join(dir, "images"), { recursive: true });
 	const client = new Database(join(dir, "site.db"), { create: true, strict: true });
 	client.run("PRAGMA journal_mode = WAL");

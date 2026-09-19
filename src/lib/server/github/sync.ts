@@ -45,14 +45,22 @@ async function blob(app: App, repo: string, sha: string): Promise<Uint8Array> {
 
 export type SyncResult = { status: "ok" | "failed" | "skipped"; changed: number; error?: string };
 
-async function runSync(repoKey: string, wanted?: string): Promise<SyncResult> {
+/** Where a sync narrates what it does: the admin's progress dialog, or nowhere. */
+export type Log = (line: string) => void;
+const quiet: Log = () => {};
+
+const short = (sha: string | null | undefined) => sha?.slice(0, 7) ?? "never";
+
+async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<SyncResult> {
 	const db = getDb();
 	const row = db.select().from(project).where(eq(project.repo, repoKey)).get();
 	if (!row?.githubRepo) {
+		log(`${repoKey}: skipped, no linked repo`);
 		return { status: "skipped", changed: 0, error: `${repoKey} has no linked repo` };
 	}
 	const app = await getGithubApp();
 	if (!app?.installationId) {
+		log(`${repoKey}: skipped, the GitHub App isn't installed`);
 		return { status: "skipped", changed: 0, error: "the GitHub App isn't installed" };
 	}
 	const fullName = row.githubRepo;
@@ -71,11 +79,15 @@ async function runSync(repoKey: string, wanted?: string): Promise<SyncResult> {
 			`/repos/${fullName}/commits/${encodeURIComponent(ref)}`,
 		);
 		const sha = commit.sha;
+		log(`${repoKey}: syncing ${fullName}@${ref} (${short(sha)})`);
 		const { tree } = await github<{ tree: TreeEntry[] }>(
 			app,
 			`/repos/${fullName}/git/trees/${commit.commit.tree.sha}?recursive=1`,
 		);
 		const wantedDocs = selectDocs(tree);
+		log(
+			`${repoKey}: ${tree.length} files in the tree, ${wantedDocs.guides.length} guides, ${wantedDocs.images.length} images, ${wantedDocs.config ? "a" : "no"} docs/config.json`,
+		);
 
 		const stored = new Map(
 			db
@@ -89,8 +101,10 @@ async function runSync(repoKey: string, wanted?: string): Promise<SyncResult> {
 		for (const entry of wantedDocs.guides) {
 			const slug = slugOf(entry.path);
 			if (stored.get(slug)?.sha === entry.sha) {
+				log(`  = ${entry.path}`);
 				continue;
 			}
+			log(`  ↓ ${entry.path}`);
 			guides.push({
 				slug,
 				path: entry.path,
@@ -111,8 +125,10 @@ async function runSync(repoKey: string, wanted?: string): Promise<SyncResult> {
 		for (const entry of wantedDocs.images) {
 			const name = imageNameOf(entry.path);
 			if (storedImages.get(name)?.sourceSha === entry.sha) {
+				log(`  = ${entry.path}`);
 				continue;
 			}
+			log(`  ↓ ${entry.path}, re-encoding to WebP`);
 			const prepared = await prepareImage(await blob(app, fullName, entry.sha)).catch((cause) => {
 				throw new GithubError(`${entry.path}: ${cause instanceof Error ? cause.message : cause}`);
 			});
@@ -127,6 +143,7 @@ async function runSync(repoKey: string, wanted?: string): Promise<SyncResult> {
 				throw new GithubError(`docs/config.json is invalid:\n${z.prettifyError(parsed.error)}`);
 			}
 			config = parsed.data;
+			log("  ✓ docs/config.json is valid");
 		}
 
 		const keepSlugs = wantedDocs.guides.map((entry) => slugOf(entry.path));
@@ -175,6 +192,12 @@ async function runSync(repoKey: string, wanted?: string): Promise<SyncResult> {
 				)
 				.returning()
 				.all();
+			for (const item of removedGuides) {
+				log(`  − ${item.sourcePath}, gone from the repo`);
+			}
+			for (const item of removedImages) {
+				log(`  − image ${item.name}, gone from the repo`);
+			}
 			changed += removedGuides.length + removedImages.length;
 			tx.update(project)
 				.set({ docsConfig: config, docsSyncedSha: sha })
@@ -186,6 +209,7 @@ async function runSync(repoKey: string, wanted?: string): Promise<SyncResult> {
 				.run();
 		});
 		invalidate();
+		log(`${repoKey}: ✓ done, ${changed} change${changed === 1 ? "" : "s"}`);
 		return { status: "ok", changed };
 	} catch (cause) {
 		const error = cause instanceof Error ? cause.message : String(cause);
@@ -193,6 +217,7 @@ async function runSync(repoKey: string, wanted?: string): Promise<SyncResult> {
 			.set({ status: "failed", error, finishedAt: new Date() })
 			.where(eq(syncRun.id, runId))
 			.run();
+		log(`${repoKey}: ✗ failed, nothing written: ${error}`);
 		return { status: "failed", changed: 0, error };
 	}
 }
@@ -202,16 +227,18 @@ async function runSync(repoKey: string, wanted?: string): Promise<SyncResult> {
 const running = new Map<string, Promise<SyncResult>>();
 const dirty = new Set<string>();
 
-export function syncRepo(repoKey: string, sha?: string): Promise<SyncResult> {
+export function syncRepo(repoKey: string, sha?: string, log = quiet): Promise<SyncResult> {
 	const current = running.get(repoKey);
 	if (current) {
+		log(`${repoKey}: already syncing, one more run will follow it`);
 		dirty.add(repoKey);
 		return current;
 	}
 	const work = (async () => {
-		let result = await runSync(repoKey, sha);
+		let result = await runSync(repoKey, sha, log);
 		while (dirty.delete(repoKey)) {
-			result = await runSync(repoKey);
+			log(`${repoKey}: pushed to again meanwhile, syncing once more`);
+			result = await runSync(repoKey, undefined, log);
 		}
 		return result;
 	})().finally(() => running.delete(repoKey));
@@ -237,23 +264,32 @@ export const touchesDocs = (paths: string[]) =>
  * The safety net for missed webhooks: every project whose default branch moved
  * since its last sync is synced again.
  */
-export async function reconcile() {
+export async function reconcile(log = quiet) {
 	const app = await getGithubApp();
 	if (!app?.installationId) {
+		log("The GitHub App isn't installed: nothing to sync.");
 		return;
 	}
 	const rows = getDb().select().from(project).where(isNotNull(project.githubRepo)).all();
+	log(`Checking ${rows.length} project${rows.length === 1 ? "" : "s"} with a linked repo.`);
 	for (const row of rows) {
+		const branch = row.defaultBranch ?? "main";
 		try {
-			const branch = await github<{ commit: { sha: string } }>(
+			const head = await github<{ commit: { sha: string } }>(
 				app,
-				`/repos/${row.githubRepo}/branches/${encodeURIComponent(row.defaultBranch ?? "main")}`,
+				`/repos/${row.githubRepo}/branches/${encodeURIComponent(branch)}`,
 			);
-			if (branch.commit.sha !== row.docsSyncedSha) {
-				await syncRepo(row.repo, branch.commit.sha);
+			const at = `${row.githubRepo}@${branch} is at ${short(head.commit.sha)}, last synced ${short(row.docsSyncedSha)}`;
+			if (head.commit.sha === row.docsSyncedSha) {
+				log(`${row.repo}: ${at}, up to date`);
+				continue;
 			}
+			log(`${row.repo}: ${at}`);
+			await syncRepo(row.repo, head.commit.sha, log);
 		} catch (cause) {
 			console.error(`reconcile ${row.repo}:`, cause);
+			log(`${row.repo}: ✗ ${cause instanceof Error ? cause.message : String(cause)}`);
 		}
 	}
+	log("Every project checked.");
 }

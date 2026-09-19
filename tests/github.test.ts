@@ -10,7 +10,7 @@ import {
 	recordInstallation,
 	useGithubFetch,
 } from "../src/lib/server/github/app";
-import { selectDocs, syncRepo } from "../src/lib/server/github/sync";
+import { reconcile, selectDocs, syncRepo } from "../src/lib/server/github/sync";
 import { handleWebhook, verifySignature } from "../src/lib/server/github/webhook";
 import { freshSite, SAMPLE_IMAGE } from "./helpers";
 
@@ -211,6 +211,23 @@ describe("sync", () => {
 		const runsBefore = site.db.select().from(syncRun).all().length;
 		await Promise.all([syncRepo("tool"), syncRepo("tool"), syncRepo("tool")]);
 		expect(site.db.select().from(syncRun).all().length - runsBefore).toBe(2);
+	});
+
+	test("reconcile narrates what it checks and syncs", async () => {
+		head = "c6";
+		files["docs/new.md"] = "# New\n\nHello again.\n";
+		const lines: string[] = [];
+		await reconcile((line) => lines.push(line));
+		expect(lines[0]).toBe("Checking 1 project with a linked repo.");
+		expect(lines).toContain("tool: me/tool@main is at c6, last synced c5");
+		expect(lines).toContain("  ↓ docs/new.md");
+		expect(lines).toContain("  = README.md");
+		expect(lines).toContain("tool: ✓ done, 1 change");
+
+		lines.length = 0;
+		await reconcile((line) => lines.push(line));
+		expect(lines).toContain("tool: me/tool@main is at c6, last synced c6, up to date");
+		expect(lines.at(-1)).toBe("Every project checked.");
 	});
 });
 
