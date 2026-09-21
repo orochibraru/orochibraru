@@ -4,8 +4,10 @@
 
 ### Bug Fixes
 
-* formatting ([0c05258](https://github.com/orochibraru/orochibraru/commit/0c052580974570aff07d8ad1be98d0a277c18491))
-* blog page desc ([4bf0021](https://github.com/orochibraru/orochibraru/commit/4bf0021775dcb8e6aa66d94bef5c3885ebd1593d))
+- formatting
+  ([0c05258](https://github.com/orochibraru/orochibraru/commit/0c052580974570aff07d8ad1be98d0a277c18491))
+- blog page desc
+  ([4bf0021](https://github.com/orochibraru/orochibraru/commit/4bf0021775dcb8e6aa66d94bef5c3885ebd1593d))
 
 ## 1.0.0 (2026-09-19)
 

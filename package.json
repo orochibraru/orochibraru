@@ -19,6 +19,7 @@
 		"@biomejs/biome": "^2.5.14",
 		"@fontsource-variable/geist": "^5.3.0",
 		"@fontsource-variable/geist-mono": "^5.3.0",
+		"@j178/prek": "^0.5.3",
 		"@lucide/svelte": "^1.46.0",
 		"@orochibraru/svelte-smol": "1.8.1",
 		"@sveltejs/kit": "^2.70.3",
