@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/orochibraru/orochibraru/compare/v1.2.0...v1.2.1) (2026-09-21)
+
+### Bug Fixes
+
+- blog code blocks
+  ([640e9b1](https://github.com/orochibraru/orochibraru/commit/640e9b151b198bb04a9de9209a14c0a04dc5f72f))
+
 ## [1.2.0](https://github.com/orochibraru/orochibraru/compare/v1.1.0...v1.2.0) (2026-09-21)
 
 ### Features
