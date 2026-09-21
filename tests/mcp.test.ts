@@ -56,6 +56,10 @@ describe("posts over MCP", () => {
 		expect(published.url).toBe("https://orochibraru.com/blog/hello-from-claude");
 		const read = (await call("get_post", { slug: "hello-from-claude" })).json();
 		expect(read.body).toBe("Edited.");
+		expect(read.description).toBe("Written over MCP.");
+		await call("update_post", { slug: "hello-from-claude", description: "Retold." });
+		const retold = (await call("get_post", { slug: "hello-from-claude" })).json();
+		expect(retold).toMatchObject({ description: "Retold.", body: "Edited." });
 		const listed = (await call("list_posts", { status: "published" })).json();
 		expect(listed.map((post: { slug: string }) => post.slug)).toContain("hello-from-claude");
 	});

@@ -27,8 +27,10 @@ export const PostInput = z
 		title: z.string().trim().min(1),
 		slug: z.string().regex(SLUG, "lowercase letters, digits and hyphens").optional(),
 		date: z.iso.date().optional(),
-		description: z.string().trim().default(""),
-		body: z.string().default(""),
+		// no .default(""): zod 4 keeps defaults through .partial(), so an update would blank
+		// whatever it leaves out. The columns default to "" on insert.
+		description: z.string().trim().optional(),
+		body: z.string().optional(),
 	})
 	.strict();
 
