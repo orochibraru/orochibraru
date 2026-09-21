@@ -237,7 +237,7 @@
 		@apply whitespace-nowrap;
 	}
 	.md pre {
-		@apply mb-5 max-w-[80ch] overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
+		@apply mb-5 overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
 	}
 	.md pre code {
 		@apply text-[1em] text-fg;
