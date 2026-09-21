@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0](https://github.com/orochibraru/orochibraru/compare/v1.0.1...v1.1.0) (2026-09-21)
+
+### Features
+
+- prek in un
+  ([87ec9a8](https://github.com/orochibraru/orochibraru/commit/87ec9a828d395e359b03e41b88fff03da1011600))
+- pinact
+  ([3c57414](https://github.com/orochibraru/orochibraru/commit/3c57414fbda8a2ef63813044a94afd2f9227b62d))
+
+### Bug Fixes
+
+- remove defaults to prevent overriding content
+  ([a60153d](https://github.com/orochibraru/orochibraru/commit/a60153d4885c95c91931199a01df9e26a1d1fa3f))
+
 ## [1.0.1](https://github.com/orochibraru/orochibraru/compare/v1.0.0...v1.0.1) (2026-09-19)
 
 ### Bug Fixes
