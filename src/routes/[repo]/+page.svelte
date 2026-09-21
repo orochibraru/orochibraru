@@ -4,6 +4,7 @@
 	import LucideIcon from "$lib/components/LucideIcon.svelte";
 	import Meta from "$lib/components/Meta.svelte";
 	import { copyButtons } from "$lib/copy";
+	import { mermaidDiagrams } from "$lib/mermaid";
 
 	let { data } = $props();
 </script>
@@ -18,7 +19,7 @@
 />
 
 <main class="mx-auto max-w-page px-6">
-	<article class="prose project" {@attach copyButtons}>
+	<article class="prose project" {@attach copyButtons} {@attach mermaidDiagrams}>
 		<div class="pt-10 pb-5">
 			<a
 				class="text-xs uppercase tracking-widest text-dim hover:text-acid"

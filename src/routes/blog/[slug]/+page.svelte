@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
 	import Meta from "$lib/components/Meta.svelte";
+	import { copyButtons } from "$lib/copy";
+	import { mermaidDiagrams } from "$lib/mermaid";
 	import { PERSON, readable, SITE } from "$lib/seo";
 
 	let { data } = $props();
@@ -54,6 +56,6 @@
 				<time datetime={post.date}>{readable(post.date)}</time>
 			</p>
 		</div>
-		<div class="md pb-22.5">{@html post.html}</div>
+		<div class="md pb-22.5" {@attach copyButtons} {@attach mermaidDiagrams}>{@html post.html}</div>
 	</article>
 </main>

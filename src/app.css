@@ -251,6 +251,11 @@
 	.project .code pre {
 		@apply pr-20;
 	}
+	/* a drawn diagram: centred, and its labels wrap like normal text */
+	.md pre.mermaid:has(svg),
+	.project pre.mermaid:has(svg) {
+		@apply flex justify-center whitespace-normal;
+	}
 	.md .copy,
 	.project .copy {
 		@apply absolute top-3 right-3 border border-line bg-bg px-2 py-0.5 font-mono text-[11px] text-dim transition-colors hover:border-edge hover:text-fg;

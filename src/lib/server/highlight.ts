@@ -39,6 +39,10 @@ export async function highlight(html: string): Promise<string> {
 	return html.replace(
 		/<pre><code(?: class="language-([\w+-]+)")?>([\s\S]*?)<\/code><\/pre>/g,
 		(_block, fence: string | undefined, body: string) => {
+			// drawn in the browser by $lib/mermaid; the escaped source is its no-JS fallback
+			if (fence === "mermaid") {
+				return `<pre class="mermaid">${body.replace(/\n$/, "")}</pre>`;
+			}
 			const lang = fence ? (ALIASES[fence] ?? fence) : "text";
 			const pre = shiki.codeToHtml(unentity(body).replace(/\n$/, ""), {
 				lang: LANGS.includes(lang) ? lang : "text",

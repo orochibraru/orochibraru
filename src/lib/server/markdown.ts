@@ -39,14 +39,17 @@ const flat = (s: string) =>
  * converter: it only knows the handful of tags these pages actually use.
  */
 export function markdown(html: string): string {
-	const pre: string[] = [];
+	const pre: { lang: string; body: string }[] = [];
 	let s = (html.match(/<main[^>]*>([\s\S]*)<\/main>/i)?.[1] ?? html)
 		.replace(/<!--[\s\S]*?-->/g, "")
 		.replace(/<(script|style|svg|template)\b[\s\S]*?<\/\1>/gi, "")
 		.replace(/<button\b[\s\S]*?<\/button>/gi, "")
 		// <pre> is stashed whole: its whitespace has to survive the tidying below.
-		.replace(/<pre[^>]*>([\s\S]*?)<\/pre>/gi, (_m, body: string) => {
-			pre.push(unentity(body.replace(/<[^>]+>/g, "")).replace(/^\n+|\s+$/g, ""));
+		.replace(/<pre([^>]*)>([\s\S]*?)<\/pre>/gi, (_m, attrs: string, body: string) => {
+			pre.push({
+				lang: /class="mermaid"/.test(attrs) ? "mermaid" : "",
+				body: unentity(body.replace(/<[^>]+>/g, "")).replace(/^\n+|\s+$/g, ""),
+			});
 			return `\n\n@@PRE${pre.length - 1}@@\n\n`;
 		});
 
@@ -98,7 +101,10 @@ export function markdown(html: string): string {
 		.replace(/\n{3,}/g, "\n\n")
 		.trim()
 		// only now, so none of the tidying above could reach inside a code block
-		.replace(/@@PRE(\d+)@@/g, (_m, i: string) => `\`\`\`\n${pre[Number(i)]}\n\`\`\``)}\n`;
+		.replace(/@@PRE(\d+)@@/g, (_m, i: string) => {
+			const block = pre[Number(i)];
+			return `\`\`\`${block?.lang}\n${block?.body}\n\`\`\``;
+		})}\n`;
 }
 
 /** Rendered Markdown's links to other sites open in a new tab, like every external link on the site. */

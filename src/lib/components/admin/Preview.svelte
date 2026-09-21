@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { copyButtons } from "$lib/copy";
+	import { mermaidDiagrams } from "$lib/mermaid";
 
 	let { kind, markdown, repo }: { kind: "post" | "project"; markdown: string; repo?: string } =
 		$props();
@@ -23,9 +24,9 @@
 {#if "error" in rendered}
 	<p class="text-plasma" role="alert">{rendered.error}</p>
 {:else if kind === "post"}
-	<div class="md" {@attach copyButtons}>{@html rendered.html}</div>
+	<div class="md" {@attach copyButtons} {@attach mermaidDiagrams}>{@html rendered.html}</div>
 {:else}
-	<article class="prose project" {@attach copyButtons}>
+	<article class="prose project" {@attach copyButtons} {@attach mermaidDiagrams}>
 		{#if rendered.lede}
 			<p class="mb-10 max-w-[72ch] text-[1.15rem] text-dim">{@html rendered.lede}</p>
 		{/if}
