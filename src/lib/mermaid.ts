@@ -3,7 +3,7 @@
 // drawn again whenever the theme flips. Mermaid is loaded only when a page has one.
 let count = 0;
 
-const dark = () => {
+export const dark = () => {
 	const theme = document.documentElement.dataset.theme;
 	return theme ? theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
 };

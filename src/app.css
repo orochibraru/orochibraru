@@ -108,6 +108,14 @@
 			radial-gradient(60rem 30rem at 15% -10%, var(--glow-1), transparent 60%),
 			radial-gradient(50rem 30rem at 90% 5%, var(--glow-2), transparent 60%);
 	}
+	/* the admin is a tool, used on a big screen: larger type, no backdrop */
+	html:has([data-admin]) {
+		font-size: 112.5%;
+	}
+	html:has([data-admin]) body::before,
+	html:has([data-admin]) body::after {
+		display: none;
+	}
 	a {
 		color: inherit;
 		text-decoration: none;
@@ -145,6 +153,61 @@
 	}
 	.chip {
 		@apply rounded-[3px] border border-edge font-mono px-2.25 py-0.75 text-[10.5px] uppercase tracking-[.08em] text-dim;
+	}
+	/* admin: a dense tool, not a page. Forms stack labels over fields. */
+	.admin-form label {
+		@apply flex flex-col gap-1.5 text-[13px] text-dim;
+	}
+	.admin-form :is(input:not([type="checkbox"]), textarea, select),
+	.field {
+		@apply w-full border border-line bg-surface px-2.5 py-1.5 text-sm text-fg transition-colors hover:border-edge focus:border-acid focus:outline-none;
+	}
+	.abtn {
+		@apply inline-flex h-8 items-center justify-center gap-2 border border-edge bg-surface px-3 text-[13px] font-medium whitespace-nowrap transition-colors hover:border-fg/40 disabled:opacity-40;
+	}
+	.abtn-primary {
+		@apply border-neon bg-neon text-onneon hover:border-neon hover:brightness-110;
+	}
+	.abtn-danger {
+		@apply hover:border-plasma hover:text-plasma;
+	}
+	.kbd {
+		@apply inline-grid h-4.5 min-w-4.5 place-items-center border border-edge px-1 font-mono text-[.625rem] text-dim;
+	}
+	/* the status of anything: a dot, then the word */
+	.status {
+		@apply inline-flex items-center gap-1.5 text-[13px] text-dim capitalize before:size-1.75 before:rounded-full before:border before:border-edge before:content-[''];
+	}
+	.status-on {
+		@apply text-fg before:border-neon before:bg-neon;
+	}
+	.status-bad {
+		@apply text-plasma before:border-plasma before:bg-plasma;
+	}
+	.status-busy {
+		@apply before:animate-pulse before:border-cyan before:bg-cyan;
+	}
+	.atable {
+		@apply w-full border-collapse text-sm;
+	}
+	.atable th {
+		@apply border-b border-line px-3 py-2 text-left text-xs font-medium text-dim;
+	}
+	.atable td {
+		@apply border-b border-line px-3 py-2.5;
+	}
+	:where(.atable tbody) tr {
+		@apply relative transition-colors hover:bg-fg/3;
+	}
+	/* the row's main link covers the whole row */
+	.atable .row-link {
+		@apply font-medium after:absolute after:inset-0 after:content-[''];
+	}
+	.apanel {
+		@apply border border-line bg-surface;
+	}
+	.apanel > header {
+		@apply flex h-10 items-center gap-3 border-b border-line px-3 text-[13px] font-medium;
 	}
 	.card {
 		@apply relative block bg-surface px-7 pt-7.5 pb-6.5 transition-colors hover:bg-fg/4;
@@ -386,13 +449,6 @@
 	.project section.ruled > h2::after {
 		content: "";
 		@apply h-px flex-1 bg-line;
-	}
-	/* admin forms: labels stacked over their fields */
-	.admin-form label {
-		@apply flex flex-col gap-1.5 text-[.85rem] text-dim;
-	}
-	.admin-form :is(input, textarea, select) {
-		@apply w-full border border-edge bg-surface px-3 py-2 text-[.95rem] text-fg focus:border-acid;
 	}
 	.card:hover h3 {
 		@apply text-acid;

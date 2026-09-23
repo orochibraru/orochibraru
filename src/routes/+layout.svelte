@@ -12,6 +12,7 @@
 
 	let search = $state<Search>();
 
+	const admin = $derived(page.route.id?.startsWith("/admin") ?? false);
 	const docs = $derived(page.route.id?.startsWith("/[repo]/docs") ?? false);
 	const width = $derived(docs ? "max-w-none" : "max-w-page");
 	// project pages and their docs hand their repo over as page data
@@ -38,10 +39,15 @@
 </script>
 
 <TopLoadingBar />
-<!-- docs render a fixed lg:w-72 sidebar, so everything else shifts right of it -->
-<div class={docs ? "lg:pl-72" : undefined}>
-  <Header {width} {source} {docs} onsearch={() => search?.open()} />
+{#if admin}
+  <!-- the admin brings its own chrome and its own ⌘K -->
   {@render children()}
-  <Footer {width} />
-</div>
-<Search bind:this={search} />
+{:else}
+  <!-- docs render a fixed lg:w-72 sidebar, so everything else shifts right of it -->
+  <div class={docs ? "lg:pl-72" : undefined}>
+    <Header {width} {source} {docs} onsearch={() => search?.open()} />
+    {@render children()}
+    <Footer {width} />
+  </div>
+  <Search bind:this={search} />
+{/if}

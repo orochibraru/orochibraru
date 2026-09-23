@@ -8,6 +8,8 @@
         "@better-auth/cimd": "1.7.5",
         "@better-auth/mcp": "1.7.5",
         "@better-auth/oauth-provider": "1.7.5",
+        "@codemirror/language": "6.12.4",
+        "@lezer/highlight": "1.2.3",
         "@milkdown/crepe": "7.22.1",
         "@modelcontextprotocol/sdk": "1.30.0",
         "better-auth": "1.7.5",

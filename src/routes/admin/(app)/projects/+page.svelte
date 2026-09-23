@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { ChevronDown, ChevronUp } from "@lucide/svelte";
 	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
+	import { statusClass } from "$lib/admin";
 
 	let { data, form } = $props();
 </script>
@@ -9,60 +11,73 @@
 	<title>Projects | orochibraru admin</title>
 </svelte:head>
 
-<div class="mb-8 flex flex-wrap items-center gap-4">
-	<h1 class="text-3xl font-extrabold tracking-[-.03em]">Projects</h1>
+<div class="mb-5 flex min-h-8 flex-wrap items-center gap-x-4 gap-y-2">
+	<h1 class="text-base font-semibold">Projects</h1>
+	<p class="text-sm text-dim">Listed in home page order.</p>
 	{#if data.addable.length}
-		<form class="admin-form ml-auto flex items-end gap-3" method="POST" action="?/add" use:enhance>
-			<label>
-				Add a repo the GitHub App can read
-				<select name="repo">
-					{#each data.addable as repo (repo)}
-						<option>{repo}</option>
-					{/each}
-				</select>
-			</label>
-			<button class="btn btn-primary" type="submit">Add project</button>
+		<form class="ml-auto flex items-center gap-2" method="POST" action="?/add" use:enhance>
+			<select class="field h-8 w-auto py-0" name="repo" aria-label="Repo to add">
+				{#each data.addable as repo (repo)}
+					<option>{repo}</option>
+				{/each}
+			</select>
+			<button class="abtn abtn-primary" type="submit">Add project</button>
 		</form>
 	{:else}
-		<a class="ml-auto text-[.9rem] text-dim hover:text-acid" href={resolve("/admin/github")}
-			>Install the GitHub App on more repos to add projects &rarr;</a
+		<a class="ml-auto text-[.8125rem] text-dim hover:text-fg" href={resolve("/admin/github")}
+			>Install the GitHub App on more repos to add projects</a
 		>
 	{/if}
 </div>
 {#if form?.message}
-	<p class="mb-5 text-plasma" role="alert">{form.message}</p>
+	<p class="mb-4 border border-plasma/40 bg-plasma/8 px-3 py-2 text-sm text-plasma" role="alert">{form.message}</p>
 {/if}
 
-<p class="mb-4 text-[.9rem] text-dim">The order here is the order of the cards on the home page.</p>
-<div class="grid gap-px border border-line bg-line">
-	{#each data.projects as project, index (project.repo)}
-		<div class="flex items-center gap-4 bg-surface px-5 py-3">
-			<form class="flex flex-col" method="POST" action="?/move" use:enhance>
-				<input type="hidden" name="repo" value={project.repo}>
-				<button
-					class="text-dim hover:text-acid disabled:opacity-30"
-					name="direction"
-					value="up"
-					disabled={index === 0}
-					aria-label="Move {project.name} up">&uarr;</button
-				>
-				<button
-					class="text-dim hover:text-acid disabled:opacity-30"
-					name="direction"
-					value="down"
-					disabled={index === data.projects.length - 1}
-					aria-label="Move {project.name} down">&darr;</button
-				>
-			</form>
-			<a
-				class="flex flex-1 items-baseline gap-4 hover:text-acid"
-				href={resolve("/admin/(app)/projects/[repo]", { repo: project.repo })}
-			>
-				<span class="font-semibold">{project.name}</span>
-				<span class="text-[.85rem] text-dim">{project.category}</span>
-			</a>
-			{#if !project.published}<span class="chip">draft</span>{/if}
-			<span class="font-mono text-[.8rem] text-dim">{project.githubRepo ?? "no repo"}</span>
-		</div>
-	{/each}
+<div class="apanel overflow-x-auto">
+	<table class="atable">
+		<thead>
+			<tr>
+				<th class="w-16"><span class="sr-only">Order</span></th>
+				<th>Name</th>
+				<th>Category</th>
+				<th>Status</th>
+				<th>Repo</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each data.projects as project, index (project.repo)}
+				<tr>
+					<td class="py-1">
+						<form class="relative z-10 flex" method="POST" action="?/move" use:enhance>
+							<input type="hidden" name="repo" value={project.repo}>
+							<button
+								class="grid size-6 place-items-center text-dim hover:text-fg disabled:opacity-25"
+								name="direction"
+								value="up"
+								disabled={index === 0}
+								aria-label="Move {project.name} up"><ChevronUp class="size-4" aria-hidden="true" /></button
+							>
+							<button
+								class="grid size-6 place-items-center text-dim hover:text-fg disabled:opacity-25"
+								name="direction"
+								value="down"
+								disabled={index === data.projects.length - 1}
+								aria-label="Move {project.name} down"><ChevronDown class="size-4" aria-hidden="true" /></button
+							>
+						</form>
+					</td>
+					<td class="w-full">
+						<a class="row-link" href={resolve("/admin/(app)/projects/[repo]", { repo: project.repo })}>{project.name}</a>
+					</td>
+					<td class="whitespace-nowrap text-dim">{project.category}</td>
+					<td>
+						<span class={statusClass(project.published ? "published" : "draft")}>{project.published ? "live" : "draft"}</span>
+					</td>
+					<td class="font-mono text-xs whitespace-nowrap text-dim">{project.githubRepo ?? "no repo"}</td>
+				</tr>
+			{:else}
+				<tr><td class="py-10 text-center text-dim" colspan="5">No projects yet. Add a repo above.</td></tr>
+			{/each}
+		</tbody>
+	</table>
 </div>

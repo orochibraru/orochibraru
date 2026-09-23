@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
+	import { statusClass } from "$lib/admin";
 
 	let { data } = $props();
 
@@ -14,33 +15,53 @@
 	<title>Posts | orochibraru admin</title>
 </svelte:head>
 
-<div class="mb-8 flex flex-wrap items-center gap-4">
-	<h1 class="text-3xl font-extrabold tracking-[-.03em]">Posts</h1>
-	<div class="flex gap-3 text-[.9rem]">
+<div class="mb-5 flex min-h-8 flex-wrap items-center gap-x-4 gap-y-2">
+	<h1 class="text-base font-semibold">Posts</h1>
+	<div class="flex border border-line bg-surface p-0.5 text-[.8125rem]">
 		{#each FILTERS as [status, label] (label)}
 			<a
-				class={[data.status === status ? "text-acid" : "text-dim", "hover:text-acid"]}
+				class={[
+					"px-2.5 py-0.5 transition-colors",
+					data.status === status ? "bg-fg/8 text-fg" : "text-dim hover:text-fg",
+				]}
+				aria-current={data.status === status ? "page" : undefined}
 				href={status ? `${resolve("/admin/posts")}?status=${status}` : resolve("/admin/posts")}
 				>{label}</a
 			>
 		{/each}
 	</div>
 	<form class="ml-auto" method="POST" action="?/create">
-		<button class="btn btn-primary" type="submit">New post</button>
+		<button class="abtn abtn-primary" type="submit">New post</button>
 	</form>
 </div>
 
-<div class="grid gap-px border border-line bg-line">
-	{#each data.posts as post (post.id)}
-		<a
-			class="flex items-baseline gap-4 bg-surface px-5 py-4 hover:bg-fg/4"
-			href={resolve("/admin/(app)/posts/[id]", { id: String(post.id) })}
-		>
-			<span class="w-24 shrink-0 font-mono text-[.8rem] text-dim">{post.date}</span>
-			<span class="flex-1 font-semibold">{post.title}</span>
-			<span class="chip">{post.status}</span>
-		</a>
-	{:else}
-		<p class="bg-surface px-5 py-4 text-dim">Nothing here yet.</p>
-	{/each}
+<div class="apanel overflow-x-auto">
+	<table class="atable">
+		<thead>
+			<tr>
+				<th>Title</th>
+				<th>Status</th>
+				<th>Slug</th>
+				<th class="text-right">Date</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each data.posts as post (post.id)}
+				<tr>
+					<td class="w-full">
+						<a class="row-link" href={resolve("/admin/(app)/posts/[id]", { id: String(post.id) })}>{post.title}</a>
+					</td>
+					<td><span class={statusClass(post.status)}>{post.status}</span></td>
+					<td class="font-mono text-xs text-dim">{post.slug}</td>
+					<td class="text-right font-mono text-xs whitespace-nowrap text-dim">{post.date}</td>
+				</tr>
+			{:else}
+				<tr>
+					<td class="py-10 text-center text-dim" colspan="4">
+						{data.status ? `No ${data.status} posts.` : "No posts yet. Start one with New post."}
+					</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
 </div>

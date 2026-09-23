@@ -34,30 +34,29 @@
 	<meta name="robots" content="noindex">
 </svelte:head>
 
-<main class="mx-auto max-w-page px-6">
-	<div class="max-w-xl pt-15 pb-22.5">
-		<span class="tag">Connect an app</span>
-		<h1 class="mt-6 text-[clamp(2rem,5vw,3rem)]/none font-extrabold tracking-[-.03em]">
-			Allow access?
-		</h1>
-		<p class="mt-6 text-dim">
-			<strong class="text-fg">{data.client || "An app"}</strong> wants to act as
-			<strong class="text-fg">{data.admin.email}</strong> on this site. It will be able to:
-		</p>
-		<ul class="mt-5 list-disc pl-4.5 text-dim marker:text-acid">
-			{#each data.scopes as scope (scope)}
-				<li class="mb-2">{DESCRIPTIONS[scope] ?? scope}</li>
-			{/each}
-		</ul>
-		<p class="mt-5 text-[.9rem] text-dim">You can revoke it any time under Connections.</p>
-		<div class="mt-8 flex gap-3">
-			<button class="btn btn-primary" type="button" disabled={busy} onclick={() => answer(true)}>
-				Allow
-			</button>
-			<button class="btn" type="button" disabled={busy} onclick={() => answer(false)}>Deny</button>
+<main data-admin class="grid min-h-dvh place-items-center px-4">
+	<div class="w-full max-w-md">
+		<div class="mb-6 flex items-center gap-3">
+			<span class="grid size-8 place-items-center bg-neon font-mono text-lg font-bold text-onneon" aria-hidden="true">&#3647;</span>
+			<h1 class="text-lg font-semibold">Allow {data.client || "this app"} access?</h1>
 		</div>
-		{#if failure}
-			<p class="mt-4 text-plasma" role="alert">{failure}</p>
-		{/if}
+		<div class="apanel p-5">
+			<p class="text-sm text-dim">
+				It will act as <strong class="text-fg">{data.admin.email}</strong> on this site, and be able to:
+			</p>
+			<ul class="my-4 grid gap-2 text-sm">
+				{#each data.scopes as scope (scope)}
+					<li class="status status-on normal-case">{DESCRIPTIONS[scope] ?? scope}</li>
+				{/each}
+			</ul>
+			<p class="mb-5 text-xs text-dim">Revoke it any time under Connections.</p>
+			<div class="grid grid-cols-2 gap-2">
+				<button class="abtn h-9" type="button" disabled={busy} onclick={() => answer(false)}>Deny</button>
+				<button class="abtn abtn-primary h-9" type="button" disabled={busy} onclick={() => answer(true)}>Allow</button>
+			</div>
+			{#if failure}
+				<p class="mt-4 text-sm text-plasma" role="alert">{failure}</p>
+			{/if}
+		</div>
 	</div>
 </main>

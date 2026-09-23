@@ -28,25 +28,27 @@
 	<meta name="robots" content="noindex">
 </svelte:head>
 
-<main class="mx-auto max-w-page px-6">
-	<div class="max-w-xl pt-15 pb-22.5">
-		<span class="tag">Admin</span>
-		<h1 class="mt-6 text-[clamp(2.2rem,6vw,3.4rem)]/none font-extrabold tracking-[-.03em]">
-			Sign in
-		</h1>
-		{#if data.signedInAs}
-			<p class="mt-6 text-dim">
-				Signed in as <strong class="text-fg">{data.signedInAs}</strong>, which isn&rsquo;t on the
-				admin allowlist. Sign in with another account below.
-			</p>
-		{:else}
-			<p class="mt-6 text-dim">The admin area and the MCP server use your SSO account.</p>
-		{/if}
-		<button class="btn btn-primary mt-8" type="button" disabled={busy} onclick={signIn}>
-			{busy ? "Redirecting…" : "Sign in with SSO"}
-		</button>
-		{#if failure}
-			<p class="mt-4 text-plasma" role="alert">{failure}</p>
-		{/if}
+<main data-admin class="grid min-h-dvh place-items-center px-4">
+	<div class="w-full max-w-sm">
+		<div class="mb-6 flex items-center gap-3">
+			<span class="grid size-8 place-items-center bg-neon font-mono text-lg font-bold text-onneon" aria-hidden="true">&#3647;</span>
+			<h1 class="text-lg font-semibold">Sign in to the admin</h1>
+		</div>
+		<div class="apanel p-5">
+			{#if data.signedInAs}
+				<p class="mb-5 text-sm text-dim">
+					<strong class="text-fg">{data.signedInAs}</strong> isn&rsquo;t on the admin allowlist. Sign in
+					with another account.
+				</p>
+			{:else}
+				<p class="mb-5 text-sm text-dim">The admin and the MCP server both use your SSO account.</p>
+			{/if}
+			<button class="abtn abtn-primary h-9 w-full" type="button" disabled={busy} onclick={signIn}>
+				{busy ? "Redirecting…" : "Continue with SSO"}
+			</button>
+			{#if failure}
+				<p class="mt-4 text-sm text-plasma" role="alert">{failure}</p>
+			{/if}
+		</div>
 	</div>
 </main>
