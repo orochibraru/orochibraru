@@ -2,6 +2,7 @@
 	import { Menu } from "@lucide/svelte";
 	import { onMount } from "svelte";
 	import { resolve } from "$app/paths";
+	import { page } from "$app/state";
 	import Drawer from "./Drawer.svelte";
 
 	let {
@@ -51,6 +52,9 @@
 	<a class={style} href={source ?? "https://github.com/orochibraru?tab=repositories"} target="_blank" rel="noopener"
 		>{source ? "Source" : "GitHub"}</a
 	>
+	{#if page.data.signedIn}
+		<a class={style} href={resolve("/admin")}>Admin</a>
+	{/if}
 {/snippet}
 
 <header class="mx-auto {width} px-6 {docs ? "lg:border-b lg:border-line" : ""}">

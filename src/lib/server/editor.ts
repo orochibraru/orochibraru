@@ -4,7 +4,7 @@ import { and, asc, desc, eq, isNull, like, or } from "drizzle-orm";
 import { z } from "zod";
 import { invalidate } from "./content";
 import { getDb } from "./db";
-import { image, installedRepo, post, project, syncRun } from "./db/schema";
+import { guide, image, installedRepo, post, project, syncRun } from "./db/schema";
 import { imageUrl } from "./images";
 import { ProjectFields } from "./project-pages";
 
@@ -227,6 +227,51 @@ export const recentSyncRuns = (limit = 8, repo?: string) =>
 		.orderBy(desc(syncRun.startedAt))
 		.limit(limit)
 		.all();
+
+export type DocsStatus = "valid" | "invalid" | "no config" | "no docs" | "not synced";
+
+/**
+ * What each project's last sync found in its docs/, going by what it stored: a
+ * config.json that fails the schema fails the whole sync, so that one is read
+ * off the latest finished run instead.
+ */
+export function docsStatuses(): Record<string, DocsStatus> {
+	const db = getDb();
+	const withDocs = new Set([
+		...db
+			.selectDistinct({ project: guide.project })
+			.from(guide)
+			.where(like(guide.sourcePath, "docs/%"))
+			.all()
+			.map((row) => row.project),
+		...db
+			.selectDistinct({ project: image.project })
+			.from(image)
+			.where(eq(image.source, "sync"))
+			.all()
+			.map((row) => row.project),
+	]);
+	const lastRun = new Map<string, typeof syncRun.$inferSelect>();
+	for (const run of db.select().from(syncRun).orderBy(asc(syncRun.id)).all()) {
+		if (run.status === "ok" || run.status === "failed") {
+			lastRun.set(run.repo, run);
+		}
+	}
+	const statuses: Record<string, DocsStatus> = {};
+	for (const row of listAllProjects()) {
+		const run = lastRun.get(row.repo);
+		if (run?.status === "failed" && run.error?.startsWith("docs/config.json is invalid")) {
+			statuses[row.repo] = "invalid";
+		} else if (!row.docsSyncedSha) {
+			statuses[row.repo] = "not synced";
+		} else if (row.docsConfig) {
+			statuses[row.repo] = "valid";
+		} else {
+			statuses[row.repo] = withDocs.has(row.repo) ? "no config" : "no docs";
+		}
+	}
+	return statuses;
+}
 
 // ---- images
 

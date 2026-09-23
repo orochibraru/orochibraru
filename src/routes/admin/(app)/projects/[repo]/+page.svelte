@@ -15,7 +15,12 @@
 
 	// writable deriveds: edited here, reset whenever another project loads
 	let body = $derived(data.project.body);
-	let buttons = $derived(data.project.buttons.map((button) => ({ ...button })));
+	// a $derived isn't deeply reactive: without the $state proxy, push, splice and
+	// bind:value on a row would change an array nothing is listening to
+	let buttons = $derived.by(() => {
+		const rows = $state(data.project.buttons.map((button) => ({ ...button })));
+		return rows;
+	});
 </script>
 
 <svelte:head>

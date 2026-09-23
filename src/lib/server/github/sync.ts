@@ -138,7 +138,13 @@ async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<S
 		let config: DocsConfig | null = null;
 		if (wantedDocs.config) {
 			const raw = new TextDecoder().decode(await blob(app, fullName, wantedDocs.config.sha));
-			const parsed = DocsConfig.safeParse(JSON.parse(raw));
+			let json: unknown;
+			try {
+				json = JSON.parse(raw);
+			} catch (cause) {
+				throw new GithubError(`docs/config.json is invalid: ${(cause as Error).message}`);
+			}
+			const parsed = DocsConfig.safeParse(json);
 			if (!parsed.success) {
 				throw new GithubError(`docs/config.json is invalid:\n${z.prettifyError(parsed.error)}`);
 			}

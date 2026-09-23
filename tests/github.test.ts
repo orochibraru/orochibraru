@@ -2,6 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:tes
 import { createHmac, generateKeyPairSync } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { guide, image, project, syncRun } from "../src/lib/server/db/schema";
+import { docsStatuses } from "../src/lib/server/editor";
 import { env } from "../src/lib/server/env";
 import {
 	appJwt,
@@ -162,6 +163,7 @@ describe("sync", () => {
 		const row = site.db.select().from(project).where(eq(project.repo, "tool")).get();
 		expect(row?.docsSyncedSha).toBe("c1");
 		expect(row?.docsConfig).toMatchObject({ categories: [{ title: "Start" }] });
+		expect(docsStatuses().tool).toBe("valid");
 
 		head = "c2";
 		calls.length = 0;
@@ -186,6 +188,7 @@ describe("sync", () => {
 				.map((row) => row.slug),
 		).toEqual(["readme"]);
 		expect(site.db.select().from(image).where(eq(image.project, "tool")).all()).toHaveLength(0);
+		expect(docsStatuses().tool).toBe("valid");
 	});
 
 	test("an invalid config changes nothing and says why", async () => {
@@ -201,6 +204,10 @@ describe("sync", () => {
 		).toBe("c3");
 		const run = site.db.select().from(syncRun).all().at(-1);
 		expect(run?.status).toBe("failed");
+		expect(docsStatuses().tool).toBe("invalid");
+		files["docs/config.json"] = "{ not json";
+		expect((await syncRepo("tool")).error).toContain("docs/config.json is invalid");
+		expect(docsStatuses().tool).toBe("invalid");
 		files["docs/config.json"] = JSON.stringify({
 			categories: [{ title: "Start", pages: [{ slug: "new" }] }],
 		});

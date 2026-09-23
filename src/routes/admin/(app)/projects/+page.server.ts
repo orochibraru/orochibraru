@@ -1,22 +1,27 @@
 import { fail, redirect } from "@sveltejs/kit";
 import {
 	createProject,
+	docsStatuses,
 	EditorError,
 	listAddableRepos,
 	listAllProjects,
 	reorderProjects,
 } from "$lib/server/editor";
 
-export const load = () => ({
-	projects: listAllProjects().map(({ repo, name, category, published, githubRepo }) => ({
-		repo,
-		name,
-		category,
-		published,
-		githubRepo,
-	})),
-	addable: listAddableRepos().map((repo) => repo.fullName),
-});
+export const load = () => {
+	const docs = docsStatuses();
+	return {
+		projects: listAllProjects().map(({ repo, name, category, published, githubRepo }) => ({
+			repo,
+			name,
+			category,
+			published,
+			githubRepo,
+			docs: docs[repo] ?? "not synced",
+		})),
+		addable: listAddableRepos().map((repo) => repo.fullName),
+	};
+};
 
 export const actions = {
 	move: async ({ request }) => {

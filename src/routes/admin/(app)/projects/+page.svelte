@@ -5,6 +5,14 @@
 	import { statusClass } from "$lib/admin";
 
 	let { data, form } = $props();
+
+	const DOCS = {
+		valid: ["status status-on", "docs/ · config.json"],
+		invalid: ["status status-bad", "config.json invalid"],
+		"no config": ["status", "docs/ · no config.json"],
+		"no docs": ["status", "no docs/"],
+		"not synced": ["status", "not synced"],
+	} as const;
 </script>
 
 <svelte:head>
@@ -41,6 +49,7 @@
 				<th>Name</th>
 				<th>Category</th>
 				<th>Status</th>
+				<th>Docs</th>
 				<th>Repo</th>
 			</tr>
 		</thead>
@@ -73,10 +82,13 @@
 					<td>
 						<span class={statusClass(project.published ? "published" : "draft")}>{project.published ? "live" : "draft"}</span>
 					</td>
+					<td class="whitespace-nowrap">
+						<span class="{DOCS[project.docs][0]} normal-case">{DOCS[project.docs][1]}</span>
+					</td>
 					<td class="font-mono text-xs whitespace-nowrap text-dim">{project.githubRepo ?? "no repo"}</td>
 				</tr>
 			{:else}
-				<tr><td class="py-10 text-center text-dim" colspan="5">No projects yet. Add a repo above.</td></tr>
+				<tr><td class="py-10 text-center text-dim" colspan="6">No projects yet. Add a repo above.</td></tr>
 			{/each}
 		</tbody>
 	</table>
