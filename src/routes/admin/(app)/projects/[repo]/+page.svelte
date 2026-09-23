@@ -1,5 +1,14 @@
 <script lang="ts">
-	import { ArrowLeft, Eye, PenLine, Plus, RefreshCw, X } from "@lucide/svelte";
+	import {
+		ArrowLeft,
+		ChevronDown,
+		ChevronUp,
+		Eye,
+		PenLine,
+		Plus,
+		RefreshCw,
+		X,
+	} from "@lucide/svelte";
 	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
 	import { ago, statusClass, syncScroll } from "$lib/admin";
@@ -21,6 +30,13 @@
 		const rows = $state(data.project.buttons.map((button) => ({ ...button })));
 		return rows;
 	});
+
+	function move(from: number, to: number) {
+		const [button] = buttons.splice(from, 1);
+		if (button) {
+			buttons.splice(to, 0, button);
+		}
+	}
 </script>
 
 <svelte:head>
@@ -163,7 +179,23 @@
 			</p>
 			<div class="apanel">
 				{#each buttons as button, index (index)}
-					<div class="grid items-end gap-3 border-b border-line p-3 sm:grid-cols-[1fr_1.5fr_.8fr_auto_auto]">
+					<div class="grid items-end gap-3 border-b border-line p-3 sm:grid-cols-[auto_1fr_1.5fr_.8fr_auto_auto]">
+						<div class="flex h-8 items-center">
+							<button
+								class="grid size-6 place-items-center text-dim hover:text-fg disabled:opacity-25"
+								type="button"
+								disabled={index === 0}
+								aria-label="Move {button.label || 'this button'} up"
+								onclick={() => move(index, index - 1)}><ChevronUp class="size-4" aria-hidden="true" /></button
+							>
+							<button
+								class="grid size-6 place-items-center text-dim hover:text-fg disabled:opacity-25"
+								type="button"
+								disabled={index === buttons.length - 1}
+								aria-label="Move {button.label || 'this button'} down"
+								onclick={() => move(index, index + 1)}><ChevronDown class="size-4" aria-hidden="true" /></button
+							>
+						</div>
 						<label>Label <input bind:value={button.label}></label>
 						<label>Link <input class="font-mono" bind:value={button.href}></label>
 						<label>Icon <input class="font-mono" bind:value={button.icon}></label>
