@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/orochibraru/orochibraru/compare/v1.2.1...v1.3.0) (2026-09-23)
+
+### Features
+
+- prettier admin
+  ([59a1984](https://github.com/orochibraru/orochibraru/commit/59a1984abadd62cfc11d700190a7a667b1d99587))
+
 ## [1.2.1](https://github.com/orochibraru/orochibraru/compare/v1.2.0...v1.2.1) (2026-09-21)
 
 ### Bug Fixes
