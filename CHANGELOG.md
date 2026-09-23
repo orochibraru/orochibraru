@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/orochibraru/orochibraru/compare/v1.3.0...v1.3.1) (2026-09-23)
+
+### Bug Fixes
+
+- admin ui
+  ([1c2fa20](https://github.com/orochibraru/orochibraru/commit/1c2fa20bf498d37b3bac85db3cfe89531a636c29))
+
 ## [1.3.0](https://github.com/orochibraru/orochibraru/compare/v1.2.1...v1.3.0) (2026-09-23)
 
 ### Features
