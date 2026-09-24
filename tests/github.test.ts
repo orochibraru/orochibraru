@@ -140,11 +140,15 @@ describe("sync", () => {
 				"docs/README.md",
 				"docs/deep/b.md",
 				"docs/images/x.png",
+				"docs/images/y.webp",
 				"src/y.md",
 			].map((path) => ({ path, type: "blob", sha: path })),
 		);
 		expect(picked.guides.map((entry) => entry.path)).toEqual(["README.md", "docs/a.md"]);
-		expect(picked.images.map((entry) => entry.path)).toEqual(["docs/images/x.png"]);
+		expect(picked.images.map((entry) => entry.path)).toEqual([
+			"docs/images/x.png",
+			"docs/images/y.webp",
+		]);
 	});
 
 	test("brings in guides, config and screenshots, then only what changed", async () => {
@@ -154,7 +158,7 @@ describe("sync", () => {
 			"docs/config.json": JSON.stringify({
 				categories: [{ title: "Start", pages: [{ slug: "setup" }] }],
 			}),
-			"docs/images/hero.png": await Bun.file(SAMPLE_IMAGE).bytes(),
+			"docs/images/hero.webp": await Bun.file(SAMPLE_IMAGE).bytes(),
 		};
 		const first = await syncRepo("tool");
 		expect(first).toEqual({ status: "ok", changed: 3 });
@@ -176,7 +180,7 @@ describe("sync", () => {
 	test("deletions upstream are deletions here", async () => {
 		head = "c3";
 		delete files["docs/setup.md"];
-		delete files["docs/images/hero.png"];
+		delete files["docs/images/hero.webp"];
 		const result = await syncRepo("tool");
 		expect(result.status).toBe("ok");
 		expect(
