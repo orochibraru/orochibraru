@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/orochibraru/orochibraru/compare/v1.3.1...v1.4.0) (2026-09-23)
+
+### Features
+
+- reorg buttoons
+  ([7bc4eee](https://github.com/orochibraru/orochibraru/commit/7bc4eee82d6a20fe04a5c271d79aaccd6ed611c7))
+
 ## [1.3.1](https://github.com/orochibraru/orochibraru/compare/v1.3.0...v1.3.1) (2026-09-23)
 
 ### Bug Fixes
