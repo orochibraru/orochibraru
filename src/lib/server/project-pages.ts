@@ -145,7 +145,15 @@ export async function renderProjectPage(row: ProjectRow): Promise<ProjectPage> {
 	};
 }
 
-type Image = (name: string) => { url: string; width: number; height: number } | undefined;
+type Size = { url: string; width: number; height: number };
+type Image = (name: string) => Size | undefined;
+
+/** A screenshot and its `-dark` twin, one <img> each: the site's theme toggle picks, not just the OS. */
+function themed(light: Size, dark: Size | undefined, alt: string, lazy: boolean): string {
+	const img = ({ url, width, height }: Size, theme: string) =>
+		`<img${theme} src="${url}" width="${width}" height="${height}"${lazy ? ' loading="lazy"' : ""} decoding="async" alt="${alt}">`;
+	return dark ? img(light, ' class="on-light"') + img(dark, ' class="on-dark"') : img(light, "");
+}
 
 /** One <section> per ##, plus an untitled one for anything between the lede and the first. */
 function sections(html: string, image: Image): string {
@@ -177,17 +185,10 @@ function tiles(html: string, image: Image, lazy: boolean): string {
 				/<p><img src="([\w-]+)" alt="([^"]*)" \/>\s*(?:<strong>([\s\S]*?)<\/strong>)?\s*([\s\S]*?)<\/p>/g,
 				(_m, name: string, alt: string, title = "", caption: string) => {
 					const light = image(name);
-					const dark = image(`${name}-dark`) ?? light;
-					if (!light || !dark) {
+					if (!light) {
 						return "";
 					}
-					const loading = lazy ? ' loading="lazy"' : "";
-					return (
-						`<figure class="shot"><picture>` +
-						`<source media="(prefers-color-scheme: dark)" srcset="${dark.url}">` +
-						`<img src="${light.url}" width="${light.width}" height="${light.height}"${loading} decoding="async" alt="${alt}">` +
-						`</picture><figcaption><b>${title}</b> ${caption}</figcaption></figure>`
-					);
+					return `<figure class="shot">${themed(light, image(`${name}-dark`), alt, lazy)}<figcaption><b>${title}</b> ${caption}</figcaption></figure>`;
 				},
 			)
 			// a run of tiles or screenshots becomes one grid

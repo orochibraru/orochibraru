@@ -6,7 +6,8 @@ import {
 	listProjectCards,
 	projectMarkdown,
 } from "../src/lib/server/content";
-import { post, project } from "../src/lib/server/db/schema";
+import { guide, post, project } from "../src/lib/server/db/schema";
+import { loadGuides } from "../src/lib/server/guides";
 import { storeImage } from "../src/lib/server/images";
 import { loadPosts } from "../src/lib/server/posts";
 import { freshSite, SAMPLE_IMAGE } from "./helpers";
@@ -70,8 +71,9 @@ describe("project pages", () => {
 	test("render tiles, screenshots from the image store, and the lede", async () => {
 		const page = await getProjectPage("demo");
 		expect(page?.lede).toBe("A start page for your homelab.");
+		// a `-dark` twin: one <img> per theme, so the site's toggle picks, not just the OS
 		expect(page?.html).toMatch(
-			/<figure class="shot"><picture><source [^>]*srcset="\/images\/[0-9a-f]{64}\.webp"/,
+			/<figure class="shot"><img class="on-light" src="\/images\/[0-9a-f]{64}\.webp"[^>]*><img class="on-dark" /,
 		);
 		expect(page?.html).toContain('<section id="alternatives" class="ruled">');
 		expect(page?.html).toContain('<div class="tiles"><div class="feat">');
@@ -92,6 +94,27 @@ describe("project pages", () => {
 		expect(twin).toMatch(/\]\(https:\/\/orochibraru\.com\/images\/[0-9a-f]{64}\.webp\)/);
 		expect(twin).toContain("](https://orochibraru.com/demo/docs/showcase)");
 		expect(twin).not.toContain("{#alternatives}");
+	});
+});
+
+describe("guides", () => {
+	test("a docs/images screenshot with a -dark twin follows the site's theme", async () => {
+		site.db.update(project).set({ githubRepo: "me/demo" }).where(eq(project.repo, "demo")).run();
+		site.db
+			.insert(guide)
+			.values({
+				project: "demo",
+				slug: "readme",
+				sourcePath: "README.md",
+				sha: "x",
+				markdown:
+					'# Demo\n\n<picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/dashboard-dark.png"><img alt="Dash" src="docs/images/dashboard.png"></picture>\n',
+			})
+			.run();
+		invalidate();
+		const [readme] = await loadGuides();
+		expect(readme?.html).not.toContain("<source");
+		expect(readme?.html).toMatch(/<img class="on-light" [^>]*><img class="on-dark" /);
 	});
 });
 

@@ -322,9 +322,24 @@ async function readGuides() {
 								const name = imageName(posix.join(folder, src));
 								const size = name ? imageByName(project.key, name) : undefined;
 								const sized = size ? ` width="${size.width}" height="${size.height}"` : "";
-								return `<img ${before}src="${source}"${rest}${sized} loading="lazy" decoding="async">`;
+								const img = (src: string, theme: string) =>
+									`<img ${theme}${before}src="${src}"${rest}${sized} loading="lazy" decoding="async">`;
+								// a `-dark` twin in docs/images: one <img> each, the site's theme picks
+								const dark = name ? imageByName(project.key, `${name}-dark`) : undefined;
+								return dark
+									? img(source, 'class="on-light" ') + img(dark.url, 'class="on-dark" ')
+									: img(source, "");
 							},
 						)
+						// a README's <picture> OS-only dark source: the pair above follows the toggle instead
+						.replace(/<source [^>]*>/g, (tag) => {
+							const src = tag.match(/srcset="([^"]*)"/)?.[1];
+							return tag.includes("prefers-color-scheme") &&
+								src &&
+								imageName(posix.join(folder, src))
+								? ""
+								: tag;
+						})
 						// <picture><source srcset="docs/images/hero-dark.png"> for the dark variant
 						.replace(
 							/ srcset="([^"]*)"/g,
