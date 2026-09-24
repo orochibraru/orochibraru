@@ -93,7 +93,7 @@
 		</button>
 	</div>
 	{#if form?.message}
-		<p class="mb-4 border border-plasma/40 bg-plasma/8 px-3 py-2 text-sm text-plasma" role="alert">{form.message}</p>
+		<p class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">{form.message}</p>
 	{/if}
 	<!-- a modal <dialog> already traps focus, closes on Escape and draws the backdrop -->
 	<dialog
@@ -118,7 +118,7 @@
 			bind:this={output}
 			class="h-[min(28rem,60dvh)] overflow-auto bg-bg p-4 font-mono text-xs/relaxed whitespace-pre-wrap"
 			aria-live="polite">{#each lines as line, index (index)}<span
-					class={line.includes("✗") ? "text-plasma" : line.includes("✓") ? "text-acid" : ""}
+					class={line.includes("✗") ? "text-hot" : line.includes("✓") ? "text-accent" : ""}
 					>{line}</span
 				>{"\n"}{/each}</pre>
 	</dialog>

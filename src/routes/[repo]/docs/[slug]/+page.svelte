@@ -70,7 +70,7 @@
 	<!-- the article centres in what is left of the viewport; the contents rail pins to its right edge -->
 	<div class="grid gap-x-12 gap-y-9 pt-12 pb-22.5 xl:grid-cols-[minmax(0,1fr)_15rem]">
 		<article class="docs mx-auto w-full max-w-6xl min-w-0">
-			<h1 class="mb-7 text-[clamp(2rem,5vw,3rem)]/[1.05] font-extrabold tracking-tight">
+			<h1 class="mb-7 text-[clamp(2rem,5vw,3rem)]/[1.05] stereo font-extrabold tracking-tight">
 				{data.title}
 			</h1>
 			<div class="md" {@attach copyButtons} {@attach mermaidDiagrams}>{@html data.html}</div>
@@ -79,12 +79,12 @@
 					{#if step.guide}
 						<a
 							class={[
-								"group rounded-xl border border-line bg-surface px-5 py-4 transition hover:border-edge",
+								"group glass rounded-2xl px-5 py-4 transition hover:border-edge",
 								step.label.startsWith("Next") && "sm:col-start-2 sm:text-right",
 							]}
 							href={resolve("/[repo]/docs/[slug]", { repo: project.key, slug: step.guide.slug })}
 							><span class="font-sans text-xs text-dim">{step.label}</span>
-							<h2 class="mt-1 font-bold tracking-[-.02em] transition-colors group-hover:text-acid">
+							<h2 class="mt-1 font-bold tracking-[-.02em] transition-colors group-hover:text-accent">
 								{step.guide.title}
 							</h2></a
 						>
@@ -94,7 +94,7 @@
 			<p class="mt-7 text-[12.5px] text-dim">
 				This guide lives in the project repo:
 				<a
-					class="border-b border-edge hover:border-cyan"
+					class="border-b border-edge hover:border-cool"
 					href={data.source}
 					target="_blank"
 					rel="noopener"
@@ -106,14 +106,14 @@
 			<nav
 				class="hidden text-[.85rem]/[1.5] text-fg/75 xl:sticky xl:top-9 xl:block xl:max-h-[calc(100vh-4.5rem)] xl:self-start xl:overflow-y-auto"
 			>
-				<p class="mb-3.5 text-[11px] tracking-[.18em] text-plasma uppercase">On this page</p>
+				<p class="mb-3.5 label">On this page</p>
 				<ul class="font-sans text-[.9rem]">
 					{#each data.contents as section (section.id)}
 						<li
-							class="border-l py-1.25 {section.level === 3 ? "pl-7.5" : "pl-4"} {section.id === active ? "border-acid text-acid" : "border-line"}"
+							class="border-l py-1.25 {section.level === 3 ? "pl-7.5" : "pl-4"} {section.id === active ? "border-accent text-accent" : "border-line"}"
 						>
 							<a
-								class="block hover:text-acid"
+								class="block hover:text-accent"
 								aria-current={section.id === active ? "location" : undefined}
 								href="#{section.id}"
 								>{section.heading}</a

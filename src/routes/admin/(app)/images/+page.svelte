@@ -33,7 +33,7 @@
 				file = undefined;
 			}}
 	>
-		<label class="abtn cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-acid">
+		<label class="abtn cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-accent">
 			<Upload class="size-3.5" aria-hidden="true" />
 			<span class="max-w-40 truncate">{file?.[0]?.name ?? "Choose an image"}</span>
 			<input
@@ -50,7 +50,7 @@
 	</form>
 </div>
 {#if form?.message}
-	<p class="mb-4 border border-plasma/40 bg-plasma/8 px-3 py-2 text-sm text-plasma" role="alert">{form.message}</p>
+	<p class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">{form.message}</p>
 {/if}
 
 <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

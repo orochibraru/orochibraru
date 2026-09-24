@@ -21,10 +21,10 @@
 	bind:this={dialog}
 	aria-label={label}
 	class={[
-		"drawer inset-y-0 m-0 h-dvh max-h-none w-[min(20rem,calc(100vw-3rem))] max-w-none flex-col border-line bg-surface p-0 text-fg open:flex",
+		"drawer inset-y-0 m-0 h-dvh overflow-hidden max-h-none w-[min(20rem,calc(100vw-3rem))] max-w-none flex-col border-line p-0 text-fg open:flex",
 		side === "left"
-			? "right-auto left-0 border-r [--drawer-from:-100%]"
-			: "right-0 left-auto border-l [--drawer-from:100%]",
+			? "right-auto left-0 rounded-r-3xl border-r [--drawer-from:-100%]"
+			: "right-0 left-auto rounded-l-3xl border-l [--drawer-from:100%]",
 	]}
 	onclick={(event) => {
 		if (event.target === dialog) {
@@ -33,11 +33,11 @@
 	}}
 >
 	<div class="flex h-16 shrink-0 items-center justify-between border-b border-line pr-3 pl-5">
-		<span class="text-[11px] tracking-[.18em] text-plasma uppercase">{label}</span>
+		<span class="label">{label}</span>
 		<button
 			type="button"
 			aria-label="Close {label.toLowerCase()}"
-			class="grid size-9 place-items-center border border-edge transition hover:border-acid hover:text-acid"
+			class="grid size-9 place-items-center rounded-full border border-edge transition hover:border-accent hover:text-accent"
 			onclick={() => dialog?.close()}
 		>
 			<X class="size-4" aria-hidden="true" />

@@ -44,11 +44,11 @@
 			>{data.posts.length}
 			post{data.posts.length === 1 ? "" : "s"}
 			&middot;
-			<a class="hover:text-acid" href={resolve("/feed.xml")} data-sveltekit-reload>RSS</a></span
+			<a class="hover:text-accent" href={resolve("/feed.xml")} data-sveltekit-reload>RSS</a></span
 		>
-		<h1 class="mt-6.5 text-[clamp(2.6rem,9vw,6.2rem)]/[.92] font-extrabold tracking-[-.03em]">
+		<h1 class="mt-6.5 text-[clamp(2.6rem,7.5vw,5.6rem)]/[.92] animate-rise stereo font-extrabold tracking-[-.045em]">
 			Things that<br>
-			<span class="bg-linear-to-r from-acid via-cyan to-plasma bg-clip-text text-transparent"
+			<span class="grad"
 				>annoyed me.</span
 			>
 		</h1>
@@ -58,22 +58,18 @@
 		</p>
 	</div>
 	<section class="mb-22.5">
-		<div class="grid gap-px border border-line bg-line sm:grid-cols-2">
+		<div class="grid gap-4 sm:grid-cols-2">
 			{#each data.posts as post (post.slug)}
 				<a class="card" href={resolve("/blog/[slug]", { slug: post.slug })}>
-					<span class="text-[11px] tracking-[.18em] text-plasma uppercase"
+					<span class="label"
 						><time datetime={post.date}>{readable(post.date)}</time></span
 					>
-					<h2 class="mt-2.5 mb-2 text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
+					<h2 class="mt-2.5 mb-2 pr-10 font-sans text-[1.35rem] font-bold tracking-[-.02em] transition-colors">
 						{post.title}
 					</h2>
 					<p class="text-[.92rem] text-dim">{post.description}</p>
 				</a>
 			{/each}
-			<!-- an odd count would leave the grid's line-coloured background showing -->
-			{#if data.posts.length % 2}
-				<div class="hidden bg-surface sm:block"></div>
-			{/if}
 		</div>
 	</section>
 </main>

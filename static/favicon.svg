@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+	<title>orochibraru</title>
+	<rect width="32" height="32" rx="9" fill="#0b0709" />
+	<defs>
+		<linearGradient id="ring" x1="4" y1="28" x2="28" y2="4" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#ff5a78" />
+			<stop offset="1" stop-color="#e9c27b" />
+		</linearGradient>
+		<mask id="eye">
+			<rect width="32" height="32" fill="#fff" />
+			<circle cx="26.46" cy="11.83" r="0.9" fill="#000" />
+		</mask>
+	</defs>
+	<path d="M22.16 8.12A10 10 0 0 0 13.41 6.34" stroke="url(#ring)" stroke-width="2.2" stroke-linecap="round" />
+	<path d="M13.41 6.34A10 10 0 1 0 25.78 13.92" stroke="url(#ring)" stroke-width="4.5" stroke-linecap="round" />
+	<circle cx="25.57" cy="12.94" r="3.4" fill="#e9c27b" mask="url(#eye)" />
+</svg>

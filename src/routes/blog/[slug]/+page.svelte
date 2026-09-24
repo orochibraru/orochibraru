@@ -44,15 +44,15 @@
 <main class="mx-auto max-w-page px-6">
 	<article>
 		<div class="pt-10 pb-8">
-			<a class="text-xs tracking-widest text-dim uppercase hover:text-acid" href={resolve("/blog")}
+			<a class="text-sm font-medium text-dim hover:text-accent" href={resolve("/blog")}
 				>&larr; All posts</a
 			>
 			<h1
-				class="mt-4.5 max-w-[24ch] text-[clamp(2.2rem,6vw,3.8rem)]/[1.05] font-extrabold tracking-tight"
+				class="mt-4.5 max-w-[24ch] text-[clamp(2.2rem,5vw,3.2rem)]/[1.05] animate-rise stereo font-extrabold tracking-[-.035em]"
 			>
 				{post.title}
 			</h1>
-			<p class="mt-5 text-xs tracking-widest text-dim uppercase">
+			<p class="mt-5 text-sm font-medium text-dim">
 				<time datetime={post.date}>{readable(post.date)}</time>
 			</p>
 		</div>

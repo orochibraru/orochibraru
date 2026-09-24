@@ -4,6 +4,7 @@
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
 	import Drawer from "./Drawer.svelte";
+	import Logo from "./Logo.svelte";
 
 	let {
 		width,
@@ -57,23 +58,37 @@
 	{/if}
 {/snippet}
 
-<header class="mx-auto {width} px-6 {docs ? "lg:border-b lg:border-line" : ""}">
+<!-- off the docs it floats: a glass pill pinned to the top while the page scrolls under it -->
+<header
+	class={[
+		"z-40 mx-auto px-6",
+		width,
+		docs ? "lg:border-b lg:border-line" : "sticky top-3 mt-3 mb-4",
+	]}
+>
 	<nav
-		class="flex flex-wrap items-center justify-between gap-4 py-7 {docs ? "lg:h-22 lg:py-0" : ""}"
+		class={[
+			"flex flex-wrap items-center justify-between gap-4",
+			docs ? "py-7 lg:h-22 lg:py-0" : "glass rounded-full py-2 pr-2 pl-5 backdrop-blur-xl",
+		]}
 	>
 		<!-- docs pages carry the logo in their sidebar from lg up -->
-		<a class="font-mono text-[17px] font-bold tracking-[-.02em] {docs ? "lg:hidden" : ""}" href={resolve("/")}
-			>orochi<span class="text-acid">braru</span></a
+		<a
+			class="group flex items-center gap-2.5 font-display text-[17px] font-semibold tracking-[-.02em] {docs ? "lg:hidden" : ""}"
+			href={resolve("/")}
+			><Logo class="size-7 transition-transform duration-700 ease-out-expo group-hover:-rotate-360" /><span
+				>orochi<span class="text-accent">braru</span></span
+			></a
 		>
 		<div class="ml-auto flex items-center gap-3 text-[15px] font-medium whitespace-nowrap text-fg/80 md:gap-6">
 			<!-- below md the links move into the menu drawer -->
 			<div class="hidden items-center gap-6 md:flex">
-				{@render links("hover:text-acid")}
+				{@render links("relative transition-colors hover:text-accent after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100")}
 			</div>
 			<button
 				type="button"
 				aria-label="Search the site"
-				class="flex h-9 items-center gap-2 border border-edge px-3 transition hover:border-acid hover:text-acid"
+				class="flex h-9 items-center gap-2 rounded-full border border-edge px-3.5 transition hover:border-accent hover:text-accent"
 				onclick={onsearch}
 			>
 				<svg
@@ -88,13 +103,13 @@
 					<path d="m20 20-3.5-3.5" />
 				</svg>
 				<span class="hidden md:inline">Search</span>
-				<kbd class="hidden font-mono text-xs font-normal text-dim md:inline">&#8984;K</kbd>
+				<kbd class="kbd hidden md:inline-grid">&#8984;K</kbd>
 			</button>
 			<button
 				type="button"
 				aria-label="Theme: {mode}. Switch to {next}."
 				title="Theme: {mode}"
-				class="grid size-9 place-items-center border border-edge transition hover:border-acid hover:text-acid"
+				class="grid size-9 place-items-center rounded-full border border-edge transition duration-500 hover:rotate-45 hover:border-accent hover:text-accent"
 				onclick={cycleTheme}
 			>
 				<svg
@@ -138,7 +153,7 @@
 			<button
 				type="button"
 				aria-label="Open the site menu"
-				class="grid size-9 place-items-center border border-edge transition hover:border-acid hover:text-acid md:hidden"
+				class="grid size-9 place-items-center rounded-full border border-edge transition hover:border-accent hover:text-accent md:hidden"
 				onclick={() => menu?.open()}
 			>
 				<Menu class="size-4" aria-hidden="true" />
@@ -149,6 +164,6 @@
 
 <Drawer bind:this={menu} label="Menu" side="right">
 	<nav class="flex flex-col p-3 text-base font-medium">
-		{@render links("px-3 py-3 text-fg/80 transition-colors hover:bg-fg/4 hover:text-acid")}
+		{@render links("rounded-2xl px-3 py-3 text-fg/80 transition-colors hover:bg-fg/4 hover:text-accent")}
 	</nav>
 </Drawer>

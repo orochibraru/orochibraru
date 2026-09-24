@@ -40,9 +40,12 @@
 
 {#if showLoadingBar}
 	<div
-		class="fixed top-0 z-50 h-0.5 w-full bg-white transition-all will-change-transform"
+		class="fixed top-0 z-50 h-0.5 w-full"
 		transition:fade
 	>
-		<div class="bg-primary h-full" style="width: {progress.current * 100}%"></div>
+		<div
+			class="h-full rounded-full bg-linear-to-r from-accent via-cool to-hot shadow-[0_0_12px_var(--color-cool)]"
+			style="width: {progress.current * 100}%"
+		></div>
 	</div>
 {/if}

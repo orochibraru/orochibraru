@@ -34,7 +34,7 @@
 <main class="mx-auto max-w-page px-6">
 	<article class="prose">
 		<div class="pt-10 pb-5">
-			<a class="text-xs uppercase tracking-widest text-dim hover:text-acid" href={resolve("/")}
+			<a class="text-sm font-medium text-dim hover:text-accent" href={resolve("/")}
 				>&larr; Home</a
 			>
 			<span class="tag ml-3.5">Self-taught &middot; 10 years</span>
@@ -44,12 +44,12 @@
 					width="112"
 					height="112"
 					alt="orochibraru&rsquo;s avatar"
-					class="size-28 shrink-0 border border-line object-cover"
+					class="size-28 shrink-0 rounded-4xl border border-line object-cover shadow-[0_0_40px_-8px_var(--color-accent)]"
 					loading="eager"
 				>
-				<h1 class="text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.03em]">
+				<h1 class="text-[clamp(2.4rem,6.5vw,4rem)]/none animate-rise stereo font-extrabold tracking-[-.045em]">
 					Who&rsquo;s writing<br>
-					<span class="bg-linear-to-r from-acid via-cyan to-plasma bg-clip-text text-transparent"
+					<span class="grad"
 						>all this.</span
 					>
 				</h1>
@@ -191,7 +191,7 @@
 				it to people. Eighteen months later there&rsquo;s a funding round, and the feature you
 				actually used has quietly moved one tier up. A year after that the tier is called Enterprise
 				and the price is
-				<b class="font-normal text-acid">&ldquo;Contact sales&rdquo;</b>, which isn&rsquo;t a price,
+				<b class="font-normal text-accent">&ldquo;Contact sales&rdquo;</b>, which isn&rsquo;t a price,
 				it&rsquo;s a process for working out how much you can be made to pay.
 			</p>
 			<p class="mt-5">
@@ -211,7 +211,7 @@
 				flow.
 			</p>
 			<p class="mt-5">
-				So: <b class="font-normal text-acid">no pricing page.</b> Not now, not at v2, not if one of
+				So: <b class="font-normal text-accent">no pricing page.</b> Not now, not at v2, not if one of
 				these somehow takes off. There are no tiers, which means there is nothing to move behind
 				one. No seats to count. No telemetry to phone home. Run it on the box in your closet and
 				never speak to me. And if I get bored, or hit by a bus, the licence means you don&rsquo;t

@@ -14,7 +14,7 @@
 	<h1 class="text-base font-semibold">Overview</h1>
 	<p class="text-sm text-dim">
 		{data.projects.filter((project) => project.published).length} of {data.projects.length} projects live,
-		{data.uploads} loose image{data.uploads === 1 ? "" : "s"}{#if failed}, <span class="text-plasma"
+		{data.uploads} loose image{data.uploads === 1 ? "" : "s"}{#if failed}, <span class="text-hot"
 				>{failed} failed sync{failed === 1 ? "" : "s"}</span
 			>{/if}
 	</p>
@@ -64,7 +64,7 @@
 				{:else}
 					<tr>
 						<td class="py-6 text-center text-dim">
-							No projects yet. <a class="text-cyan" href={resolve("/admin/projects")}>Add one from GitHub</a>.
+							No projects yet. <a class="text-cool" href={resolve("/admin/projects")}>Add one from GitHub</a>.
 						</td>
 					</tr>
 				{/each}
@@ -86,7 +86,7 @@
 						<td class="font-mono text-xs text-dim">{run.sha?.slice(0, 7) ?? ""}</td>
 						<td class="w-full text-dim">
 							{#if run.error}
-								<span class="text-plasma">{run.error}</span>
+								<span class="text-hot">{run.error}</span>
 							{:else}
 								{run.changed} file{run.changed === 1 ? "" : "s"} changed
 							{/if}

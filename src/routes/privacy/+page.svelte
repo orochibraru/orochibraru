@@ -16,11 +16,11 @@
 <main class="mx-auto max-w-page px-6">
 	<article class="prose">
 		<div class="pt-10 pb-5">
-			<a class="text-xs uppercase tracking-widest text-dim hover:text-acid" href={resolve("/")}
+			<a class="text-sm font-medium text-dim hover:text-accent" href={resolve("/")}
 				>&larr; Home</a
 			>
 			<span class="tag ml-3.5">Updated {UPDATED}</span>
-			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.03em]">
+			<h1 class="mt-4.5 text-[clamp(2.4rem,6.5vw,4rem)]/none animate-rise stereo font-extrabold tracking-[-.045em]">
 				Privacy.
 			</h1>
 			<p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">
@@ -34,14 +34,14 @@
 			<p>
 				The data controller for orochibraru.com, under the EU General Data Protection Regulation
 				(GDPR), is orochibraru, a private individual running a non-commercial site. For anything
-				about your data, email <a class="text-acid" href="mailto:{EMAIL}">{EMAIL}</a>.
+				about your data, email <a class="text-accent" href="mailto:{EMAIL}">{EMAIL}</a>.
 			</p>
 		</section>
 
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Visit statistics</h2>
 			<p>
-				This site uses <a class="text-acid" href="https://umami.is" target="_blank" rel="noopener"
+				This site uses <a class="text-accent" href="https://umami.is" target="_blank" rel="noopener"
 					>Umami</a
 				>, open-source analytics, self-hosted at <code>anal.orochibraru.com</code>. On each page view
 				it records:
@@ -111,7 +111,7 @@
 				<li>object to it being processed at all</li>
 			</ul>
 			<p class="mt-5">
-				Email <a class="text-acid" href="mailto:{EMAIL}">{EMAIL}</a> and you&rsquo;ll get an answer within
+				Email <a class="text-accent" href="mailto:{EMAIL}">{EMAIL}</a> and you&rsquo;ll get an answer within
 				a month. Because nothing here is tied to a name, I may need details such as your IP address and
 				the approximate time of your visit to find your data.
 			</p>
@@ -122,7 +122,7 @@
 			<p class="mt-5">
 				If you think your data is being mishandled, you can complain to the French data protection
 				authority, the
-				<a class="text-acid" href="https://www.cnil.fr/en/complaints" target="_blank" rel="noopener"
+				<a class="text-accent" href="https://www.cnil.fr/en/complaints" target="_blank" rel="noopener"
 					>CNIL</a
 				>, or to the authority in your own EU country.
 			</p>

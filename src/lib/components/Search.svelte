@@ -104,7 +104,7 @@
 <dialog
 	bind:this={dialog}
 	aria-label="Search"
-	class="m-0 mx-auto mt-[12vh] w-[min(38rem,calc(100vw-2rem))] border border-edge bg-surface p-0 text-fg backdrop:bg-black/50"
+	class="pop glass m-0 backdrop-blur-2xl mx-auto mt-[12vh] w-[min(38rem,calc(100vw-2rem))] overflow-hidden rounded-3xl p-0 text-fg"
 	onkeydown={onDialogKeydown}
 	onclick={(event) => event.target === dialog && dialog.close()}
 >
@@ -128,14 +128,17 @@
 			placeholder="Search the guides"
 			class="w-full bg-transparent py-1 text-[.95rem] outline-none placeholder:text-dim"
 		>
-		<kbd class="hidden text-[11px] text-edge sm:block">esc</kbd>
+		<kbd class="kbd hidden px-1.5 sm:inline-grid">esc</kbd>
 	</div>
-	<ul class="max-h-[52vh] divide-y divide-line overflow-y-auto">
+	<ul class="max-h-[52vh] overflow-y-auto p-2">
 		{#each results as entry, position (entry.u)}
 			<li>
-				<a class={["block px-4 py-3", position === active && "bg-fg/5 text-acid"]} href={entry.u}>
+				<a
+					class={["block rounded-2xl px-4 py-3 transition-colors", position === active && "bg-fg/6 text-accent"]}
+					href={entry.u}
+				>
 					<span class="block text-[.95rem] font-bold tracking-[-.01em]">{entry.t}</span>
-					<span class="mt-0.5 block text-[11px] tracking-[.14em] text-plasma uppercase"
+					<span class="mt-0.5 block label"
 						>{entry.g || entry.p}</span
 					>
 					{#if entry.x}

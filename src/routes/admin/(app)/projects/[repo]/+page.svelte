@@ -82,19 +82,19 @@
 		<label class="ml-auto flex cursor-pointer items-center gap-2 text-[.8125rem]">
 			<input class="peer sr-only" type="checkbox" name="published" checked={data.project.published}>
 			<span
-				class="relative h-4 w-7 border border-edge bg-surface transition-colors peer-checked:border-neon peer-checked:bg-neon peer-focus-visible:outline-2 peer-focus-visible:outline-acid after:absolute after:top-0.5 after:left-0.5 after:size-2.5 after:bg-dim after:transition-transform after:content-[''] peer-checked:after:translate-x-3 peer-checked:after:bg-onneon"
+				class="relative h-4 w-7 border border-edge bg-surface transition-colors peer-checked:border-spark peer-checked:bg-spark peer-focus-visible:outline-2 peer-focus-visible:outline-accent after:absolute after:top-0.5 after:left-0.5 after:size-2.5 after:bg-dim after:transition-transform after:content-[''] peer-checked:after:translate-x-3 peer-checked:after:bg-onspark"
 				aria-hidden="true"
 			></span>
 			Live
 		</label>
 		<button class="abtn abtn-primary" type="submit" disabled={saving}>
-			{saving ? "Saving…" : "Save"}<span class="kbd border-onneon/30 text-onneon/70">⌘S</span>
+			{saving ? "Saving…" : "Save"}<span class="kbd border-onspark/30 text-onspark/70">⌘S</span>
 		</button>
 	</div>
 
 	<div>
 		{#if form?.message}
-			<pre class="mb-6 border border-plasma/40 bg-plasma/8 px-3 py-2 text-sm whitespace-pre-wrap text-plasma" role="alert">{form.message}</pre>
+			<pre class="mb-6 border border-hot/40 bg-hot/8 px-3 py-2 text-sm whitespace-pre-wrap text-hot" role="alert">{form.message}</pre>
 		{:else if form && "synced" in form}
 			<p class="mb-6 border border-line bg-surface px-3 py-2 text-sm" role="status">
 				<span class="status status-on">Synced</span>, {form.synced} file{form.synced === 1 ? "" : "s"} changed.
@@ -175,7 +175,7 @@
 			<p class="text-[.8125rem] text-dim">
 				The links under the project's title. Icon is <code class="text-fg">github</code>,
 				<code class="text-fg">docker</code>, or any
-				<a class="text-cyan hover:underline" href="https://lucide.dev/icons" target="_blank" rel="noopener">Lucide</a> name.
+				<a class="text-cool hover:underline" href="https://lucide.dev/icons" target="_blank" rel="noopener">Lucide</a> name.
 			</p>
 			<div class="apanel">
 				{#each buttons as button, index (index)}
@@ -200,10 +200,10 @@
 						<label>Link <input class="font-mono" bind:value={button.href}></label>
 						<label>Icon <input class="font-mono" bind:value={button.icon}></label>
 						<label class="h-8 flex-row! items-center gap-2! text-fg!">
-							<input type="checkbox" class="accent-neon" bind:checked={button.primary}> Primary
+							<input type="checkbox" class="accent-spark" bind:checked={button.primary}> Primary
 						</label>
 						<button
-							class="grid size-8 place-items-center text-dim hover:text-plasma"
+							class="grid size-8 place-items-center text-dim hover:text-hot"
 							type="button"
 							aria-label="Remove {button.label || 'this button'}"
 							onclick={() => buttons.splice(index, 1)}><X class="size-4" aria-hidden="true" /></button
@@ -242,7 +242,7 @@
 									<td class="font-mono text-xs text-dim">{run.sha?.slice(0, 7) ?? ""}</td>
 									<td class="w-full text-dim">
 										{#if run.error}
-											<span class="text-plasma">{run.error}</span>
+											<span class="text-hot">{run.error}</span>
 										{:else}
 											{run.changed} file{run.changed === 1 ? "" : "s"} changed
 										{/if}

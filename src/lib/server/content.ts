@@ -1,10 +1,10 @@
 // What the public routes read, and nothing else: routes never touch Drizzle
 // directly. Rendering (Shiki above all) is cached in memory until a save or a
 // sync calls invalidate().
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, count, eq } from "drizzle-orm";
 import { SITE } from "$lib/seo";
 import { getDb } from "./db";
-import { project } from "./db/schema";
+import { guide, project } from "./db/schema";
 import { invalidateGuides } from "./guides";
 import { imageByName } from "./images";
 import { invalidatePosts } from "./posts";
@@ -16,6 +16,11 @@ export type ProjectCard = {
 	category: string;
 	blurb: string;
 	chips: string[];
+	tag: string;
+	/** Published guides: 0 means the project has no docs here. */
+	guides: number;
+	/** The page's hero screenshot, when it has one: dark falls back to light. */
+	shot?: { light: string; dark: string; width: number; height: number; alt: string };
 };
 
 const published = () =>
@@ -27,14 +32,39 @@ const published = () =>
 		.all();
 
 /** The home page's cards, in the order the admin set. */
-export const listProjectCards = (): ProjectCard[] =>
-	published().map(({ repo, name, category, blurb, chips }) => ({
-		repo,
-		name,
-		category,
-		blurb,
-		chips,
-	}));
+export function listProjectCards(): ProjectCard[] {
+	const guides = new Map(
+		getDb()
+			.select({ project: guide.project, total: count() })
+			.from(guide)
+			.groupBy(guide.project)
+			.all()
+			.map((row) => [row.project, row.total]),
+	);
+	return published().map(({ repo, name, category, blurb, chips, tag, image }) => {
+		const light = image ? imageByName(repo, image.src) : undefined;
+		const dark = image ? (imageByName(repo, `${image.src}-dark`) ?? light) : undefined;
+		return {
+			repo,
+			name,
+			category,
+			blurb,
+			chips,
+			tag,
+			guides: guides.get(repo) ?? 0,
+			shot:
+				image && light && dark
+					? {
+							light: light.url,
+							dark: dark.url,
+							width: light.width,
+							height: light.height,
+							alt: image.alt,
+						}
+					: undefined,
+		};
+	});
+}
 
 /** Published project pages, for the sitemap, search and the llms files. */
 export const listProjectPages = () =>

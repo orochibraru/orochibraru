@@ -5,6 +5,7 @@
 	import { page } from "$app/state";
 	import Footer from "$lib/components/Footer.svelte";
 	import Header from "$lib/components/Header.svelte";
+	import Particles from "$lib/components/Particles.svelte";
 	import Search from "$lib/components/Search.svelte";
 	import TopLoadingBar from "$lib/components/top-loading-bar.svelte";
 
@@ -19,6 +20,17 @@
 	const source = $derived(
 		typeof page.data.source === "string" ? (page.data.source as string) : undefined,
 	);
+
+	// feeds the card spotlight in app.css: one listener for every card on every page
+	function spotlight(event: PointerEvent) {
+		const card = (event.target as Element | null)?.closest?.<HTMLElement>(".card");
+		if (!card) {
+			return;
+		}
+		const box = card.getBoundingClientRect();
+		card.style.setProperty("--x", `${event.clientX - box.left}px`);
+		card.style.setProperty("--y", `${event.clientY - box.top}px`);
+	}
 
 	onNavigate((navigation) => {
 		if (!browser) {
@@ -38,11 +50,17 @@
 	});
 </script>
 
+<svelte:window onpointermove={spotlight} />
+
 <TopLoadingBar />
 {#if admin}
   <!-- the admin brings its own chrome and its own ⌘K -->
   {@render children()}
 {:else}
+  <!-- guides are for reading: nothing moves behind them -->
+  {#if !docs}
+    <Particles />
+  {/if}
   <!-- docs render a fixed lg:w-72 sidebar, so everything else shifts right of it -->
   <div class={docs ? "lg:pl-72" : undefined}>
     <Header {width} {source} {docs} onsearch={() => search?.open()} />

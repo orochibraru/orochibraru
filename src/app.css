@@ -9,25 +9,34 @@
    --------------------------------------------------------------- */
 @theme {
 	--font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+	--font-display: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
 	--font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-	--container-page: 96rem; /* the one page-width knob: max-w-page */
+	--container-page: 120rem; /* the one page-width knob: max-w-page */
 
-	--color-bg: #fbfbfd;
+	/* Bordeaux, in stereo: a crimson channel on the left, a champagne-gold one on
+	   the right, bordeaux as the accent between them. Text colours all clear 4.5:1. */
+	--color-bg: #f8f6f7;
 	--color-surface: #ffffff;
-	--color-line: #e6e8ee;
-	--color-edge: #cbd1db;
-	--color-fg: #0a0c10;
-	--color-dim: #525a69;
-	--color-acid: #3f7400; /* accent for text/borders: contrast-safe */
-	--color-neon: #a8f000; /* raw lime, only ever used as a fill */
-	--color-onneon: #0a0c10;
-	--color-plasma: #b3006e;
-	--color-cyan: #0a6f8a; /* darkened from #0b7f9e: that was 4.24:1 on --color-bg */
+	--color-line: #ebe4e7;
+	--color-edge: #d3c6cc;
+	--color-fg: #140a0e;
+	--color-dim: #5e5058;
+	--color-accent: #7a1333; /* bordeaux, text-safe */
+	--color-spark: #7a1333; /* bordeaux as a fill, under light text */
+	--color-onspark: #fff3f6;
+	--color-hot: #c2183f; /* left channel: crimson */
+	--color-cool: #7d5a0b; /* right channel: gold, also links and code */
 
-	--glow-1: rgba(168, 240, 0, 0.32);
-	--glow-2: rgba(255, 46, 168, 0.18);
+	--glow-1: rgba(194, 24, 63, 0.14);
+	--glow-2: rgba(214, 160, 60, 0.2);
+	--glow-3: rgba(122, 19, 51, 0.12);
 	--grid-op: 0.9;
+	--glass: rgba(255, 255, 255, 0.78);
+	--glass-rim: rgba(255, 255, 255, 0.9);
+
+	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+	--ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
 
 	--animate-marquee: marquee 32s linear infinite;
 	@keyframes marquee {
@@ -35,45 +44,91 @@
 			transform: translateX(-50%);
 		}
 	}
+	/* hero lines arrive out of focus and settle: the one page-load moment */
+	--animate-rise: rise 0.9s var(--ease-out-expo) both;
+	@keyframes rise {
+		from {
+			opacity: 0;
+			filter: blur(12px);
+			transform: translateY(0.35em) scale(0.98);
+		}
+	}
+	--animate-shimmer: shimmer 8s linear infinite;
+	@keyframes shimmer {
+		to {
+			background-position: 200% 50%;
+		}
+	}
+	--animate-aurora: aurora 28s ease-in-out infinite alternate;
+	@keyframes aurora {
+		50% {
+			transform: translate3d(-6%, 4%, 0) rotate(8deg) scale(1.1);
+		}
+		to {
+			transform: translate3d(5%, -3%, 0) rotate(-6deg) scale(1.05);
+		}
+	}
 }
 
 /* dark tokens, once for the OS preference and once for the explicit override */
 @media (prefers-color-scheme: dark) {
 	:root:not([data-theme="light"]) {
-		--color-bg: #060709;
-		--color-surface: #0b0d11;
-		--color-line: #1c2029;
-		--color-edge: #2b323f;
-		--color-fg: #e6e9ef;
-		--color-dim: #838c9d;
-		--color-acid: #b4ff2e;
-		--color-neon: #b4ff2e;
-		--color-onneon: #060709;
-		--color-plasma: #ff2ea8;
-		--color-cyan: #2ee6ff;
-		--glow-1: rgba(180, 255, 46, 0.1);
-		--glow-2: rgba(255, 46, 168, 0.09);
-		--grid-op: 0.55;
+		--color-bg: #0b0709;
+		--color-surface: #150d11;
+		--color-line: #26171e;
+		--color-edge: #3b2530;
+		--color-fg: #f3ecef;
+		--color-dim: #9a8a93;
+		--color-accent: #f07a95;
+		--color-spark: #9c1d45;
+		--color-onspark: #fff3f6;
+		--color-hot: #ff5a78;
+		--color-cool: #e9c27b;
+		--glow-1: rgba(255, 90, 120, 0.12);
+		--glow-2: rgba(233, 194, 123, 0.1);
+		--glow-3: rgba(156, 29, 69, 0.28);
+		--grid-op: 0.5;
+		--glass: rgba(20, 12, 16, 0.78);
+		--glass-rim: rgba(255, 255, 255, 0.07);
 	}
 }
 :root[data-theme="dark"] {
-	--color-bg: #060709;
-	--color-surface: #0b0d11;
-	--color-line: #1c2029;
-	--color-edge: #2b323f;
-	--color-fg: #e6e9ef;
-	--color-dim: #838c9d;
-	--color-acid: #b4ff2e;
-	--color-neon: #b4ff2e;
-	--color-onneon: #060709;
-	--color-plasma: #ff2ea8;
-	--color-cyan: #2ee6ff;
-	--glow-1: rgba(180, 255, 46, 0.1);
-	--glow-2: rgba(255, 46, 168, 0.09);
-	--grid-op: 0.55;
+	--color-bg: #0b0709;
+	--color-surface: #150d11;
+	--color-line: #26171e;
+	--color-edge: #3b2530;
+	--color-fg: #f3ecef;
+	--color-dim: #9a8a93;
+	--color-accent: #f07a95;
+	--color-spark: #9c1d45;
+	--color-onspark: #fff3f6;
+	--color-hot: #ff5a78;
+	--color-cool: #e9c27b;
+	--glow-1: rgba(255, 90, 120, 0.12);
+	--glow-2: rgba(233, 194, 123, 0.1);
+	--glow-3: rgba(156, 29, 69, 0.28);
+	--grid-op: 0.5;
+	--glass: rgba(20, 12, 16, 0.78);
+	--glass-rim: rgba(255, 255, 255, 0.07);
+}
+
+/* Tinted panel with a lit top rim. No backdrop blur: the particles repaint every
+   frame, and each blurred panel over them would have to be re-blurred with it.
+   The few overlays that float (header, search, drawers) add frost themselves. */
+@utility glass {
+	background: var(--glass);
+	box-shadow:
+		inset 0 1px 0 var(--glass-rim),
+		0 20px 50px -30px rgb(0 0 0 / 0.5);
+	@apply border border-line;
 }
 
 @layer base {
+	/* clip, not hidden: cards slide out sideways, and hidden would break the sticky header */
+	html,
+	body {
+		overflow-x: clip;
+	}
 	html {
 		scroll-behavior: smooth;
 		color-scheme: light dark;
@@ -83,7 +138,7 @@
 		overflow: hidden;
 	}
 	body {
-		@apply bg-bg text-fg font-sans text-base/[1.65] antialiased overflow-x-hidden;
+		@apply bg-bg text-fg font-sans text-base/[1.65] antialiased;
 	}
 	/* decorative backdrop: grid + glow. No utility does masked repeating grids. */
 	body::before {
@@ -92,21 +147,21 @@
 		inset: 0;
 		z-index: -2;
 		opacity: var(--grid-op);
-		background-image:
-			linear-gradient(var(--color-line) 1px, transparent 1px),
-			linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
-		background-size: 64px 64px;
+		background-image: radial-gradient(var(--color-edge) 1px, transparent 1.5px);
+		background-size: 28px 28px;
 		mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, #000 0%, transparent 75%);
 	}
 	body::after {
 		content: "";
 		position: fixed;
-		inset: 0;
+		inset: -20%;
 		z-index: -1;
 		pointer-events: none;
 		background:
-			radial-gradient(60rem 30rem at 15% -10%, var(--glow-1), transparent 60%),
-			radial-gradient(50rem 30rem at 90% 5%, var(--glow-2), transparent 60%);
+			radial-gradient(50rem 28rem at 25% 12%, var(--glow-1), transparent 60%),
+			radial-gradient(45rem 30rem at 80% 18%, var(--glow-2), transparent 60%),
+			radial-gradient(40rem 26rem at 55% 40%, var(--glow-3), transparent 65%);
+		@apply animate-aurora motion-reduce:animate-none;
 	}
 	/* the admin is a tool, used on a big screen: larger type, no backdrop */
 	html:has([data-admin]) {
@@ -120,13 +175,22 @@
 		color: inherit;
 		text-decoration: none;
 	}
-	/* Sans is the reading face; mono stays as the accent for eyebrow labels, which are
-     always uppercase. :where keeps it overridable by a font-* utility. */
-	:where(.uppercase) {
-		font-family: var(--font-mono);
+	/* mono is for code only: headings are Geist, heavy and tight */
+	h1,
+	h2 {
+		font-family: var(--font-display);
+		font-weight: 700;
+		letter-spacing: -0.035em;
+	}
+	/* anchor jumps clear the floating header */
+	[id] {
+		scroll-margin-top: 6rem;
+	}
+	::selection {
+		@apply bg-spark text-onspark;
 	}
 	:focus-visible {
-		@apply outline-2 outline-offset-[3px] outline-acid;
+		@apply rounded-sm outline-2 outline-offset-[3px] outline-accent;
 	}
 
 	button,
@@ -138,21 +202,51 @@
 @layer components {
 	/* the five atoms that repeat on every page */
 	.btn {
-		@apply inline-flex items-center gap-2.25 border border-edge font-mono px-5.5 py-3 text-[13px] uppercase tracking-[.04em] transition duration-150 hover:border-acid hover:text-acid;
+		@apply relative inline-flex items-center gap-2.25 overflow-hidden rounded-full border border-edge bg-surface/40 px-6 py-3 text-sm font-medium transition duration-300 ease-out-expo hover:-translate-y-0.5 hover:border-accent hover:text-accent active:translate-y-0 active:scale-[.98];
 	}
 	.btn-primary {
-		@apply border-neon bg-neon font-bold text-onneon hover:border-neon hover:bg-neon hover:text-onneon hover:brightness-110;
+		@apply border-spark bg-spark font-semibold text-onspark hover:border-spark hover:text-onspark;
+		box-shadow: 0 0 0 0 var(--color-spark);
+	}
+	.btn-primary:hover {
+		box-shadow: 0 10px 40px -8px var(--color-spark);
+	}
+	/* a sheen sweeps across the primary button on hover */
+	.btn-primary::after {
+		content: "";
+		@apply pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out-expo;
+	}
+	.btn-primary:hover::after {
+		@apply translate-x-full;
 	}
 	.tag {
-		@apply inline-flex items-center gap-2 rounded-full border border-edge font-mono px-3 py-1.25 text-[11px] uppercase tracking-[.18em] text-dim;
+		@apply glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[13px] font-medium text-dim;
 	}
 	.tag::before {
 		content: "";
-		@apply size-1.5 rounded-full bg-neon;
-		box-shadow: 0 0 10px var(--color-neon);
+		@apply size-1.5 animate-pulse rounded-full bg-hot motion-reduce:animate-none;
+		box-shadow:
+			-2px 0 8px var(--color-hot),
+			2px 0 8px var(--color-cool);
 	}
 	.chip {
-		@apply rounded-[3px] border border-edge font-mono px-2.25 py-0.75 text-[10.5px] uppercase tracking-[.08em] text-dim;
+		@apply rounded-full border border-edge bg-bg/40 px-2.5 py-0.5 text-xs text-dim;
+	}
+	/* a small coloured label over a title: category, date, section */
+	.label {
+		@apply text-[13px] font-medium text-hot;
+	}
+	/* the flowing accent gradient, used on one line of each hero */
+	.grad {
+		background-image: linear-gradient(
+			90deg,
+			var(--color-hot),
+			var(--color-accent),
+			var(--color-cool),
+			var(--color-accent),
+			var(--color-hot)
+		);
+		@apply animate-shimmer bg-size-[200%_100%] bg-clip-text text-transparent motion-reduce:animate-none;
 	}
 	/* admin: a dense tool, not a page. Forms stack labels over fields. */
 	.admin-form label {
@@ -160,32 +254,32 @@
 	}
 	.admin-form :is(input:not([type="checkbox"]), textarea, select),
 	.field {
-		@apply w-full border border-line bg-surface px-2.5 py-1.5 text-sm text-fg transition-colors hover:border-edge focus:border-acid focus:outline-none;
+		@apply w-full rounded-lg border border-line bg-surface px-2.5 py-1.5 text-sm text-fg transition-colors hover:border-edge focus:border-accent focus:outline-none;
 	}
 	.abtn {
-		@apply inline-flex h-8 items-center justify-center gap-2 border border-edge bg-surface px-3 text-[13px] font-medium whitespace-nowrap transition-colors hover:border-fg/40 disabled:opacity-40;
+		@apply inline-flex h-8 items-center justify-center gap-2 rounded-lg border border-edge bg-surface px-3 text-[13px] font-medium whitespace-nowrap transition-colors hover:border-fg/40 disabled:opacity-40;
 	}
 	.abtn-primary {
-		@apply border-neon bg-neon text-onneon hover:border-neon hover:brightness-110;
+		@apply border-spark bg-spark text-onspark hover:border-spark hover:brightness-110;
 	}
 	.abtn-danger {
-		@apply hover:border-plasma hover:text-plasma;
+		@apply hover:border-hot hover:text-hot;
 	}
 	.kbd {
-		@apply inline-grid h-4.5 min-w-4.5 place-items-center border border-edge px-1 font-mono text-[.625rem] text-dim;
+		@apply inline-grid h-4.5 min-w-4.5 place-items-center rounded border border-edge px-1 font-mono text-[.625rem] text-dim;
 	}
 	/* the status of anything: a dot, then the word */
 	.status {
 		@apply inline-flex items-center gap-1.5 text-[13px] text-dim capitalize before:size-1.75 before:rounded-full before:border before:border-edge before:content-[''];
 	}
 	.status-on {
-		@apply text-fg before:border-neon before:bg-neon;
+		@apply text-fg before:border-spark before:bg-spark;
 	}
 	.status-bad {
-		@apply text-plasma before:border-plasma before:bg-plasma;
+		@apply text-hot before:border-hot before:bg-hot;
 	}
 	.status-busy {
-		@apply before:animate-pulse before:border-cyan before:bg-cyan;
+		@apply before:animate-pulse before:border-cool before:bg-cool;
 	}
 	.atable {
 		@apply w-full border-collapse text-sm;
@@ -204,30 +298,67 @@
 		@apply font-medium after:absolute after:inset-0 after:content-[''];
 	}
 	.apanel {
-		@apply border border-line bg-surface;
+		@apply overflow-hidden rounded-xl border border-line bg-surface;
 	}
 	.apanel > header {
 		@apply flex h-10 items-center gap-3 border-b border-line px-3 text-[13px] font-medium;
 	}
+	/* a card lights up under the cursor: --x/--y come from the layout's pointer handler */
 	.card {
-		@apply relative block bg-surface px-7 pt-7.5 pb-6.5 transition-colors hover:bg-fg/4;
+		@apply glass relative block isolate overflow-hidden rounded-3xl px-7 pt-7.5 pb-6.5 transition duration-500 ease-out-expo hover:-translate-y-1 hover:border-edge;
+	}
+	.card::before {
+		content: "";
+		@apply pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500;
+		/* two lights a little apart, one per channel */
+		background:
+			radial-gradient(
+				24rem circle at calc(var(--x, 50%) - 28px) var(--y, 0%),
+				var(--glow-1),
+				transparent 45%
+			),
+			radial-gradient(
+				24rem circle at calc(var(--x, 50%) + 28px) var(--y, 0%),
+				var(--glow-2),
+				transparent 45%
+			);
+	}
+	.card:hover::before {
+		@apply opacity-100;
 	}
 	.card::after {
-		content: "→";
-		@apply absolute top-6.5 right-6.5 text-edge transition;
+		content: "";
+		@apply absolute top-6.5 right-6.5 size-8 rounded-full border border-line bg-no-repeat bg-center bg-size-[14px] transition duration-500 ease-out-expo;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M7 17 17 7M8 7h9v9'/%3E%3C/svg%3E");
 	}
 	.card:hover::after {
-		@apply text-acid translate-x-1;
+		@apply rotate-45 border-spark bg-spark;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff3f6' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M7 17 17 7M8 7h9v9'/%3E%3C/svg%3E");
+	}
+	/* cards drift in as they scroll into view, where the browser can tie it to scroll */
+	@supports (animation-timeline: view()) {
+		@media (prefers-reduced-motion: no-preference) {
+			.card,
+			.feat,
+			.shot {
+				animation: reveal linear both;
+				animation-timeline: view();
+				animation-range: entry 0% entry 80%;
+			}
+		}
 	}
 	.feat {
-		@apply bg-surface px-6.5 py-6;
+		@apply glass rounded-2xl px-6.5 py-6;
 	}
 	.feat h3 {
-		@apply mb-1.5 text-base font-bold tracking-[-.01em];
+		@apply mb-1.5 flex items-center gap-2.5 text-base font-semibold tracking-[-.01em];
 	}
 	.feat h3::before {
-		content: "// ";
-		@apply text-acid;
+		content: "";
+		@apply size-2 shrink-0 rounded-full bg-linear-to-br from-hot to-cool;
+		box-shadow:
+			-3px 0 10px var(--color-hot),
+			3px 0 10px var(--color-cool);
 	}
 
 	/* body copy inside project pages: classing every <p> and <li> buys nothing */
@@ -238,20 +369,20 @@
 		@apply max-w-[80ch] list-disc pl-4.5 text-dim;
 	}
 	.prose li {
-		@apply mb-2 marker:text-acid;
+		@apply mb-2 marker:text-accent;
 	}
 	.prose strong,
 	.prose b {
 		@apply text-fg;
 	}
 	.prose a:not(.btn):not(.chip) {
-		@apply text-cyan border-b border-edge hover:border-cyan;
+		@apply text-cool border-b border-edge hover:border-cool;
 	}
 	.prose code {
-		@apply text-cyan;
+		@apply text-cool;
 	}
 	.prose pre {
-		@apply overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
+		@apply overflow-x-auto rounded-2xl border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
 	}
 	/* the hand-drawn blocks (svelte-smol's tree) dim comments this way */
 	.prose pre .c {
@@ -267,7 +398,7 @@
 		@apply m-0 max-w-none text-[.9rem];
 	}
 	.md h2 {
-		@apply mt-12 mb-4 text-2xl font-bold tracking-[-.02em] text-fg;
+		@apply mt-12 font-display mb-4 text-2xl font-bold tracking-[-.02em] text-fg;
 	}
 	.md h3 {
 		@apply mt-8 mb-3 text-lg font-bold tracking-[-.01em] text-fg;
@@ -279,28 +410,28 @@
 		@apply mb-5 max-w-[80ch] list-decimal pl-4.5 text-dim;
 	}
 	.md li {
-		@apply mb-2 marker:text-acid;
+		@apply mb-2 marker:text-accent;
 	}
 	.md blockquote {
-		@apply mb-5 max-w-[80ch] border-l-2 border-acid pl-5 text-dim italic;
+		@apply mb-5 max-w-[80ch] rounded-r-2xl border-l-2 border-accent bg-accent/5 py-3 pr-4 pl-5 text-dim italic;
 	}
 	.md blockquote p {
 		@apply mb-0;
 	}
 	.md a {
-		@apply border-b border-edge text-cyan hover:border-cyan;
+		@apply border-b border-edge text-cool hover:border-cool;
 	}
 	.md strong {
 		@apply font-semibold text-fg;
 	}
 	.md code {
-		@apply text-[.9em] text-cyan;
+		@apply text-[.9em] text-cool;
 	}
 	.md-table code {
 		@apply whitespace-nowrap;
 	}
 	.md pre {
-		@apply mb-5 overflow-x-auto border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
+		@apply mb-5 overflow-x-auto rounded-2xl border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
 	}
 	.md pre code {
 		@apply text-[1em] text-fg;
@@ -321,13 +452,13 @@
 	}
 	.md .copy,
 	.project .copy {
-		@apply absolute top-3 right-3 border border-line bg-bg px-2 py-0.5 font-mono text-[11px] text-dim transition-colors hover:border-edge hover:text-fg;
+		@apply absolute top-3 right-3 rounded-full border border-line bg-bg px-2.5 py-0.5 font-mono text-[11px] text-dim transition-colors hover:border-edge hover:text-fg;
 	}
 	.md hr {
 		@apply my-10 border-line;
 	}
 	.md img {
-		@apply my-6 border border-line;
+		@apply my-6 rounded-2xl border border-line;
 	}
 
 	/* guides: tables, deeper headings and the odd nested list the blog never had */
@@ -335,7 +466,7 @@
 		@apply mt-6 mb-2 text-[.95rem] font-bold tracking-[-.01em] text-fg;
 	}
 	.md-table {
-		@apply mb-5 overflow-x-auto border border-line bg-surface;
+		@apply mb-5 overflow-x-auto rounded-2xl border border-line bg-surface;
 	}
 	.md-table table {
 		@apply w-full border-collapse text-[.85rem]/[1.55] whitespace-nowrap;
@@ -359,10 +490,10 @@
 
 	/* showcase screenshots: <picture> picks one file per figure, light or dark */
 	.shot {
-		@apply m-0 bg-surface p-5;
+		@apply glass m-0 rounded-3xl p-5;
 	}
 	.shot img {
-		@apply block w-full border border-line;
+		@apply block w-full rounded-xl border border-line;
 	}
 	.shot figcaption {
 		@apply mt-4 text-[.9rem]/[1.6] text-dim;
@@ -424,7 +555,7 @@
 		@apply mt-0;
 	}
 	.tiles {
-		@apply grid gap-px border border-line bg-line;
+		@apply grid gap-4;
 	}
 	.tiles:has(> :nth-child(2)) {
 		@apply sm:grid-cols-2;
@@ -436,11 +567,11 @@
 		@apply mb-22.5;
 	}
 	.project section > h2 {
-		@apply mb-5 text-2xl font-bold tracking-[-.02em];
+		@apply mb-5 text-2xl tracking-[-.02em];
 	}
 	/* the small label over a code block: "Docker Compose" */
 	.project section > h3 {
-		@apply mb-3 font-mono text-xs tracking-widest text-dim uppercase;
+		@apply mb-3 text-sm font-medium text-dim;
 	}
 	/* a section of tiles gets a rule running out from its heading */
 	.project section.ruled > h2 {
@@ -450,8 +581,8 @@
 		content: "";
 		@apply h-px flex-1 bg-line;
 	}
-	.card:hover h3 {
-		@apply text-acid;
+	.card:hover :is(h3, h4) {
+		@apply text-accent;
 	}
 }
 
@@ -473,6 +604,8 @@
    opening slide somewhere to start from. */
 .drawer {
 	translate: var(--drawer-from) 0;
+	background: var(--glass);
+	backdrop-filter: blur(24px) saturate(1.5);
 	transition:
 		translate 0.3s cubic-bezier(0.32, 0.72, 0, 1),
 		display 0.3s allow-discrete,
@@ -490,6 +623,7 @@
 }
 .drawer[open]::backdrop {
 	background: rgb(0 0 0 / 0.5);
+	backdrop-filter: blur(4px);
 }
 @starting-style {
 	.drawer[open] {
@@ -503,5 +637,240 @@
 	.drawer,
 	.drawer::backdrop {
 		transition: none;
+	}
+}
+
+/* dialogs (search) scale up out of the page and back into it */
+.pop {
+	opacity: 0;
+	scale: 0.96;
+	transition:
+		opacity 0.25s,
+		scale 0.35s var(--ease-out-expo),
+		display 0.35s allow-discrete,
+		overlay 0.35s allow-discrete;
+}
+.pop[open] {
+	opacity: 1;
+	scale: 1;
+}
+.pop::backdrop {
+	background: rgb(0 0 0 / 0);
+	transition:
+		background-color 0.3s,
+		display 0.3s allow-discrete,
+		overlay 0.3s allow-discrete;
+}
+.pop[open]::backdrop {
+	background: rgb(0 0 0 / 0.45);
+	backdrop-filter: blur(6px);
+}
+@starting-style {
+	.pop[open] {
+		opacity: 0;
+		scale: 0.96;
+	}
+	.pop[open]::backdrop {
+		background: rgb(0 0 0 / 0);
+	}
+}
+
+/* page changes cross-fade with a slight lift; the header stays put */
+::view-transition-old(root) {
+	animation: 0.2s ease-in both fade-out;
+}
+::view-transition-new(root) {
+	animation: 0.5s var(--ease-out-expo) both page-in;
+}
+@keyframes page-in {
+	from {
+		opacity: 0;
+		transform: translateY(12px);
+	}
+}
+@keyframes fade-out {
+	to {
+		opacity: 0;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.pop,
+	.pop::backdrop {
+		transition: none;
+	}
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation: none;
+	}
+}
+
+/* a screenshot pair: one <img> per theme, the page's theme picks */
+.on-dark {
+	display: none;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) .on-light {
+		display: none;
+	}
+	:root:not([data-theme="light"]) .on-dark {
+		display: block;
+	}
+}
+:root[data-theme="dark"] .on-light {
+	display: none;
+}
+:root[data-theme="dark"] .on-dark {
+	display: block;
+}
+
+/* Scroll-driven motion, where the browser ties animations to scroll. Elsewhere
+   everything simply sits still in its final place. */
+@supports (animation-timeline: scroll()) {
+	@media (prefers-reduced-motion: no-preference) {
+		/* the hero sinks at a fraction of the scroll speed and blurs out: parallax */
+		.hero-exit {
+			animation: hero-exit linear both;
+			animation-timeline: scroll(root);
+			animation-range: 0 75svh;
+		}
+		/* flagships glide in from their side, hold, and get flung back out that way
+		   as they leave the top of the screen */
+		.slide {
+			animation: slide linear both;
+			animation-timeline: view();
+			animation-range: cover 0% cover 100%;
+		}
+		/* screenshots lie back in 3D and stand up as they scroll into view */
+		.tilt {
+			transform-origin: 50% 100%;
+			animation: tilt linear both;
+			animation-timeline: view();
+			animation-range: entry 0% cover 45%;
+		}
+	}
+}
+/* Scroll-linked keyframes move only transform and opacity, so the compositor runs
+   them off the main thread; the easing lives on the keyframes because the timeline
+   itself is linear scroll distance. */
+@keyframes reveal {
+	from {
+		opacity: 0;
+		transform: translateY(48px) scale(0.97);
+		animation-timing-function: var(--ease-apple);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+@keyframes hero-exit {
+	from {
+		animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(18%) scale(0.94);
+	}
+}
+@keyframes tilt {
+	from {
+		opacity: 0.4;
+		transform: perspective(1600px) rotateX(16deg) scale(0.94);
+		animation-timing-function: var(--ease-apple);
+	}
+	to {
+		opacity: 1;
+		transform: perspective(1600px) rotateX(0) scale(1);
+	}
+}
+/* in from a little off its side, hold, then drawn away to that side as it leaves */
+@keyframes slide {
+	0% {
+		opacity: 0;
+		transform: translateX(calc(var(--from) * 0.3)) scale(0.94);
+		animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+	}
+	28%,
+	62% {
+		opacity: 1;
+		transform: none;
+		animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+	}
+	100% {
+		opacity: 0;
+		transform: translateX(var(--from)) scale(0.9);
+	}
+}
+
+/* Anaglyph headline: a crimson ghost left, a gold ghost right. On load the two
+   channels start far apart and converge, like glasses coming into focus.
+   Gradient lines skip it: a text-shadow would paint over their clipped fill. */
+.stereo {
+	text-shadow:
+		-0.03em 0 color-mix(in oklab, var(--color-hot) 55%, transparent),
+		0.03em 0 color-mix(in oklab, var(--color-cool) 55%, transparent);
+	animation: converge 1.4s var(--ease-out-expo) both;
+}
+.stereo .grad {
+	text-shadow: none;
+}
+@keyframes converge {
+	from {
+		text-shadow:
+			-0.25em 0 transparent,
+			0.25em 0 transparent;
+	}
+}
+
+/* A section's own backdrop, bled to the full viewport width behind it and faded
+   out at the top and bottom so neighbours blend. Variants set --zone. */
+.zone {
+	position: relative;
+	isolation: isolate;
+}
+.zone::before {
+	content: "";
+	position: absolute;
+	inset: -7rem calc(50% - 50vw);
+	z-index: -1;
+	pointer-events: none;
+	background: var(--zone);
+	mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+}
+/* the two channels, one per side: crimson left, gold right */
+.zone-split {
+	--zone:
+		radial-gradient(45% 55% at 0% 45%, var(--glow-1), transparent 70%),
+		radial-gradient(45% 55% at 100% 60%, var(--glow-2), transparent 70%);
+}
+/* scanlines over a violet core */
+.zone-scan {
+	--zone:
+		repeating-linear-gradient(
+			0deg,
+			color-mix(in oklab, var(--color-fg) 4%, transparent) 0 1px,
+			transparent 1px 6px
+		),
+		radial-gradient(60% 70% at 50% 50%, var(--glow-3), transparent 75%);
+}
+/* a floor grid running to a horizon */
+.zone-grid {
+	--zone:
+		linear-gradient(color-mix(in oklab, var(--color-cool) 14%, transparent) 1px, transparent 1px) 0
+		0 / 56px 56px,
+		linear-gradient(
+			90deg,
+			color-mix(in oklab, var(--color-cool) 14%, transparent) 1px,
+			transparent 1px
+		)
+		0 0 / 56px 56px;
+}
+.zone-grid::before {
+	transform: perspective(700px) rotateX(55deg) scale(1.6);
+	transform-origin: 50% 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+	.stereo {
+		animation: none;
 	}
 }

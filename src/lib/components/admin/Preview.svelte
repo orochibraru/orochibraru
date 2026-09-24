@@ -22,7 +22,7 @@
 </script>
 
 {#if "error" in rendered}
-	<p class="text-plasma" role="alert">{rendered.error}</p>
+	<p class="text-hot" role="alert">{rendered.error}</p>
 {:else if kind === "post"}
 	<div class="md" {@attach copyButtons} {@attach mermaidDiagrams}>{@html rendered.html}</div>
 {:else}

@@ -5,6 +5,7 @@
 	import { page } from "$app/state";
 	import { authClient } from "$lib/auth-client";
 	import Palette, { type Command } from "$lib/components/admin/Palette.svelte";
+	import Logo from "$lib/components/Logo.svelte";
 
 	let { data, children } = $props();
 
@@ -79,9 +80,9 @@
 		class="sticky top-0 z-20 flex h-11 shrink-0 items-center gap-2 border-b border-line bg-bg/85 pr-2 pl-3 backdrop-blur"
 	>
 		<a
-			class="grid size-6 shrink-0 place-items-center bg-neon font-mono text-[.9375rem] font-bold text-onneon"
+			class="grid size-6 shrink-0 place-items-center rounded-md bg-spark text-onspark"
 			href={resolve("/admin")}
-			aria-label="Overview">&#3647;</a
+			aria-label="Overview"><Logo mono class="size-4" /></a
 		>
 		<nav class="-mb-px flex h-full min-w-0 overflow-x-auto" aria-label="Admin">
 			{#each NAV as [href, label] (href)}
@@ -90,7 +91,7 @@
 					class={[
 						"flex h-full items-center px-2.5 text-[.8125rem] whitespace-nowrap transition-colors",
 						current(href)
-							? "text-fg shadow-[inset_0_-2px_0_var(--color-neon)]"
+							? "text-fg shadow-[inset_0_-2px_0_var(--color-spark)]"
 							: "text-dim hover:text-fg",
 					]}
 					aria-current={current(href) ? "page" : undefined}>{label}</a
@@ -117,7 +118,7 @@
 		</a>
 		<button
 			type="button"
-			class="grid size-7 shrink-0 place-items-center text-dim transition-colors hover:text-plasma"
+			class="grid size-7 shrink-0 place-items-center text-dim transition-colors hover:text-hot"
 			title="Sign out {data.admin.email}"
 			aria-label="Sign out {data.admin.email}"
 			onclick={signOut}

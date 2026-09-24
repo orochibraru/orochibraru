@@ -22,12 +22,12 @@
 	<article class="prose project" {@attach copyButtons} {@attach mermaidDiagrams}>
 		<div class="pt-10 pb-5">
 			<a
-				class="text-xs uppercase tracking-widest text-dim hover:text-acid"
+				class="text-sm font-medium text-dim hover:text-accent"
 				href={resolve("/#projects")}
 				>&larr; All projects</a
 			>
 			<span class="tag ml-3.5">{data.tag}</span>
-			<h1 class="mt-4.5 text-[clamp(2.4rem,8vw,4.6rem)]/none font-extrabold tracking-[-.03em]">
+			<h1 class="mt-4.5 text-[clamp(2.4rem,6.5vw,4rem)]/none animate-rise stereo font-extrabold tracking-[-.045em]">
 				{data.name}
 			</h1>
 			<p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">{@html data.lede}</p>

@@ -59,6 +59,14 @@ describe("project pages", () => {
 		expect(listProjectCards().map((card) => card.repo)).toEqual(["demo", "other"]);
 	});
 
+	test("cards carry their screenshot and guide count", () => {
+		const [demo, other] = listProjectCards();
+		expect(demo?.shot?.light).toMatch(/^\/images\/[0-9a-f]{64}\.webp$/);
+		expect(demo?.shot?.alt).toBe("The dashboard");
+		expect(other?.shot).toBeUndefined();
+		expect(demo?.guides).toBe(0);
+	});
+
 	test("render tiles, screenshots from the image store, and the lede", async () => {
 		const page = await getProjectPage("demo");
 		expect(page?.lede).toBe("A start page for your homelab.");

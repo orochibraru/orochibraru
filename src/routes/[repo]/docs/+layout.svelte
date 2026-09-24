@@ -3,6 +3,7 @@
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
 	import Drawer from "$lib/components/Drawer.svelte";
+	import Logo from "$lib/components/Logo.svelte";
 	import LucideIcon from "$lib/components/LucideIcon.svelte";
 
 	let { data, children } = $props();
@@ -43,14 +44,14 @@
 {#snippet link(item: typeof overview)}
 	<a
 		class={[
-			"flex items-center gap-2.5 rounded-md px-2.5 py-1.5 font-medium transition-colors",
-			item.active ? "bg-acid/10 text-fg" : "text-fg/80 hover:bg-fg/4 hover:text-fg",
+			"flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 font-medium transition-colors",
+			item.active ? "bg-accent/10 text-fg" : "text-fg/80 hover:bg-fg/4 hover:text-fg",
 		]}
 		aria-current={item.active ? "page" : undefined}
 		href={item.href}
 		><LucideIcon
 			node={item.icon}
-			class={["size-4 shrink-0", item.active ? "text-acid" : "opacity-75"]}
+			class={["size-4 shrink-0", item.active ? "text-accent" : "opacity-75"]}
 			aria-hidden="true"
 		/>
 		{item.title}</a
@@ -61,7 +62,7 @@
 	{@render link(overview)}
 	{#each sections as section, index (index)}
 		{#if section.title}
-			<h2 class="mt-5 mb-1 px-2.5 text-[10px] tracking-[.18em] text-dim uppercase">
+			<h2 class="mt-5 mb-1 px-2.5 font-sans text-xs font-medium text-dim">
 				{section.title}
 			</h2>
 		{/if}
@@ -74,15 +75,15 @@
 {#snippet navigation()}
 	<div class="px-3.5 pt-5 pb-2">
 		<a
-			class="group flex items-center justify-between rounded-lg border border-line bg-bg px-3 py-2.5 transition hover:border-edge"
+			class="group flex items-center justify-between rounded-2xl border border-line bg-bg px-3 py-2.5 transition hover:border-edge"
 			href={resolve(`/${project.key}`)}
 		>
 			<span>
-				<span class="block text-[10px] tracking-[.18em] text-plasma uppercase">Documentation</span>
+				<span class="block label">Documentation</span>
 				<span class="mt-0.5 block font-bold tracking-[-.02em]">{project.name}</span>
 			</span>
 			<ArrowUpRight
-				class="size-4 text-dim transition group-hover:text-acid"
+				class="size-4 text-dim transition group-hover:text-accent"
 				aria-label="Project page"
 			/>
 		</a>
@@ -104,7 +105,7 @@
 		</svg>
 		{project.name} on GitHub
 		<ArrowUpRight
-			class="ml-auto size-4 text-dim transition group-hover:text-acid"
+			class="ml-auto size-4 text-dim transition group-hover:text-accent"
 			aria-hidden="true"
 		/>
 	</a>
@@ -115,9 +116,9 @@
 >
 	<!-- same height as the docs header, so the two bottom borders meet -->
 	<a
-		class="flex h-22 shrink-0 items-center border-b border-line px-6 font-mono text-[17px] font-bold tracking-[-.02em]"
+		class="flex h-22 shrink-0 items-center gap-2.5 border-b border-line px-6 font-display text-[17px] font-semibold tracking-[-.02em]"
 		href={resolve("/")}
-		>orochi<span class="text-acid">braru</span></a
+		><Logo class="size-7" /><span>orochi<span class="text-accent">braru</span></span></a
 	>
 	{@render navigation()}
 </aside>

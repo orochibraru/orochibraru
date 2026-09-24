@@ -43,7 +43,7 @@
 			{#each ["draft", "published"] as const as option (option)}
 				<label
 					class={[
-						"cursor-pointer px-2.5 py-0.5 capitalize transition-colors has-focus-visible:outline-2 has-focus-visible:outline-acid",
+						"cursor-pointer px-2.5 py-0.5 capitalize transition-colors has-focus-visible:outline-2 has-focus-visible:outline-accent",
 						status === option ? "bg-fg/8 text-fg" : "text-dim hover:text-fg",
 					]}
 				>
@@ -60,13 +60,13 @@
 			{/if}
 		</button>
 		<button class="abtn abtn-primary" type="submit" disabled={saving}>
-			{saving ? "Saving…" : "Save"}<span class="kbd border-onneon/30 text-onneon/70">⌘S</span>
+			{saving ? "Saving…" : "Save"}<span class="kbd border-onspark/30 text-onspark/70">⌘S</span>
 		</button>
 	</div>
 
 	<div>
 		{#if form?.message}
-			<p class="mb-6 border border-plasma/40 bg-plasma/8 px-3 py-2 text-sm text-plasma" role="alert">{form.message}</p>
+			<p class="mb-6 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">{form.message}</p>
 		{/if}
 
 		<input
@@ -81,22 +81,22 @@
 		<dl class="mt-5 mb-8 grid max-w-5xl grid-cols-[7rem_1fr] items-center gap-x-3 gap-y-1 border-y border-line py-3 text-sm">
 			<dt class="text-dim"><label for="slug">Slug</label></dt>
 			<dd class="flex items-center gap-2">
-				<input id="slug" class="field border-transparent bg-transparent hover:border-line focus:border-acid font-mono text-[.8125rem]" name="slug" value={data.post.slug} pattern={"[a-z0-9]+(-[a-z0-9]+)*"}>
+				<input id="slug" class="field border-transparent bg-transparent hover:border-line focus:border-accent font-mono text-[.8125rem]" name="slug" value={data.post.slug} pattern={"[a-z0-9]+(-[a-z0-9]+)*"}>
 				{#if data.post.status === "published"}
 					<a
-						class="shrink-0 text-xs text-cyan hover:underline"
+						class="shrink-0 text-xs text-cool hover:underline"
 						href={resolve("/blog/[slug]", { slug: data.post.slug })}
 						target="_blank">Open</a
 					>
 				{/if}
 			</dd>
 			<dt class="text-dim"><label for="date">Date</label></dt>
-			<dd><input id="date" class="field w-auto border-transparent bg-transparent hover:border-line focus:border-acid" name="date" type="date" value={data.post.date}></dd>
+			<dd><input id="date" class="field w-auto border-transparent bg-transparent hover:border-line focus:border-accent" name="date" type="date" value={data.post.date}></dd>
 			<dt class="self-start pt-1.5 text-dim"><label for="description">Description</label></dt>
 			<dd>
 				<textarea
 					id="description"
-					class="field field-sizing-content resize-none border-transparent bg-transparent hover:border-line focus:border-acid"
+					class="field field-sizing-content resize-none border-transparent bg-transparent hover:border-line focus:border-accent"
 					name="description"
 					rows="1"
 					placeholder="One or two sentences for the blog index and link previews">{data.post.description}</textarea

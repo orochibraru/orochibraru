@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { authClient } from "$lib/auth-client";
+	import Logo from "$lib/components/Logo.svelte";
 
 	let { data } = $props();
 	let busy = $state(false);
@@ -37,7 +38,7 @@
 <main data-admin class="grid min-h-dvh place-items-center px-4">
 	<div class="w-full max-w-md">
 		<div class="mb-6 flex items-center gap-3">
-			<span class="grid size-8 place-items-center bg-neon font-mono text-lg font-bold text-onneon" aria-hidden="true">&#3647;</span>
+			<span class="grid size-8 place-items-center rounded-lg bg-spark text-onspark" aria-hidden="true"><Logo mono class="size-5" /></span>
 			<h1 class="text-lg font-semibold">Allow {data.client || "this app"} access?</h1>
 		</div>
 		<div class="apanel p-5">
@@ -55,7 +56,7 @@
 				<button class="abtn abtn-primary h-9" type="button" disabled={busy} onclick={() => answer(true)}>Allow</button>
 			</div>
 			{#if failure}
-				<p class="mt-4 text-sm text-plasma" role="alert">{failure}</p>
+				<p class="mt-4 text-sm text-hot" role="alert">{failure}</p>
 			{/if}
 		</div>
 	</div>

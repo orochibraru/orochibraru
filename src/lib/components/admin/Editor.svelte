@@ -147,13 +147,13 @@
 		--crepe-color-on-surface: var(--color-fg);
 		--crepe-color-on-surface-variant: var(--color-dim);
 		--crepe-color-outline: var(--color-edge);
-		--crepe-color-primary: var(--color-acid);
+		--crepe-color-primary: var(--color-accent);
 		--crepe-color-secondary: var(--color-line);
 		--crepe-color-on-secondary: var(--color-fg);
 		--crepe-color-inverse: var(--color-fg);
 		--crepe-color-on-inverse: var(--color-bg);
-		--crepe-color-inline-code: var(--color-cyan);
-		--crepe-color-error: var(--color-plasma);
+		--crepe-color-inline-code: var(--color-cool);
+		--crepe-color-error: var(--color-hot);
 		--crepe-color-hover: var(--color-line);
 		--crepe-color-selected: var(--color-edge);
 		--crepe-color-inline-area: var(--color-line);
@@ -217,21 +217,21 @@
 		margin-top: 0;
 	}
 	.editor :global(.milkdown .ProseMirror code) {
-		color: var(--color-cyan);
+		color: var(--color-cool);
 		background: none;
 		padding: 0;
 		font-size: 0.9em;
 		display: inline;
 	}
 	.editor :global(.milkdown .ProseMirror a) {
-		color: var(--color-cyan);
+		color: var(--color-cool);
 		text-decoration: none;
 		border-bottom: 1px solid var(--color-edge);
 	}
 	.editor :global(.milkdown .ProseMirror blockquote) {
 		padding-left: 1.25rem;
 		font-style: italic;
-		border-left: 2px solid var(--color-acid);
+		border-left: 2px solid var(--color-accent);
 	}
 	.editor :global(.milkdown .ProseMirror blockquote::before) {
 		display: none;
@@ -240,7 +240,7 @@
 		border: 1px solid var(--color-line);
 	}
 
-	/* lists: the acid disc and the tight rhythm of .md li */
+	/* lists: the accent disc and the tight rhythm of .md li */
 	.editor :global(.milkdown .milkdown-list-item-block li) {
 		gap: 0.625rem;
 	}
@@ -249,10 +249,10 @@
 		width: 0.5rem;
 		height: 1.65rem;
 		padding: 0;
-		color: var(--color-acid);
+		color: var(--color-accent);
 	}
 	.editor :global(.milkdown .milkdown-list-item-block li .label-wrapper svg) {
-		fill: var(--color-acid);
+		fill: var(--color-accent);
 	}
 	.editor :global(.milkdown .ProseMirror :is(ul, ol) p) {
 		margin: 0;
@@ -439,7 +439,7 @@
 	}
 	.project-look :global(.milkdown .ProseMirror > .tile-head::before) {
 		content: "// ";
-		color: var(--color-acid);
+		color: var(--color-accent);
 	}
 	.project-look :global(.milkdown .ProseMirror > p.tile-body) {
 		margin-top: 0;

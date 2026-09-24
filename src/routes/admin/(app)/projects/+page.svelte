@@ -38,7 +38,7 @@
 	{/if}
 </div>
 {#if form?.message}
-	<p class="mb-4 border border-plasma/40 bg-plasma/8 px-3 py-2 text-sm text-plasma" role="alert">{form.message}</p>
+	<p class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">{form.message}</p>
 {/if}
 
 <div class="apanel overflow-x-auto">

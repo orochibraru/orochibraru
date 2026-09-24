@@ -32,7 +32,15 @@ const ALIASES: Record<string, string> = {
 	yml: "yaml",
 };
 
-const highlighter = createHighlighter({ themes: ["github-light", "github-dark"], langs: LANGS });
+// Vite re-runs this module on every hot reload in dev: parking the highlighter on
+// globalThis keeps it one per process instead of one per edit. A LANGS change needs
+// a dev server restart to take effect.
+const shared = globalThis as { shikiHighlighter?: ReturnType<typeof createHighlighter> };
+shared.shikiHighlighter ??= createHighlighter({
+	themes: ["github-light", "github-dark"],
+	langs: LANGS,
+});
+const highlighter = shared.shikiHighlighter;
 
 export async function highlight(html: string): Promise<string> {
 	const shiki = await highlighter;
