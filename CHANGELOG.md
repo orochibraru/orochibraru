@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/orochibraru/orochibraru/compare/v1.5.0...v1.6.0) (2026-09-24)
+
+### Features
+
+- testcase for webp
+  ([32bbeda](https://github.com/orochibraru/orochibraru/commit/32bbeda309220833131478e00c7147a39650b0b6))
+
 ## [1.5.0](https://github.com/orochibraru/orochibraru/compare/v1.4.0...v1.5.0) (2026-09-24)
 
 ### Features
