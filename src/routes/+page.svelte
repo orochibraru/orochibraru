@@ -124,15 +124,15 @@
 
 			<div class="flex flex-col gap-6">
 				{#each flagships as project, index (project.repo)}
-					<!-- odd ones swap sides, and slide in and out from their own side -->
+					<!-- odd ones swap sides -->
 					<article
 						class={[
-							"slide glass group grid items-center gap-8 overflow-hidden rounded-4xl p-7 sm:p-10 lg:grid-cols-[2fr_3fr]",
+							"glass group grid items-center gap-8 overflow-hidden rounded-4xl p-7 sm:p-10 lg:grid-cols-[2fr_3fr]",
 							// each side is a channel: left slides glow crimson, right ones gold
-							index % 2 ? "[--from:45%] [--ch:var(--color-cool)]" : "[--from:-45%] [--ch:var(--color-hot)]",
+							index % 2 ? "[--ch:var(--color-cool)]" : "[--ch:var(--color-hot)]",
 						]}
 					>
-						<div class={index % 2 ? "lg:order-2" : undefined}>
+						<div class={["drift", index % 2 && "lg:order-2"]}>
 							<span class="label">{project.category}</span>
 							<h3 class="mt-2 text-[clamp(1.8rem,3.5vw,2.6rem)]/none font-extrabold tracking-[-.04em]">
 								{project.name}

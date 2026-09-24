@@ -124,7 +124,7 @@
 }
 
 @layer base {
-	/* clip, not hidden: cards slide out sideways, and hidden would break the sticky header */
+	/* clip, not hidden: hidden would break the sticky header */
 	html,
 	body {
 		overflow-x: clip;
@@ -733,10 +733,9 @@
 			animation-timeline: scroll(root);
 			animation-range: 0 75svh;
 		}
-		/* flagships glide in from their side, hold, and get flung back out that way
-		   as they leave the top of the screen */
-		.slide {
-			animation: slide linear both;
+		/* a flagship's text drifts up faster than its screenshot: parallax */
+		.drift {
+			animation: drift linear both;
 			animation-timeline: view();
 			animation-range: cover 0% cover 100%;
 		}
@@ -783,22 +782,12 @@
 		transform: perspective(1600px) rotateX(0) scale(1);
 	}
 }
-/* in from a little off its side, hold, then drawn away to that side as it leaves */
-@keyframes slide {
-	0% {
-		opacity: 0;
-		transform: translateX(calc(var(--from) * 0.3)) scale(0.94);
-		animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+@keyframes drift {
+	from {
+		transform: translateY(1.5rem);
 	}
-	28%,
-	62% {
-		opacity: 1;
-		transform: none;
-		animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
-	}
-	100% {
-		opacity: 0;
-		transform: translateX(var(--from)) scale(0.9);
+	to {
+		transform: translateY(-1.5rem);
 	}
 }
 
