@@ -122,3 +122,12 @@ export const webhookDelivery = sqliteTable("webhook_delivery", {
 	id: text("id").primaryKey(),
 	receivedAt: timestamp("received_at"),
 });
+
+/** One row, id 1: the Umami instance the admin overview reads visitor stats from. */
+export const umami = sqliteTable("umami", {
+	id: integer("id").primaryKey(),
+	url: text("url").notNull(),
+	websiteId: text("website_id").notNull(),
+	/** Sealed with AES-GCM: see crypto.ts. */
+	apiKey: text("api_key").notNull(),
+});

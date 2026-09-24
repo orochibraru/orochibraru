@@ -2,6 +2,7 @@
 	import { resolve } from "$app/paths";
 	import Meta from "$lib/components/Meta.svelte";
 	import { copyButtons } from "$lib/copy";
+	import { lightbox } from "$lib/lightbox";
 	import { mermaidDiagrams } from "$lib/mermaid";
 	import { clip, PERSON, SITE } from "$lib/seo";
 
@@ -73,7 +74,7 @@
 			<h1 class="mb-7 text-[clamp(2rem,5vw,3rem)]/[1.05] stereo font-extrabold tracking-tight">
 				{data.title}
 			</h1>
-			<div class="md" {@attach copyButtons} {@attach mermaidDiagrams}>{@html data.html}</div>
+			<div class="md" {@attach copyButtons} {@attach mermaidDiagrams} {@attach lightbox}>{@html data.html}</div>
 			<div class="mt-14 grid gap-3 sm:grid-cols-2">
 				{#each steps as step (step.label)}
 					{#if step.guide}

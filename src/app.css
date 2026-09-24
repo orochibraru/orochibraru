@@ -675,6 +675,28 @@
 	}
 }
 
+/* a content image blown up to the viewport; the whole overlay closes it */
+.lightbox {
+	margin: auto;
+	outline: none;
+	max-width: none;
+	max-height: none;
+	padding: 0;
+	border: 0;
+	background: none;
+	cursor: zoom-out;
+}
+.lightbox img {
+	display: block;
+	max-width: calc(100vw - 2rem);
+	max-height: calc(100dvh - 2rem);
+	border-radius: 1rem;
+}
+.md img:not(a img),
+.project img:not(a img) {
+	cursor: zoom-in;
+}
+
 /* page changes cross-fade with a slight lift; the header stays put */
 ::view-transition-old(root) {
 	animation: 0.2s ease-in both fade-out;
