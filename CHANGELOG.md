@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/orochibraru/orochibraru/compare/v1.4.0...v1.5.0) (2026-09-24)
+
+### Features
+
+- sexier ui
+  ([4025fac](https://github.com/orochibraru/orochibraru/commit/4025fac010a8dc77ef475be7c8f11538d5f5c34f))
+
 ## [1.4.0](https://github.com/orochibraru/orochibraru/compare/v1.3.1...v1.4.0) (2026-09-23)
 
 ### Features
