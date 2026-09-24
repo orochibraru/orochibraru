@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/orochibraru/orochibraru/compare/v1.6.0...v1.6.1) (2026-09-24)
+
+### Bug Fixes
+
+- parallax
+  ([17e0fd6](https://github.com/orochibraru/orochibraru/commit/17e0fd6d860d078fb58c4397c26fcca2e9292b31))
+
 ## [1.6.0](https://github.com/orochibraru/orochibraru/compare/v1.5.0...v1.6.0) (2026-09-24)
 
 ### Features
