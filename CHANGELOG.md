@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.2](https://github.com/orochibraru/orochibraru/compare/v1.6.1...v1.6.2) (2026-09-24)
+
+### Bug Fixes
+
+- handle themed screenshots
+  ([c90abb4](https://github.com/orochibraru/orochibraru/commit/c90abb419c3a814c84c4b4c198eae06d3747a545))
+
 ## [1.6.1](https://github.com/orochibraru/orochibraru/compare/v1.6.0...v1.6.1) (2026-09-24)
 
 ### Bug Fixes
