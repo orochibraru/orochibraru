@@ -27,6 +27,10 @@
 	--color-onspark: #fff3f6;
 	--color-hot: #c2183f; /* left channel: crimson */
 	--color-cool: #7d5a0b; /* right channel: gold, also links and code */
+	/* the heading fringes only work as light glowing off a dark page: on a light
+	   one any colour just blurs a black letter, so there they're switched off */
+	--stereo-hot: transparent;
+	--stereo-cool: transparent;
 
 	--glow-1: rgba(194, 24, 63, 0.14);
 	--glow-2: rgba(214, 160, 60, 0.2);
@@ -84,6 +88,8 @@
 		--color-onspark: #fff3f6;
 		--color-hot: #ff5a78;
 		--color-cool: #e9c27b;
+		--stereo-hot: var(--color-hot);
+		--stereo-cool: var(--color-cool);
 		--glow-1: rgba(255, 90, 120, 0.12);
 		--glow-2: rgba(233, 194, 123, 0.1);
 		--glow-3: rgba(156, 29, 69, 0.28);
@@ -104,6 +110,8 @@
 	--color-onspark: #fff3f6;
 	--color-hot: #ff5a78;
 	--color-cool: #e9c27b;
+	--stereo-hot: var(--color-hot);
+	--stereo-cool: var(--color-cool);
 	--glow-1: rgba(255, 90, 120, 0.12);
 	--glow-2: rgba(233, 194, 123, 0.1);
 	--glow-3: rgba(156, 29, 69, 0.28);
@@ -231,6 +239,14 @@
 	}
 	.chip {
 		@apply rounded-full border border-edge bg-bg/40 px-2.5 py-0.5 text-xs text-dim;
+	}
+	/* a price crossed out by a drawn line rather than the font's, so it can animate */
+	.strike {
+		@apply relative;
+	}
+	.strike::after {
+		content: "";
+		@apply absolute -inset-x-0.5 top-1/2 h-0.5 origin-left rounded-full bg-hot;
 	}
 	/* a small coloured label over a title: category, date, section */
 	.label {
@@ -486,6 +502,21 @@
 	}
 	.md h2 + h3 {
 		@apply mt-6;
+	}
+	/* a heading's # copies a link to it: hung in the gutter so the text stays on the
+     prose's edge, and out of the way until the heading is pointed at */
+	.md :has(> .anchor) {
+		@apply relative;
+	}
+	.md .anchor {
+		@apply absolute right-full pr-2 font-normal text-dim opacity-0 transition-opacity hover:text-accent focus-visible:opacity-100;
+	}
+	.md :hover > .anchor,
+	.md .anchor[data-copied] {
+		@apply opacity-100;
+	}
+	.md .anchor[data-copied] {
+		@apply text-accent;
 	}
 
 	/* showcase screenshots: <picture> picks one file per figure, light or dark */
@@ -761,6 +792,12 @@
 			animation-timeline: view();
 			animation-range: cover 0% cover 100%;
 		}
+		/* a rented price gets crossed out as it scrolls into view */
+		.strike::after {
+			animation: strike linear both;
+			animation-timeline: view();
+			animation-range: entry 100% cover 45%;
+		}
 		/* screenshots lie back in 3D and stand up as they scroll into view */
 		.tilt {
 			transform-origin: 50% 100%;
@@ -804,6 +841,11 @@
 		transform: perspective(1600px) rotateX(0) scale(1);
 	}
 }
+@keyframes strike {
+	from {
+		transform: scaleX(0);
+	}
+}
 @keyframes drift {
 	from {
 		transform: translateY(1.5rem);
@@ -818,8 +860,8 @@
    Gradient lines skip it: a text-shadow would paint over their clipped fill. */
 .stereo {
 	text-shadow:
-		-0.03em 0 color-mix(in oklab, var(--color-hot) 55%, transparent),
-		0.03em 0 color-mix(in oklab, var(--color-cool) 55%, transparent);
+		-0.03em 0 color-mix(in oklab, var(--stereo-hot) 55%, transparent),
+		0.03em 0 color-mix(in oklab, var(--stereo-cool) 55%, transparent);
 	animation: converge 1.4s var(--ease-out-expo) both;
 }
 .stereo .grad {

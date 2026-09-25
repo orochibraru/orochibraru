@@ -4,6 +4,7 @@
  */
 export const PAGES = [
 	{ path: "/", group: "Start here", priority: "1.0" },
+	{ path: "/projects", group: "Start here", priority: "0.9" },
 	{ path: "/blog", group: "Start here", priority: "0.9" },
 	{ path: "/about", group: "Start here", priority: "0.7" },
 	{ path: "/privacy", group: "Start here", priority: "0.3" },

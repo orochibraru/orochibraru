@@ -2,7 +2,8 @@
 	import { onMount } from "svelte";
 
 	// Drifting specks at three depths. Scrolling moves the near ones faster than the far
-	// ones (parallax), and the cursor strings the closest ones together.
+	// ones (parallax), and the cursor strings the closest ones together. They belong to
+	// the hero: they fade out as it scrolls away, and stop drawing once they're gone.
 	let canvas = $state<HTMLCanvasElement>();
 
 	type Speck = { x: number; y: number; z: number; vx: number; vy: number; hue: number };
@@ -55,9 +56,16 @@
 			if (!context) {
 				return;
 			}
-			context.clearRect(0, 0, width, height);
 			eased += (scrollY - eased) * (still.matches ? 1 : 0.08);
 			const scroll = eased;
+			const fade = Math.max(0, 1 - scroll / (height * 0.75));
+			if (canvas) {
+				canvas.style.opacity = String(fade);
+			}
+			if (!fade) {
+				return;
+			}
+			context.clearRect(0, 0, width, height);
 			const placed = specks.map((speck) => {
 				speck.x = (speck.x + speck.vx * speck.z + width) % width;
 				speck.y = (speck.y + speck.vy * speck.z + height) % height;
@@ -109,6 +117,12 @@
 		const onLeave = () => {
 			pointer = undefined;
 		};
+		// reduced motion draws one frame, not a loop: scrolling still has to fade it
+		const onScroll = () => {
+			if (still.matches) {
+				draw();
+			}
+		};
 		const onResize = () => {
 			resize();
 			start();
@@ -122,6 +136,7 @@
 		resize();
 		start();
 		addEventListener("resize", onResize);
+		addEventListener("scroll", onScroll, { passive: true });
 		addEventListener("pointermove", onMove);
 		document.addEventListener("pointerleave", onLeave);
 		scheme.addEventListener("change", readColours);
@@ -131,6 +146,7 @@
 			cancelAnimationFrame(frame);
 			themes.disconnect();
 			removeEventListener("resize", onResize);
+			removeEventListener("scroll", onScroll);
 			removeEventListener("pointermove", onMove);
 			document.removeEventListener("pointerleave", onLeave);
 			scheme.removeEventListener("change", readColours);

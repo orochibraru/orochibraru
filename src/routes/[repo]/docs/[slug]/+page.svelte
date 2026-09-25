@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
 	import Meta from "$lib/components/Meta.svelte";
-	import { copyButtons } from "$lib/copy";
+	import PageActions from "$lib/components/PageActions.svelte";
+	import { anchorLinks, copyButtons } from "$lib/copy";
 	import { lightbox } from "$lib/lightbox";
 	import { mermaidDiagrams } from "$lib/mermaid";
 	import { clip, PERSON, SITE } from "$lib/seo";
@@ -71,10 +72,13 @@
 	<!-- the article centres in what is left of the viewport; the contents rail pins to its right edge -->
 	<div class="grid gap-x-12 gap-y-9 pt-12 pb-22.5 xl:grid-cols-[minmax(0,1fr)_15rem]">
 		<article class="docs mx-auto w-full max-w-6xl min-w-0">
-			<h1 class="mb-7 text-[clamp(2rem,5vw,3rem)]/[1.05] stereo font-extrabold tracking-tight">
-				{data.title}
-			</h1>
-			<div class="md" {@attach copyButtons} {@attach mermaidDiagrams} {@attach lightbox}>{@html data.html}</div>
+			<div class="mb-7 flex flex-wrap items-start justify-between gap-4">
+				<h1 class="text-[clamp(2rem,5vw,3rem)]/[1.05] stereo font-extrabold tracking-tight">
+					{data.title}
+				</h1>
+				<PageActions {path} />
+			</div>
+			<div class="md" {@attach copyButtons} {@attach anchorLinks} {@attach mermaidDiagrams} {@attach lightbox}>{@html data.html}</div>
 			<div class="mt-14 grid gap-3 sm:grid-cols-2">
 				{#each steps as step (step.label)}
 					{#if step.guide}

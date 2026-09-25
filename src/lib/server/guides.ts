@@ -308,7 +308,8 @@ async function readGuides() {
 							const seen = ids.get(base) ?? 0;
 							ids.set(base, seen + 1);
 							const id = seen ? `${base}-${seen}` : base;
-							return `<h${level} id="${id}">${inner}</h${level}>`;
+							// a sibling of the text, not a wrapper: a heading can hold a link itself
+							return `<h${level} id="${id}"><a class="anchor" href="#${id}" aria-label="Copy link to this section">#</a>${inner}</h${level}>`;
 						})
 						.replace(
 							/<a href="([^"]*)"/g,

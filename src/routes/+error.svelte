@@ -19,7 +19,7 @@
 			here.
 		</h1>
 		<div class="mt-9 flex flex-wrap gap-3">
-			<a class="btn btn-primary" href={resolve("/#projects")}>Back to the projects</a>
+			<a class="btn btn-primary" href={resolve("/projects")}>Back to the projects</a>
 		</div>
 	</div>
 </main>

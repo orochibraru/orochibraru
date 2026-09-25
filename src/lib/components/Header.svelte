@@ -47,7 +47,7 @@
 </script>
 
 {#snippet links(style: string)}
-	<a class={style} href={resolve("/#projects")}>Projects</a>
+	<a class={style} href={resolve("/projects")}>Projects</a>
 	<a class={style} href={resolve("/blog")}>Blog</a>
 	<a class={style} href={resolve("/about")}>About</a>
 	<a class={style} href={source ?? "https://github.com/orochibraru?tab=repositories"} target="_blank" rel="noopener"

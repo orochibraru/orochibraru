@@ -24,7 +24,7 @@
 		<div class="pt-10 pb-5">
 			<a
 				class="text-sm font-medium text-dim hover:text-accent"
-				href={resolve("/#projects")}
+				href={resolve("/projects")}
 				>&larr; All projects</a
 			>
 			<span class="tag ml-3.5">{data.tag}</span>

@@ -5,7 +5,6 @@
 	import { page } from "$app/state";
 	import Footer from "$lib/components/Footer.svelte";
 	import Header from "$lib/components/Header.svelte";
-	import Particles from "$lib/components/Particles.svelte";
 	import Search from "$lib/components/Search.svelte";
 	import TopLoadingBar from "$lib/components/top-loading-bar.svelte";
 
@@ -57,10 +56,6 @@
   <!-- the admin brings its own chrome and its own ⌘K -->
   {@render children()}
 {:else}
-  <!-- guides are for reading: nothing moves behind them -->
-  {#if !docs}
-    <Particles />
-  {/if}
   <!-- docs render a fixed lg:w-72 sidebar, so everything else shifts right of it -->
   <div class={docs ? "lg:pl-72" : undefined}>
     <Header {width} {source} {docs} onsearch={() => search?.open()} />
