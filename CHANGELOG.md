@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/orochibraru/orochibraru/compare/v1.8.0...v1.9.0) (2026-09-25)
+
+### Features
+
+- **docs:** publish the Latest release's docs, main as canary
+  ([ce8f6b9](https://github.com/orochibraru/orochibraru/commit/ce8f6b983ec45198c77ec7aaca3d44cc68490cdf))
+
 ## [1.8.0](https://github.com/orochibraru/orochibraru/compare/v1.7.0...v1.8.0) (2026-09-25)
 
 ### Features
