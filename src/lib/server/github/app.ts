@@ -19,9 +19,12 @@ export const useGithubFetch = (fake: Fetch) => {
 	tokens.clear();
 };
 
-export class GithubError extends Error {}
+export class GithubError extends Error {
+	/** The HTTP status GitHub answered, when it answered at all. */
+	status?: number;
+}
 
-/** What GitHub is told the app is: read-only on contents, one webhook, push events. */
+/** What GitHub is told the app is: read-only on contents, one webhook, push and release events. */
 export function manifest(origin = env.origin) {
 	return {
 		name: `${new URL(origin).hostname} docs`,
@@ -33,7 +36,7 @@ export function manifest(origin = env.origin) {
 		public: false,
 		default_permissions: { contents: "read", metadata: "read" },
 		// installation and installation_repositories always reach an app's webhook
-		default_events: ["push"],
+		default_events: ["push", "release"],
 	};
 }
 
@@ -161,7 +164,9 @@ export async function github<T>(app: App, path: string): Promise<T> {
 		},
 	});
 	if (!response.ok) {
-		throw new GithubError(`GitHub answered ${response.status} for ${path}`);
+		const failure = new GithubError(`GitHub answered ${response.status} for ${path}`);
+		failure.status = response.status;
+		throw failure;
 	}
 	return (await response.json()) as T;
 }

@@ -1,17 +1,22 @@
 import { fail } from "@sveltejs/kit";
-import { overview } from "$lib/server/editor";
+import { docsVersions, overview } from "$lib/server/editor";
 import { forgetUmami, getUmami, saveUmami, UmamiError, umamiStats } from "$lib/server/umami";
 
 export const load = async () => {
 	const { posts, projects, runs, uploads } = overview();
+	const synced = new Map(
+		docsVersions()
+			.filter((version) => version.channel === "latest")
+			.map((version) => [version.project, version.sha]),
+	);
 	const umami = await getUmami();
 	return {
 		posts: posts.map(({ id, title, date, status }) => ({ id, title, date, status })),
-		projects: projects.map(({ repo, name, published, docsSyncedSha }) => ({
+		projects: projects.map(({ repo, name, published }) => ({
 			repo,
 			name,
 			published,
-			docsSyncedSha,
+			docsSyncedSha: synced.get(repo),
 		})),
 		runs,
 		uploads,

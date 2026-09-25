@@ -83,7 +83,7 @@
 								>Open {project.name}</a
 							>
 							{#if project.guides}
-								<a class="btn" href={resolve("/[repo]/docs", { repo: project.repo })}
+								<a class="btn" href={resolve("/[repo]/[[channel=channel]]/docs", { repo: project.repo })}
 									>{project.guides} guides</a
 								>
 							{/if}

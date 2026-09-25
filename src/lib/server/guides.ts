@@ -10,10 +10,10 @@ import { and, asc, eq, isNotNull } from "drizzle-orm";
 import { z } from "zod";
 import type { IconNode } from "$lib/components/LucideIcon.svelte";
 import { DocsConfig, lucideIcon } from "$lib/docs-config";
-import { docsUrl, type Project, ROOT_GUIDES } from "$lib/projects";
+import { type Channel, docsUrl, type Project, ROOT_GUIDES } from "$lib/projects";
 import { SITE } from "$lib/seo";
 import { getDb } from "./db";
-import { guide as guideTable, project as projectTable } from "./db/schema";
+import { docsVersion, guide as guideTable, project as projectTable } from "./db/schema";
 import { highlight } from "./highlight";
 import { imageByName } from "./images";
 import { externalLinks } from "./markdown";
@@ -158,35 +158,42 @@ export type Category = {
 	slugs: string[];
 };
 
-let loaded: Promise<{ guides: Guide[]; categories: Map<Project["key"], Category[]> }> | undefined;
+type Loaded = {
+	guides: Guide[];
+	projects: Map<Project["key"], Project>;
+	categories: Map<Project["key"], Category[]>;
+};
 
-const load = () => {
-	loaded ??= readGuides().catch((cause) => {
-		loaded = undefined;
-		throw cause;
-	});
-	return loaded;
+const loaded = new Map<Channel, Promise<Loaded>>();
+
+const load = (channel: Channel) => {
+	let pending = loaded.get(channel);
+	if (!pending) {
+		pending = readGuides(channel).catch((cause) => {
+			loaded.delete(channel);
+			throw cause;
+		});
+		loaded.set(channel, pending);
+	}
+	return pending;
 };
 
 /** Every save and sync calls this: the next request renders from the rows again. */
 export const invalidateGuides = () => {
-	loaded = undefined;
+	loaded.clear();
 };
 
-/** The projects with at least one guide, as the docs routes know them. */
-export const loadDocProjects = () =>
-	load().then(({ categories }) =>
-		[...categories.keys()].map((key) => projects.get(key) as Project),
-	);
+/** The projects with at least one guide in this channel, as the docs routes know them. */
+export const loadDocProjects = (channel: Channel = "latest") =>
+	load(channel).then(({ projects }) => [...projects.values()]);
 
-const projects = new Map<string, Project>();
-
-/** Every guide, each project's in its config.json reading order. */
-export const loadGuides = () => load().then(({ guides }) => guides);
+/** Every guide of a channel, each project's in its config.json reading order. */
+export const loadGuides = (channel: Channel = "latest") =>
+	load(channel).then(({ guides }) => guides);
 
 /** A project's sidebar sections: config.json's categories, then anything it doesn't list. */
 export const loadCategories = (project: Project) =>
-	load().then(({ categories }) => categories.get(project.key) ?? []);
+	load(project.channel).then(({ categories }) => categories.get(project.key) ?? []);
 
 /** The synced docs/config.json, or null when the repo has none. */
 function readConfig(repo: string, json: unknown): DocsConfig | null {
@@ -202,8 +209,9 @@ function readConfig(repo: string, json: unknown): DocsConfig | null {
 	return parsed.data;
 }
 
-async function readGuides() {
+async function readGuides(channel: Channel): Promise<Loaded> {
 	const guides: Guide[] = [];
+	const projects = new Map<Project["key"], Project>();
 	const categories = new Map<Project["key"], Category[]>();
 
 	const db = getDb();
@@ -213,31 +221,36 @@ async function readGuides() {
 		.where(and(eq(projectTable.published, true), isNotNull(projectTable.githubRepo)))
 		.orderBy(asc(projectTable.position))
 		.all();
-	projects.clear();
 
 	for (const row of rows) {
 		const files = new Map(
 			db
 				.select()
 				.from(guideTable)
-				.where(eq(guideTable.project, row.repo))
+				.where(and(eq(guideTable.project, row.repo), eq(guideTable.channel, channel)))
 				.all()
 				.map((file) => [file.slug, file]),
 		);
 		if (!files.size) {
 			continue;
 		}
+		const version = db
+			.select()
+			.from(docsVersion)
+			.where(and(eq(docsVersion.project, row.repo), eq(docsVersion.channel, channel)))
+			.get();
 		const project: Project = {
 			key: row.repo,
 			name: row.name,
 			blurb: row.blurb || row.description,
 			repo: `https://github.com/${row.githubRepo}`,
-			branch: row.defaultBranch ?? "main",
+			branch: version?.ref ?? row.defaultBranch ?? "main",
+			channel,
 		};
 		projects.set(project.key, project);
 		const directory = `${row.repo} docs`;
 		const slugs = new Set(files.keys());
-		const config = readConfig(row.repo, row.docsConfig);
+		const config = readConfig(row.repo, version?.config);
 		const pages = new Map(
 			config?.categories.flatMap((category) => category.pages.map((page) => [page.slug, page])),
 		);
@@ -286,7 +299,7 @@ async function readGuides() {
 			const body = heading ? raw.replace(heading[0], "").trimStart() : raw;
 
 			const image = (name: string) => {
-				const found = imageByName(project.key, name);
+				const found = imageByName(project.key, name, channel);
 				if (!found) {
 					console.warn(`${directory}: image ${name} is missing, resync the project`);
 				}
@@ -321,12 +334,12 @@ async function readGuides() {
 							(_tag, before: string, src: string, rest: string) => {
 								const source = rewrite(src, project, slugs, image, folder);
 								const name = imageName(posix.join(folder, src));
-								const size = name ? imageByName(project.key, name) : undefined;
+								const size = name ? imageByName(project.key, name, channel) : undefined;
 								const sized = size ? ` width="${size.width}" height="${size.height}"` : "";
 								const img = (src: string, theme: string) =>
 									`<img ${theme}${before}src="${src}"${rest}${sized} loading="lazy" decoding="async">`;
 								// a `-dark` twin in docs/images: one <img> each, the site's theme picks
-								const dark = name ? imageByName(project.key, `${name}-dark`) : undefined;
+								const dark = name ? imageByName(project.key, `${name}-dark`, channel) : undefined;
 								return dark
 									? img(source, 'class="on-light" ') + img(dark.url, 'class="on-dark" ')
 									: img(source, "");
@@ -365,7 +378,8 @@ async function readGuides() {
 				icon: lucideIcon(root?.icon ?? pages.get(slug)?.icon ?? "file"),
 				intro,
 				html,
-				source: `${project.repo}/blob/${project.branch}/${file}`,
+				// edits land on the default branch, whatever ref this channel reads
+				source: `${project.repo}/blob/${row.defaultBranch ?? "main"}/${file}`,
 				// read away from this site, so every link and image has to be absolute
 				markdown: raw
 					.replace(/\]\(([^)]+)\)/g, (_link, target: string) => `](${absolute(target)})`)
@@ -378,5 +392,5 @@ async function readGuides() {
 		}
 	}
 
-	return { guides, categories };
+	return { guides, projects, categories };
 }

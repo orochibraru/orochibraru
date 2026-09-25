@@ -5,14 +5,16 @@
 	import Drawer from "$lib/components/Drawer.svelte";
 	import Logo from "$lib/components/Logo.svelte";
 	import LucideIcon from "$lib/components/LucideIcon.svelte";
+	import type { Channel } from "$lib/projects";
 
 	let { data, children } = $props();
 	const project = $derived(data.project);
 	const current = $derived(page.params.slug);
+	const channel = $derived(page.params.channel);
 	const overview = $derived({
 		slug: "overview",
 		title: "Overview",
-		href: resolve("/[repo]/docs", { repo: project.key }),
+		href: resolve("/[repo]/[[channel=channel]]/docs", { repo: project.key, channel }),
 		active: !current,
 		icon: data.overviewIcon,
 	});
@@ -24,8 +26,9 @@
 				.map((guide) => ({
 					slug: guide.slug,
 					title: guide.label,
-					href: resolve("/[repo]/docs/[slug]", {
+					href: resolve("/[repo]/[[channel=channel]]/docs/[slug]", {
 						repo: project.key,
+						channel,
 						slug: guide.slug,
 					}),
 					active: guide.slug === current,
@@ -37,6 +40,18 @@
 	const here = $derived(
 		sections.flatMap((section) => section.items).find((item) => item.active)?.title ?? "Overview",
 	);
+
+	/** The same guide in another channel, or its overview when that one doesn't have it. */
+	const versionHref = (version: { channel: Channel; slugs: string[] }) => {
+		const params = {
+			repo: project.key,
+			channel: version.channel === "latest" ? undefined : version.channel,
+		};
+		return current && version.slugs.includes(current)
+			? resolve("/[repo]/[[channel=channel]]/docs/[slug]", { ...params, slug: current })
+			: resolve("/[repo]/[[channel=channel]]/docs", params);
+	};
+	const latest = $derived(data.versions.find((version) => version.channel === "latest"));
 
 	let menu = $state<Drawer>();
 </script>
@@ -87,6 +102,24 @@
 				aria-label="Project page"
 			/>
 		</a>
+		{#if data.versions.length > 1}
+			<div class="mt-2 grid grid-cols-2 gap-1 rounded-2xl border border-line bg-bg p-1 font-sans text-xs">
+				{#each data.versions as version (version.channel)}
+					<a
+						class={[
+							"rounded-xl px-2.5 py-1.5 transition-colors",
+							version.channel === project.channel
+								? "bg-accent/10 text-fg"
+								: "text-dim hover:bg-fg/4 hover:text-fg",
+						]}
+						aria-current={version.channel === project.channel ? "page" : undefined}
+						href={versionHref(version)}
+						><span class="block font-medium capitalize">{version.channel}</span>
+						<span class="block truncate font-mono text-[11px] opacity-75">{version.ref}</span></a
+					>
+				{/each}
+			</div>
+		{/if}
 	</div>
 	<nav class="flex flex-col gap-0.5 px-3.5 pt-2 pb-6 font-sans text-sm">
 		{@render links()}
@@ -141,5 +174,19 @@
 <Drawer bind:this={menu} label="{project.name} docs" side="left">
 	{@render navigation()}
 </Drawer>
+
+{#if project.channel !== "latest"}
+	<div class="px-6 pt-6 lg:px-10">
+		<p class="rounded-xl border border-hot/30 bg-hot/5 px-4 py-3 font-sans text-sm text-fg/80">
+			These are the <strong class="text-fg">{project.channel}</strong> docs, read from
+			<code>{project.branch}</code>: they can describe changes no release has shipped yet.
+			{#if latest}
+				<a class="border-b border-edge font-medium text-fg hover:border-hot" href={versionHref(latest)}
+					>Read the {latest.ref} docs</a
+				>.
+			{/if}
+		</p>
+	</div>
+{/if}
 
 {@render children()}

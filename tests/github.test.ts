@@ -1,8 +1,8 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { createHmac, generateKeyPairSync } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { guide, image, project, syncRun } from "../src/lib/server/db/schema";
-import { docsStatuses } from "../src/lib/server/editor";
+import { docsStatuses, docsVersions } from "../src/lib/server/editor";
 import { env } from "../src/lib/server/env";
 import {
 	appJwt,
@@ -13,6 +13,7 @@ import {
 } from "../src/lib/server/github/app";
 import { reconcile, selectDocs, syncRepo } from "../src/lib/server/github/sync";
 import { handleWebhook, verifySignature } from "../src/lib/server/github/webhook";
+import { loadGuides } from "../src/lib/server/guides";
 import { freshSite, SAMPLE_IMAGE } from "./helpers";
 
 env.authSecret = "test-secret-test-secret-test-secret";
@@ -23,13 +24,15 @@ const { privateKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
 const pem = privateKey.export({ type: "pkcs1", format: "pem" }).toString();
 const sha = (text: string) => new Bun.CryptoHasher("sha1").update(text).digest("hex");
 
-// A GitHub with one repo whose files the tests edit.
+// A GitHub with one repo whose files the tests edit, and maybe a Latest release.
 let files: Record<string, string | Uint8Array> = {};
 let head = "c1";
+let release: { tag: string; sha: string; files: Record<string, string> } | null = null;
 const calls: string[] = [];
+const filesAt = (commit: string) => (release && commit === release.sha ? release.files : files);
 const blobs = () =>
 	Object.fromEntries(
-		Object.values(files).map((body) => [
+		[...Object.values(files), ...Object.values(release?.files ?? {})].map((body) => [
 			typeof body === "string" ? sha(body) : sha(Buffer.from(body).toString("base64")),
 			body,
 		]),
@@ -59,15 +62,19 @@ useGithubFetch(async (input, init) => {
 			repositories: [{ full_name: "me/tool", default_branch: "main", private: false }],
 		});
 	}
+	if (path === "/repos/me/tool/releases/latest") {
+		return release
+			? Response.json({ tag_name: release.tag })
+			: new Response("no release", { status: 404 });
+	}
 	if (path.startsWith("/repos/me/tool/commits/")) {
-		return Response.json({ sha: head, commit: { tree: { sha: `tree-${head}` } } });
+		const commit = release && path.endsWith(`/${release.tag}`) ? release.sha : head;
+		return Response.json({ sha: commit, commit: { tree: { sha: `tree-${commit}` } } });
 	}
-	if (path.startsWith("/repos/me/tool/branches/")) {
-		return Response.json({ commit: { sha: head } });
-	}
-	if (path.startsWith("/repos/me/tool/git/trees/")) {
+	const tree = path.match(/^\/repos\/me\/tool\/git\/trees\/tree-(\w+)/);
+	if (tree?.[1]) {
 		return Response.json({
-			tree: Object.entries(files).map(([file, body]) => ({
+			tree: Object.entries(filesAt(tree[1])).map(([file, body]) => ({
 				path: file,
 				type: "blob",
 				sha: typeof body === "string" ? sha(body) : sha(Buffer.from(body).toString("base64")),
@@ -164,9 +171,9 @@ describe("sync", () => {
 		expect(first).toEqual({ status: "ok", changed: 3 });
 		expect(site.db.select().from(guide).where(eq(guide.project, "tool")).all()).toHaveLength(2);
 		expect(site.db.select().from(image).where(eq(image.project, "tool")).get()?.name).toBe("hero");
-		const row = site.db.select().from(project).where(eq(project.repo, "tool")).get();
-		expect(row?.docsSyncedSha).toBe("c1");
-		expect(row?.docsConfig).toMatchObject({ categories: [{ title: "Start" }] });
+		const [version] = docsVersions("tool");
+		expect(version).toMatchObject({ channel: "latest", ref: "main", sha: "c1" });
+		expect(version?.config).toMatchObject({ categories: [{ title: "Start" }] });
 		expect(docsStatuses().tool).toBe("valid");
 
 		head = "c2";
@@ -203,9 +210,7 @@ describe("sync", () => {
 		expect(result.status).toBe("failed");
 		expect(result.error).toContain("docs/config.json is invalid");
 		expect(site.db.select().from(guide).where(eq(guide.slug, "new")).get()).toBeUndefined();
-		expect(
-			site.db.select().from(project).where(eq(project.repo, "tool")).get()?.docsSyncedSha,
-		).toBe("c3");
+		expect(docsVersions("tool")[0]?.sha).toBe("c3");
 		const run = site.db.select().from(syncRun).all().at(-1);
 		expect(run?.status).toBe("failed");
 		expect(docsStatuses().tool).toBe("invalid");
@@ -242,28 +247,28 @@ describe("sync", () => {
 	});
 });
 
-describe("webhook", () => {
-	const deliver = (event: string, payload: unknown, id: string, secret = "whsec") => {
-		const body = JSON.stringify(payload);
-		return handleWebhook(
-			new Request("https://site.test/api/github/webhook", {
-				method: "POST",
-				body,
-				headers: {
-					"x-github-event": event,
-					"x-github-delivery": id,
-					"x-hub-signature-256": `sha256=${createHmac("sha256", secret).update(body).digest("hex")}`,
-				},
-			}),
-		);
-	};
-	const push = (ref: string, paths: string[]) => ({
-		ref,
-		after: head,
-		repository: { full_name: "me/tool" },
-		commits: [{ modified: paths }],
-	});
+const deliver = (event: string, payload: unknown, id: string, secret = "whsec") => {
+	const body = JSON.stringify(payload);
+	return handleWebhook(
+		new Request("https://site.test/api/github/webhook", {
+			method: "POST",
+			body,
+			headers: {
+				"x-github-event": event,
+				"x-github-delivery": id,
+				"x-hub-signature-256": `sha256=${createHmac("sha256", secret).update(body).digest("hex")}`,
+			},
+		}),
+	);
+};
+const push = (ref: string, paths: string[]) => ({
+	ref,
+	after: head,
+	repository: { full_name: "me/tool" },
+	commits: [{ modified: paths }],
+});
 
+describe("webhook", () => {
 	test("checks signatures in constant time and refuses bad ones", async () => {
 		expect(
 			verifySignature(
@@ -299,5 +304,45 @@ describe("webhook", () => {
 		await deliver("push", push("refs/heads/main", ["src/index.ts"]), "d-3");
 		await Bun.sleep(200);
 		expect(calls.filter((call) => call.includes("/commits/"))).toHaveLength(0);
+	});
+});
+
+describe("versions", () => {
+	const readme = (channel: "latest" | "canary") =>
+		site.db
+			.select()
+			.from(guide)
+			.where(and(eq(guide.project, "tool"), eq(guide.channel, channel), eq(guide.slug, "readme")))
+			.get()?.markdown;
+
+	test("a Latest release is the latest docs, the default branch the canary ones", async () => {
+		release = { tag: "v1.0.0", sha: "t1", files: { "README.md": "# Tool\n\nReleased.\n" } };
+		const lines: string[] = [];
+		await reconcile((line) => lines.push(line));
+		expect(lines).toContain("tool: me/tool@v1.0.0 is at t1, last synced c6");
+		expect(lines).toContain("tool canary: me/tool@main is at c6, last synced never");
+		expect(readme("latest")).toBe("# Tool\n\nReleased.\n");
+		expect(readme("canary")).toBe(files["README.md"] as string);
+		expect(docsVersions("tool").map(({ channel, ref, sha }) => [channel, ref, sha])).toEqual([
+			["latest", "v1.0.0", "t1"],
+			["canary", "main", "c6"],
+		]);
+
+		const latest = await loadGuides();
+		expect(latest.map((item) => item.url)).toEqual(["/tool/docs/readme"]);
+		expect(latest[0]?.source).toBe("https://github.com/me/tool/blob/main/README.md");
+		const canary = await loadGuides("canary");
+		expect(canary.map((item) => item.url)).toContain("/tool/canary/docs/new");
+	});
+
+	test("a release event resyncs, and losing the release drops the canary", async () => {
+		release = null;
+		await deliver("release", { action: "deleted", repository: { full_name: "me/tool" } }, "d-r1");
+		await Bun.sleep(300);
+		expect(docsVersions("tool").map(({ channel, ref }) => [channel, ref])).toEqual([
+			["latest", "main"],
+		]);
+		expect(readme("canary")).toBeUndefined();
+		expect(readme("latest")).toBe(files["README.md"] as string);
 	});
 });

@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { and, eq, isNull } from "drizzle-orm";
 import { getDataDir, getDb } from "./db";
-import { image } from "./db/schema";
+import { type Channel, image } from "./db/schema";
 
 const WIDTH = 1200; // twice the widest a screenshot is ever displayed
 const QUALITY = 80;
@@ -19,6 +19,7 @@ export type ImageMeta = {
 	/** With `name`: a repo screenshot, addressed in Markdown as ![alt](name). */
 	project?: string;
 	name?: string;
+	channel?: Channel;
 	sourceSha?: string;
 };
 
@@ -120,6 +121,7 @@ export function recordImage(prepared: Prepared, meta: ImageMeta, db: Writer = ge
 		source: meta.source,
 		project: meta.project ?? null,
 		name: meta.name ?? null,
+		channel: meta.channel ?? "latest",
 		sourceSha: meta.sourceSha ?? null,
 	};
 	if (meta.project && meta.name) {
@@ -127,7 +129,7 @@ export function recordImage(prepared: Prepared, meta: ImageMeta, db: Writer = ge
 			.insert(image)
 			.values(values)
 			.onConflictDoUpdate({
-				target: [image.project, image.name],
+				target: [image.project, image.channel, image.name],
 				set: { ...prepared, sourceSha: values.sourceSha, ...(meta.alt && { alt: meta.alt }) },
 			})
 			.returning()
@@ -151,11 +153,15 @@ export async function storeImage(bytes: Uint8Array, meta: ImageMeta): Promise<Im
 	return recordImage(await prepareImage(bytes), meta);
 }
 
-export function imageByName(project: string, name: string): Image | undefined {
+export function imageByName(
+	project: string,
+	name: string,
+	channel: Channel = "latest",
+): Image | undefined {
 	const row = getDb()
 		.select()
 		.from(image)
-		.where(and(eq(image.project, project), eq(image.name, name)))
+		.where(and(eq(image.project, project), eq(image.channel, channel), eq(image.name, name)))
 		.get();
 	return row && toImage(row);
 }

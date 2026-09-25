@@ -4,7 +4,7 @@ import { and, asc, desc, eq, isNull, like, or } from "drizzle-orm";
 import { z } from "zod";
 import { invalidate } from "./content";
 import { getDb } from "./db";
-import { guide, image, installedRepo, post, project, syncRun } from "./db/schema";
+import { docsVersion, guide, image, installedRepo, post, project, syncRun } from "./db/schema";
 import { imageUrl } from "./images";
 import { ProjectFields } from "./project-pages";
 
@@ -228,6 +228,16 @@ export const recentSyncRuns = (limit = 8, repo?: string) =>
 		.limit(limit)
 		.all();
 
+/** What each channel of a project's docs was last synced from, latest first. */
+export const docsVersions = (repo?: string) =>
+	getDb()
+		.select()
+		.from(docsVersion)
+		.where(repo ? eq(docsVersion.project, repo) : undefined)
+		// "latest" sorts after "canary"
+		.orderBy(desc(docsVersion.channel))
+		.all();
+
 export type DocsStatus = "valid" | "invalid" | "no config" | "no docs" | "not synced";
 
 /**
@@ -257,14 +267,20 @@ export function docsStatuses(): Record<string, DocsStatus> {
 			lastRun.set(run.repo, run);
 		}
 	}
+	const latest = new Map(
+		docsVersions()
+			.filter((version) => version.channel === "latest")
+			.map((version) => [version.project, version]),
+	);
 	const statuses: Record<string, DocsStatus> = {};
 	for (const row of listAllProjects()) {
 		const run = lastRun.get(row.repo);
+		const synced = latest.get(row.repo);
 		if (run?.status === "failed" && run.error?.startsWith("docs/config.json is invalid")) {
 			statuses[row.repo] = "invalid";
-		} else if (!row.docsSyncedSha) {
+		} else if (!synced) {
 			statuses[row.repo] = "not synced";
-		} else if (row.docsConfig) {
+		} else if (synced.config) {
 			statuses[row.repo] = "valid";
 		} else {
 			statuses[row.repo] = withDocs.has(row.repo) ? "no config" : "no docs";
@@ -315,7 +331,7 @@ export const projectImages = (repo: string): Record<string, string> =>
 		getDb()
 			.select({ name: image.name, sha256: image.sha256 })
 			.from(image)
-			.where(eq(image.project, repo))
+			.where(and(eq(image.project, repo), eq(image.channel, "latest")))
 			.all()
 			.flatMap((row) => (row.name ? [[row.name, imageUrl(row.sha256)]] : [])),
 	);

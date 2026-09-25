@@ -1,5 +1,6 @@
 import { error, fail } from "@sveltejs/kit";
 import {
+	docsVersions,
 	EditorError,
 	getProject,
 	projectImages,
@@ -19,6 +20,7 @@ const projectOr404 = (repo: string) => {
 export const load = ({ params }) => ({
 	project: projectOr404(params.repo),
 	runs: recentSyncRuns(10, params.repo),
+	versions: docsVersions(params.repo).map(({ channel, ref, sha }) => ({ channel, ref, sha })),
 	images: projectImages(params.repo),
 });
 

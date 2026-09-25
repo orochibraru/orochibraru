@@ -225,9 +225,14 @@
 			{#if data.project.githubRepo}
 				<div class="mb-4 flex flex-wrap items-center gap-3 text-[.8125rem] text-dim">
 					<p>
-						Synced from <code class="text-fg">{data.project.githubRepo}</code> on
-						<code class="text-fg">{data.project.defaultBranch}</code>, now at
-						<code class="text-fg">{data.project.docsSyncedSha?.slice(0, 7) ?? "nothing yet"}</code>.
+						Synced from <code class="text-fg">{data.project.githubRepo}</code>:
+						{#each data.versions as version, index (version.channel)}
+							{index ? ", " : ""}{version.channel} from
+							<code class="text-fg">{version.ref}</code> at
+							<code class="text-fg">{version.sha.slice(0, 7)}</code>
+						{:else}
+							nothing yet
+						{/each}.
 					</p>
 					<button class="abtn ml-auto" type="submit" formaction="?/resync">
 						<RefreshCw class="size-3.5" aria-hidden="true" /> Resync now

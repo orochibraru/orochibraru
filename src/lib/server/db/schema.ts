@@ -2,6 +2,7 @@
 // auth-schema.ts by `bunx @better-auth/cli generate` and re-exported here.
 import { sql } from "drizzle-orm";
 import { integer, primaryKey, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
+import { CHANNELS } from "../../projects";
 
 export * from "./auth-schema";
 
@@ -29,8 +30,6 @@ export const project = sqliteTable("project", {
 	/** owner/name on GitHub; null for a project with no linked repo. */
 	githubRepo: text("github_repo"),
 	defaultBranch: text("default_branch"),
-	docsConfig: text("docs_config", { mode: "json" }).$type<DocsConfigJson | null>(),
-	docsSyncedSha: text("docs_synced_sha"),
 	published: integer("published", { mode: "boolean" }).notNull().default(false),
 	updatedAt: timestamp("updated_at"),
 });
@@ -49,19 +48,44 @@ export const post = sqliteTable("post", {
 	updatedAt: timestamp("updated_at"),
 });
 
+export type { Channel } from "../../projects";
+
+/**
+ * Which docs a row belongs to. With a GitHub release marked Latest, latest is that
+ * tag and canary the default branch; without one, latest is the default branch.
+ */
+const channel = () => text("channel", { enum: CHANNELS }).notNull().default("latest");
+
+/** One synced channel of a project's docs: where it was read from and its config.json. */
+export const docsVersion = sqliteTable(
+	"docs_version",
+	{
+		project: text("project")
+			.notNull()
+			.references(() => project.repo, { onDelete: "cascade", onUpdate: "cascade" }),
+		channel: channel(),
+		/** The tag or branch synced: v1.2.0, main. */
+		ref: text("ref").notNull(),
+		sha: text("sha").notNull(),
+		config: text("config", { mode: "json" }).$type<DocsConfigJson | null>(),
+	},
+	(table) => [primaryKey({ columns: [table.project, table.channel] })],
+);
+
 export const guide = sqliteTable(
 	"guide",
 	{
 		project: text("project")
 			.notNull()
 			.references(() => project.repo, { onDelete: "cascade", onUpdate: "cascade" }),
+		channel: channel(),
 		slug: text("slug").notNull(),
 		/** Verbatim upstream: rewriting happens when it is rendered. */
 		markdown: text("markdown").notNull(),
 		sourcePath: text("source_path").notNull(),
 		sha: text("sha").notNull(),
 	},
-	(table) => [primaryKey({ columns: [table.project, table.slug] })],
+	(table) => [primaryKey({ columns: [table.project, table.channel, table.slug] })],
 );
 
 export const image = sqliteTable(
@@ -79,11 +103,13 @@ export const image = sqliteTable(
 			onUpdate: "cascade",
 		}),
 		name: text("name"),
+		/** Screenshots only: uploads keep the default. */
+		channel: channel(),
 		/** The upstream blob sha, so a sync only re-fetches what changed. */
 		sourceSha: text("source_sha"),
 		createdAt: timestamp("created_at"),
 	},
-	(table) => [unique().on(table.project, table.name)],
+	(table) => [unique().on(table.project, table.channel, table.name)],
 );
 
 export const githubApp = sqliteTable("github_app", {

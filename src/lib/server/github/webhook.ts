@@ -1,10 +1,11 @@
-// The GitHub App's one webhook: installation changes, and pushes that touch docs.
+// The GitHub App's one webhook: installation changes, pushes that touch docs, and
+// releases, which can move the Latest one that the latest docs are read from.
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { lt } from "drizzle-orm";
 import { getDb } from "../db";
 import { webhookDelivery } from "../db/schema";
 import { forgetInstallation, getGithubApp, recordInstallation, refreshInstalledRepos } from "./app";
-import { projectsForPush, syncRepo, touchesDocs } from "./sync";
+import { projectsForPush, projectsForRelease, syncRepo, touchesDocs } from "./sync";
 
 /** X-Hub-Signature-256 is "sha256=" + the hex HMAC of the raw body. */
 export function verifySignature(secret: string, body: string, header: string | null): boolean {
@@ -37,6 +38,8 @@ type Push = {
 	repository: { full_name: string };
 	commits?: { added?: string[]; modified?: string[]; removed?: string[] }[];
 };
+
+type Release = { repository: { full_name: string } };
 
 type Installation = { action: string; installation: { id: number } };
 
@@ -83,6 +86,10 @@ export async function handleWebhook(request: Request): Promise<Response> {
 			for (const repo of projectsForPush(push.repository.full_name, push.ref)) {
 				background(syncRepo(repo, push.after));
 			}
+		}
+	} else if (event === "release") {
+		for (const repo of projectsForRelease((payload as Release).repository.full_name)) {
+			background(syncRepo(repo));
 		}
 	}
 	return new Response("Accepted", { status: 202 });

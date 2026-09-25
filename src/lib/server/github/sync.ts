@@ -9,7 +9,7 @@ import { DocsConfig } from "$lib/docs-config";
 import { ROOT_GUIDES } from "$lib/projects";
 import { invalidate } from "../content";
 import { getDb } from "../db";
-import { guide, image, project, syncRun } from "../db/schema";
+import { type Channel, docsVersion, guide, image, project, syncRun } from "../db/schema";
 import { type Prepared, prepareImage, recordImage } from "../images";
 import { type App, GithubError, getGithubApp, github } from "./app";
 
@@ -51,6 +51,38 @@ const quiet: Log = () => {};
 
 const short = (sha: string | null | undefined) => sha?.slice(0, 7) ?? "never";
 
+type ProjectRow = typeof project.$inferSelect;
+type Target = { channel: Channel; ref: string };
+
+/**
+ * Where each channel reads from. A repo whose GitHub release is marked Latest
+ * publishes that tag as latest and its default branch as canary: unreleased
+ * work never reads as released. Without one, latest is the default branch.
+ */
+async function targetsOf(app: App, row: ProjectRow): Promise<Target[]> {
+	const branch = row.defaultBranch ?? "main";
+	const release = await github<{ tag_name: string }>(
+		app,
+		`/repos/${row.githubRepo}/releases/latest`,
+	).catch((cause) => {
+		if (cause instanceof GithubError && cause.status === 404) {
+			return null;
+		}
+		throw cause;
+	});
+	return release
+		? [
+				{ channel: "latest", ref: release.tag_name },
+				{ channel: "canary", ref: branch },
+			]
+		: [{ channel: "latest", ref: branch }];
+}
+
+const labelOf = (repoKey: string, channel: Channel) =>
+	channel === "latest" ? repoKey : `${repoKey} ${channel}`;
+
+const message = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
+
 async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<SyncResult> {
 	const db = getDb();
 	const row = db.select().from(project).where(eq(project.repo, repoKey)).get();
@@ -63,8 +95,73 @@ async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<S
 		log(`${repoKey}: skipped, the GitHub App isn't installed`);
 		return { status: "skipped", changed: 0, error: "the GitHub App isn't installed" };
 	}
-	const fullName = row.githubRepo;
-	const ref = wanted ?? row.defaultBranch ?? "main";
+	let targets: Target[];
+	try {
+		targets = await targetsOf(app, row);
+	} catch (cause) {
+		const error = message(cause);
+		db.insert(syncRun)
+			.values({ repo: repoKey, status: "failed", error, finishedAt: new Date() })
+			.run();
+		log(`${repoKey}: ✗ failed, nothing written: ${error}`);
+		return { status: "failed", changed: 0, error };
+	}
+
+	const result: SyncResult = { status: "ok", changed: 0 };
+	for (const target of targets) {
+		// a pushed sha pins the branch, never a release tag
+		const pinned = target.ref === (row.defaultBranch ?? "main") ? wanted : undefined;
+		const one = await syncChannel(app, row, target, pinned, log);
+		result.changed += one.changed;
+		if (one.status === "failed") {
+			result.status = "failed";
+			result.error ??= one.error;
+		}
+	}
+	if (!targets.some((target) => target.channel === "canary")) {
+		result.changed += dropChannel(repoKey, "canary", log);
+	}
+	return result;
+}
+
+/** A channel the repo no longer has: its release was deleted, say. */
+function dropChannel(repoKey: string, channel: Channel, log: Log): number {
+	const removed = getDb().transaction((tx) => {
+		const guides = tx
+			.delete(guide)
+			.where(and(eq(guide.project, repoKey), eq(guide.channel, channel)))
+			.returning()
+			.all();
+		const images = tx
+			.delete(image)
+			.where(and(eq(image.project, repoKey), eq(image.source, "sync"), eq(image.channel, channel)))
+			.returning()
+			.all();
+		tx.delete(docsVersion)
+			.where(and(eq(docsVersion.project, repoKey), eq(docsVersion.channel, channel)))
+			.run();
+		return guides.length + images.length;
+	});
+	if (removed) {
+		invalidate();
+		log(`${labelOf(repoKey, channel)}: − ${removed} files, the channel is gone`);
+	}
+	return removed;
+}
+
+async function syncChannel(
+	app: App,
+	row: ProjectRow,
+	target: Target,
+	wanted: string | undefined,
+	log: Log,
+): Promise<SyncResult> {
+	const db = getDb();
+	const repoKey = row.repo;
+	const { channel } = target;
+	const label = labelOf(repoKey, channel);
+	const fullName = row.githubRepo as string;
+	const ref = wanted ?? target.ref;
 	const [run] = db
 		.insert(syncRun)
 		.values({ repo: repoKey, sha: wanted ?? null, status: "running" })
@@ -73,27 +170,27 @@ async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<S
 	const runId = (run as typeof syncRun.$inferSelect).id;
 
 	try {
-		// the commit, not the tree: its sha is what reconcile compares branches against
+		// the commit, not the tree: its sha is what reconcile compares refs against
 		const commit = await github<{ sha: string; commit: { tree: { sha: string } } }>(
 			app,
 			`/repos/${fullName}/commits/${encodeURIComponent(ref)}`,
 		);
 		const sha = commit.sha;
-		log(`${repoKey}: syncing ${fullName}@${ref} (${short(sha)})`);
+		log(`${label}: syncing ${fullName}@${target.ref} (${short(sha)})`);
 		const { tree } = await github<{ tree: TreeEntry[] }>(
 			app,
 			`/repos/${fullName}/git/trees/${commit.commit.tree.sha}?recursive=1`,
 		);
 		const wantedDocs = selectDocs(tree);
 		log(
-			`${repoKey}: ${tree.length} files in the tree, ${wantedDocs.guides.length} guides, ${wantedDocs.images.length} images, ${wantedDocs.config ? "a" : "no"} docs/config.json`,
+			`${label}: ${tree.length} files in the tree, ${wantedDocs.guides.length} guides, ${wantedDocs.images.length} images, ${wantedDocs.config ? "a" : "no"} docs/config.json`,
 		);
 
 		const stored = new Map(
 			db
 				.select()
 				.from(guide)
-				.where(eq(guide.project, repoKey))
+				.where(and(eq(guide.project, repoKey), eq(guide.channel, channel)))
 				.all()
 				.map((item) => [item.slug, item]),
 		);
@@ -117,7 +214,7 @@ async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<S
 			db
 				.select()
 				.from(image)
-				.where(and(eq(image.project, repoKey), isNotNull(image.name)))
+				.where(and(eq(image.project, repoKey), eq(image.channel, channel), isNotNull(image.name)))
 				.all()
 				.map((item) => [item.name as string, item]),
 		);
@@ -160,13 +257,14 @@ async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<S
 				tx.insert(guide)
 					.values({
 						project: repoKey,
+						channel,
 						slug: item.slug,
 						markdown: item.markdown,
 						sourcePath: item.path,
 						sha: item.sha,
 					})
 					.onConflictDoUpdate({
-						target: [guide.project, guide.slug],
+						target: [guide.project, guide.channel, guide.slug],
 						set: { markdown: item.markdown, sourcePath: item.path, sha: item.sha },
 					})
 					.run();
@@ -174,7 +272,7 @@ async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<S
 			for (const item of images) {
 				recordImage(
 					item.prepared,
-					{ source: "sync", project: repoKey, name: item.name, sourceSha: item.sha },
+					{ source: "sync", project: repoKey, channel, name: item.name, sourceSha: item.sha },
 					tx,
 				);
 			}
@@ -182,8 +280,12 @@ async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<S
 				.delete(guide)
 				.where(
 					keepSlugs.length
-						? and(eq(guide.project, repoKey), notInArray(guide.slug, keepSlugs))
-						: eq(guide.project, repoKey),
+						? and(
+								eq(guide.project, repoKey),
+								eq(guide.channel, channel),
+								notInArray(guide.slug, keepSlugs),
+							)
+						: and(eq(guide.project, repoKey), eq(guide.channel, channel)),
 				)
 				.returning()
 				.all();
@@ -193,6 +295,7 @@ async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<S
 					and(
 						eq(image.project, repoKey),
 						eq(image.source, "sync"),
+						eq(image.channel, channel),
 						keepImages.length ? notInArray(image.name, keepImages) : isNotNull(image.name),
 					),
 				)
@@ -205,9 +308,12 @@ async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<S
 				log(`  − image ${item.name}, gone from the repo`);
 			}
 			changed += removedGuides.length + removedImages.length;
-			tx.update(project)
-				.set({ docsConfig: config, docsSyncedSha: sha })
-				.where(eq(project.repo, repoKey))
+			tx.insert(docsVersion)
+				.values({ project: repoKey, channel, ref: target.ref, sha, config })
+				.onConflictDoUpdate({
+					target: [docsVersion.project, docsVersion.channel],
+					set: { ref: target.ref, sha, config },
+				})
 				.run();
 			tx.update(syncRun)
 				.set({ status: "ok", sha, changed, finishedAt: new Date() })
@@ -215,15 +321,15 @@ async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<S
 				.run();
 		});
 		invalidate();
-		log(`${repoKey}: ✓ done, ${changed} change${changed === 1 ? "" : "s"}`);
+		log(`${label}: ✓ done, ${changed} change${changed === 1 ? "" : "s"}`);
 		return { status: "ok", changed };
 	} catch (cause) {
-		const error = cause instanceof Error ? cause.message : String(cause);
+		const error = message(cause);
 		db.update(syncRun)
 			.set({ status: "failed", error, finishedAt: new Date() })
 			.where(eq(syncRun.id, runId))
 			.run();
-		log(`${repoKey}: ✗ failed, nothing written: ${error}`);
+		log(`${label}: ✗ failed, nothing written: ${error}`);
 		return { status: "failed", changed: 0, error };
 	}
 }
@@ -252,23 +358,25 @@ export function syncRepo(repoKey: string, sha?: string, log = quiet): Promise<Sy
 	return work;
 }
 
+const linked = (fullName: string) =>
+	getDb().select().from(project).where(eq(project.githubRepo, fullName)).all();
+
 /** The projects a push to this repo and ref should resync. */
 export const projectsForPush = (fullName: string, ref: string) =>
-	getDb()
-		.select()
-		.from(project)
-		.where(eq(project.githubRepo, fullName))
-		.all()
+	linked(fullName)
 		.filter((row) => ref === `refs/heads/${row.defaultBranch ?? "main"}`)
 		.map((row) => row.repo);
+
+/** The projects a release of this repo can move: any of them may change which one is Latest. */
+export const projectsForRelease = (fullName: string) => linked(fullName).map((row) => row.repo);
 
 /** Paths a push touched that the docs are built from. */
 export const touchesDocs = (paths: string[]) =>
 	paths.some((path) => path.startsWith("docs/") || ROOT_GUIDES.some((root) => root.file === path));
 
 /**
- * The safety net for missed webhooks: every project whose default branch moved
- * since its last sync is synced again.
+ * The safety net for missed webhooks: every project whose default branch or
+ * Latest release moved since its last sync is synced again.
  */
 export async function reconcile(log = quiet) {
 	const app = await getGithubApp();
@@ -276,25 +384,44 @@ export async function reconcile(log = quiet) {
 		log("The GitHub App isn't installed: nothing to sync.");
 		return;
 	}
-	const rows = getDb().select().from(project).where(isNotNull(project.githubRepo)).all();
+	const db = getDb();
+	const rows = db.select().from(project).where(isNotNull(project.githubRepo)).all();
 	log(`Checking ${rows.length} project${rows.length === 1 ? "" : "s"} with a linked repo.`);
 	for (const row of rows) {
-		const branch = row.defaultBranch ?? "main";
 		try {
-			const head = await github<{ commit: { sha: string } }>(
-				app,
-				`/repos/${row.githubRepo}/branches/${encodeURIComponent(branch)}`,
+			const targets = await targetsOf(app, row);
+			const synced = new Map(
+				db
+					.select()
+					.from(docsVersion)
+					.where(eq(docsVersion.project, row.repo))
+					.all()
+					.map((version) => [version.channel, version]),
 			);
-			const at = `${row.githubRepo}@${branch} is at ${short(head.commit.sha)}, last synced ${short(row.docsSyncedSha)}`;
-			if (head.commit.sha === row.docsSyncedSha) {
-				log(`${row.repo}: ${at}, up to date`);
-				continue;
+			// a channel stored but no longer wanted is stale too
+			let stale = synced.size > targets.length;
+			let head: string | undefined;
+			for (const target of targets) {
+				const commit = await github<{ sha: string }>(
+					app,
+					`/repos/${row.githubRepo}/commits/${encodeURIComponent(target.ref)}`,
+				);
+				if (target.ref === (row.defaultBranch ?? "main")) {
+					head = commit.sha;
+				}
+				const last = synced.get(target.channel);
+				const current = last?.sha === commit.sha && last.ref === target.ref;
+				stale ||= !current;
+				log(
+					`${labelOf(row.repo, target.channel)}: ${row.githubRepo}@${target.ref} is at ${short(commit.sha)}, last synced ${short(last?.sha)}${current ? ", up to date" : ""}`,
+				);
 			}
-			log(`${row.repo}: ${at}`);
-			await syncRepo(row.repo, head.commit.sha, log);
+			if (stale) {
+				await syncRepo(row.repo, head, log);
+			}
 		} catch (cause) {
 			console.error(`reconcile ${row.repo}:`, cause);
-			log(`${row.repo}: ✗ ${cause instanceof Error ? cause.message : String(cause)}`);
+			log(`${row.repo}: ✗ ${message(cause)}`);
 		}
 	}
 	log("Every project checked.");

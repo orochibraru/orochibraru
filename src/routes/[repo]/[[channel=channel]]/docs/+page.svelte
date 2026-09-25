@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { ArrowRight, ArrowUpRight } from "@lucide/svelte";
 	import { resolve } from "$app/paths";
+	import { page } from "$app/state";
 	import LucideIcon from "$lib/components/LucideIcon.svelte";
 	import Meta from "$lib/components/Meta.svelte";
+	import { docsUrl } from "$lib/projects";
 	import { clip, PERSON, SITE, WEBSITE } from "$lib/seo";
 
 	let { data } = $props();
 	const project = $derived(data.project);
-	const path = $derived(`/${project.key}/docs`);
+	const path = $derived(docsUrl(project));
 	const description = $derived(`Every guide for ${project.name}: ${project.blurb}`);
 	// cards cycle through the three brand accents; full class strings so Tailwind sees them
 	const TINTS = [
@@ -25,6 +27,7 @@
   title="{project.name} documentation"
   {description}
   {path}
+  noindex={project.channel !== "latest"}
   trail={[
     [project.name, `/${project.key}`],
     ["Docs", path],
@@ -60,7 +63,12 @@
         class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 font-sans text-xs text-dim"
       >
         <span class="size-1.5 rounded-full bg-hot shadow-[0_0_8px_var(--color-hot)]"></span>
-        {data.guides.length} guides &middot; synced daily from GitHub
+        {data.guides.length} guides &middot;
+        {#if data.versions.length > 1 && project.channel === "latest"}
+          the {project.branch} release
+        {:else}
+          synced daily from GitHub
+        {/if}
       </p>
       <h1 class="mt-5 text-[clamp(2.2rem,4.5vw,2.9rem)]/[1.05] animate-rise stereo font-extrabold tracking-[-.035em]">
         {project.name}
@@ -73,7 +81,8 @@
         {#if start}
           <a
             class="group inline-flex items-center gap-2 rounded-lg bg-spark px-4 py-2.5 font-semibold text-onspark shadow-[0_8px_24px_-10px_var(--color-spark)] transition hover:brightness-105"
-            href={resolve("/[repo]/docs/[slug]", {
+            href={resolve("/[repo]/[[channel=channel]]/docs/[slug]", {
+              channel: page.params.channel,
               repo: project.key,
               slug: start.slug,
             })}
@@ -118,7 +127,8 @@
             {@const tint = TINTS[index % TINTS.length] ?? TINTS[0]}
             <a
               class="group relative flex flex-col glass rounded-3xl p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-16px_rgb(0_0_0/0.25)] {tint.card}"
-              href={resolve("/[repo]/docs/[slug]", {
+              href={resolve("/[repo]/[[channel=channel]]/docs/[slug]", {
+              channel: page.params.channel,
                 repo: project.key,
                 slug: guide.slug,
               })}

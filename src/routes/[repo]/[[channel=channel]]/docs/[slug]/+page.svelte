@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
+	import { page } from "$app/state";
 	import Meta from "$lib/components/Meta.svelte";
 	import PageActions from "$lib/components/PageActions.svelte";
 	import { anchorLinks, copyButtons } from "$lib/copy";
 	import { lightbox } from "$lib/lightbox";
 	import { mermaidDiagrams } from "$lib/mermaid";
+	import { docsUrl } from "$lib/projects";
 	import { clip, PERSON, SITE } from "$lib/seo";
 
 	let { data } = $props();
@@ -15,7 +17,9 @@
 		{ guide: data.guides[position - 1], label: "← Previous" },
 		{ guide: data.guides[position + 1], label: "Next →" },
 	]);
-	const path = $derived(`/${project.key}/docs/${data.slug}`);
+	const path = $derived(docsUrl(project, data.slug));
+	// a repo that cuts releases publishes its Latest one: edits wait for the next
+	const released = $derived(data.versions.length > 1 && project.channel === "latest");
 	const description = $derived(clip(guide?.intro ?? "", 180) || `${project.name} documentation.`);
 
 	// The section being read is the last heading scrolled past; at the very bottom it is the
@@ -43,10 +47,11 @@
 	title="{data.title} | {project.name} docs"
 	{description}
 	{path}
+	noindex={project.channel !== "latest"}
 	ogType="article"
 	trail={[
 	[project.name, `/${project.key}`],
-	["Docs", `/${project.key}/docs`],
+	["Docs", docsUrl(project)],
 	[data.title, path],
 ]}
 	structuredData={[
@@ -57,7 +62,7 @@
 		description: clip(guide?.intro ?? "", 180),
 		url: `${SITE}${path}`,
 		mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}${path}` },
-		isPartOf: { "@id": `${SITE}/${project.key}/docs#docs` },
+		isPartOf: { "@id": `${SITE}${docsUrl(project)}#docs` },
 		about: { "@type": "SoftwareApplication", name: project.name, url: `${SITE}/${project.key}` },
 		inLanguage: "en",
 		author: PERSON,
@@ -87,7 +92,11 @@
 								"group glass rounded-2xl px-5 py-4 transition hover:border-edge",
 								step.label.startsWith("Next") && "sm:col-start-2 sm:text-right",
 							]}
-							href={resolve("/[repo]/docs/[slug]", { repo: project.key, slug: step.guide.slug })}
+							href={resolve("/[repo]/[[channel=channel]]/docs/[slug]", {
+								repo: project.key,
+								channel: page.params.channel,
+								slug: step.guide.slug,
+							})}
 							><span class="font-sans text-xs text-dim">{step.label}</span>
 							<h2 class="mt-1 font-bold tracking-[-.02em] transition-colors group-hover:text-accent">
 								{step.guide.title}
@@ -104,7 +113,7 @@
 					target="_blank"
 					rel="noopener"
 					>edit it there</a
-				>, and this page follows within a day.
+				>, and this page follows {released ? "with the next release" : "within a day"}.
 			</p>
 		</article>
 		{#if data.contents.length >= 2}

@@ -2,7 +2,7 @@ import { error } from "@sveltejs/kit";
 import { loadGuides } from "$lib/server/guides";
 
 export const load = async ({ params }) => {
-	const guide = (await loadGuides()).find(
+	const guide = (await loadGuides(params.channel)).find(
 		(guide) => guide.project.key === params.repo && guide.slug === params.slug,
 	);
 	if (!guide) {

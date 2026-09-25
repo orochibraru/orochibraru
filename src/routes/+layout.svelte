@@ -13,7 +13,7 @@
 	let search = $state<Search>();
 
 	const admin = $derived(page.route.id?.startsWith("/admin") ?? false);
-	const docs = $derived(page.route.id?.startsWith("/[repo]/docs") ?? false);
+	const docs = $derived(page.route.id?.startsWith("/[repo]/[[channel=channel]]/docs") ?? false);
 	const width = $derived(docs ? "max-w-none" : "max-w-page");
 	// project pages and their docs hand their repo over as page data
 	const source = $derived(

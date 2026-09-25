@@ -15,6 +15,13 @@
 			"when": 1790268261596,
 			"tag": "0001_umami",
 			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "6",
+			"when": 1790359538323,
+			"tag": "0002_docs_versions",
+			"breakpoints": true
 		}
 	]
 }
