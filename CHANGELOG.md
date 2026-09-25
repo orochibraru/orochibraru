@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/orochibraru/orochibraru/compare/v1.7.0...v1.8.0) (2026-09-25)
+
+### Features
+
+- smarter content
+  ([97380d2](https://github.com/orochibraru/orochibraru/commit/97380d2aaa54bb5699035f81ffa9d39ccbf57b40))
+
 ## [1.7.0](https://github.com/orochibraru/orochibraru/compare/v1.6.2...v1.7.0) (2026-09-24)
 
 ### Features
