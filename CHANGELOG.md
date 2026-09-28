@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/orochibraru/orochibraru/compare/v1.11.0...v1.12.0) (2026-09-28)
+
+### Features
+
+- **admin:** sync history with diffs, confirm dialog, live sync spinners
+  ([2834778](https://github.com/orochibraru/orochibraru/commit/2834778212ee73cad6e92f8bad4c3bea30f2daea))
+
 ## [1.11.0](https://github.com/orochibraru/orochibraru/compare/v1.10.0...v1.11.0) (2026-09-28)
 
 ### Features
