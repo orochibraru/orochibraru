@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.0](https://github.com/orochibraru/orochibraru/compare/v1.13.1...v1.14.0) (2026-09-28)
+
+### Features
+
+- analytics digest
+  ([fc71e78](https://github.com/orochibraru/orochibraru/commit/fc71e78f82d3a92df7ac16c8e93bb6d8ce59e4c7))
+
 ## [1.13.1](https://github.com/orochibraru/orochibraru/compare/v1.13.0...v1.13.1) (2026-09-28)
 
 ### Bug Fixes
