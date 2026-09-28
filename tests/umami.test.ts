@@ -1,7 +1,14 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { umami } from "../src/lib/server/db/schema";
 import { env } from "../src/lib/server/env";
-import { fillSeries, forgetUmami, getUmami, saveUmami, umamiStats } from "../src/lib/server/umami";
+import {
+	fillSeries,
+	forgetUmami,
+	getUmami,
+	saveUmami,
+	umamiReport,
+	umamiStats,
+} from "../src/lib/server/umami";
 import { freshSite } from "./helpers";
 
 env.authSecret = "test-secret-test-secret-test-secret";
@@ -26,7 +33,14 @@ globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) =>
 		const bucket = [{ x: "1970-01-12T13:00:00Z", y: 5 }];
 		return Response.json({ pageviews: bucket, sessions: bucket });
 	}
-	return Response.json(url.endsWith("/active") ? { visitors: 3 } : { visitors: 10, pageviews: 42 });
+	if (url.includes("/metrics?")) {
+		return Response.json([{ x: new URL(url).searchParams.get("type"), y: 4 }]);
+	}
+	return Response.json(
+		url.endsWith("/active")
+			? { visitors: 3 }
+			: { visitors: 10, pageviews: 42, visits: 12, bounces: 3, totaltime: 600 },
+	);
 }) as typeof fetch;
 afterAll(() => {
 	globalThis.fetch = realFetch;
@@ -38,14 +52,18 @@ describe("the Umami connection", () => {
 		expect(await getUmami()).toBeNull();
 	});
 
-	test("won't save what doesn't connect", async () => {
-		await expect(saveUmami({ ...config, apiKey: "wrong" })).rejects.toThrow("Couldn't reach Umami");
+	test("won't save what's malformed", async () => {
 		await expect(saveUmami({ ...config, url: "nope" })).rejects.toThrow("Enter the Umami URL");
 		expect(await getUmami()).toBeNull();
 	});
 
+	test("saves what doesn't connect, and says why", async () => {
+		expect(await saveUmami({ ...config, apiKey: "wrong" })).toContain("status 401");
+		expect(await getUmami()).toEqual({ ...config, apiKey: "wrong" });
+	});
+
 	test("saves with the key sealed, and a blank key keeps it", async () => {
-		await saveUmami({ ...config, url: "https://umami.test/" });
+		expect(await saveUmami({ ...config, url: "https://umami.test/" })).toBeNull();
 		expect(await getUmami()).toEqual(config);
 		expect(site.db.select().from(umami).get()?.apiKey).not.toContain("key");
 
@@ -99,6 +117,21 @@ describe("umamiStats", () => {
 		const stale = await umamiStats(config, 1_000_120_000);
 		expect(requests.length).toBeGreaterThan(0);
 		expect(stale.active).toBe(3);
+	});
+});
+
+describe("umamiReport", () => {
+	test("reads the range's totals, days and top lists", async () => {
+		down = false;
+		const report = await umamiReport(config, 7, 1_000_000_000);
+		expect(report).toMatchObject({ days: 7, unit: "day", visits: 12, bounces: 3, totaltime: 600 });
+		expect(report.series).toHaveLength(8);
+		expect(report.pages).toEqual([{ x: "path", y: 4 }]);
+		expect(report.devices).toEqual([{ x: "device", y: 4 }]);
+	});
+
+	test("counts a year by month", async () => {
+		expect((await umamiReport(config, 365, 1_000_000_000)).unit).toBe("month");
 	});
 });
 

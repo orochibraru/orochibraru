@@ -92,8 +92,11 @@ export async function getUmami(): Promise<UmamiConfig | null> {
 
 export class UmamiError extends Error {}
 
-/** Tests the connection before saving it. A blank API key keeps the saved one. */
-export async function saveUmami(input: UmamiConfig) {
+/**
+ * Saves a well-formed connection even when Umami can't be reached, then tests it:
+ * resolves to what's wrong with it, or null. A blank API key keeps the saved one.
+ */
+export async function saveUmami(input: UmamiConfig): Promise<string | null> {
 	const config = {
 		url: input.url.trim().replace(/\/+$/, ""),
 		websiteId: input.websiteId.trim(),
@@ -102,20 +105,30 @@ export async function saveUmami(input: UmamiConfig) {
 	if (!URL.canParse(config.url) || !config.websiteId || !config.apiKey) {
 		throw new UmamiError("Enter the Umami URL, the website ID and an API key.");
 	}
-	try {
-		await fetchStats(config, Date.now());
-	} catch (cause) {
-		console.error("Umami connection test failed:", cause);
-		throw new UmamiError("Couldn't reach Umami with this URL, website ID and API key.");
-	}
 	const values = { id: 1, ...config, apiKey: await seal(config.apiKey) };
 	getDb().insert(umami).values(values).onConflictDoUpdate({ target: umami.id, set: values }).run();
-	cache = undefined;
+	return testUmami(config, true);
+}
+
+/** What's wrong with the connection, or null when it works. Fresh drops the cache. */
+export async function testUmami(config: UmamiConfig, fresh = false): Promise<string | null> {
+	if (fresh) {
+		cache = undefined;
+		reports.clear();
+	}
+	try {
+		await umamiStats(config);
+		return null;
+	} catch (cause) {
+		console.error("Umami connection test failed:", cause);
+		return `Couldn't reach Umami with this URL, website ID and API key: ${cause instanceof Error ? cause.message : cause}`;
+	}
 }
 
 export function forgetUmami() {
 	getDb().delete(umami).run();
 	cache = undefined;
+	reports.clear();
 }
 
 /** Cached a minute, and the last good result outlives an outage. */
@@ -135,18 +148,106 @@ export async function umamiStats(config: UmamiConfig, now = Date.now()): Promise
 	}
 }
 
-async function fetchStats(config: UmamiConfig, now: number): Promise<UmamiStats> {
+/** GET one of the website's API endpoints. */
+async function request<T>(config: UmamiConfig, path: string): Promise<T> {
 	const base = `${config.url}/api/websites/${encodeURIComponent(config.websiteId)}`;
-	const get = async <T>(path: string): Promise<T> => {
-		const response = await fetch(base + path, {
-			headers: { authorization: `Bearer ${config.apiKey}` },
-			signal: AbortSignal.timeout(5000),
-		});
-		if (!response.ok) {
-			throw new Error(`Umami ${path} failed with status ${response.status}`);
+	const response = await fetch(base + path, {
+		headers: { authorization: `Bearer ${config.apiKey}` },
+		signal: AbortSignal.timeout(5000),
+	});
+	if (!response.ok) {
+		throw new Error(`Umami ${path} failed with status ${response.status}`);
+	}
+	return response.json() as Promise<T>;
+}
+
+export type Metric = { x: string; y: number };
+
+export type UmamiReport = {
+	days: number;
+	unit: Unit;
+	visitors: number;
+	visits: number;
+	pageviews: number;
+	/** Visits that saw one page. */
+	bounces: number;
+	/** Seconds, summed over visits. */
+	totaltime: number;
+	series: Point[];
+	pages: Metric[];
+	referrers: Metric[];
+	countries: Metric[];
+	browsers: Metric[];
+	os: Metric[];
+	devices: Metric[];
+};
+
+const reports = new Map<number, { report: UmamiReport; until: number }>();
+
+/** The last `days` days in detail, for the analytics page: cached like umamiStats. */
+export async function umamiReport(
+	config: UmamiConfig,
+	days: number,
+	now = Date.now(),
+): Promise<UmamiReport> {
+	const cached = reports.get(days);
+	if (cached && cached.until > now) {
+		return cached.report;
+	}
+	try {
+		const report = await fetchReport(config, days, now);
+		reports.set(days, { report, until: now + TTL });
+		return report;
+	} catch (error) {
+		if (cached) {
+			return cached.report;
 		}
-		return response.json() as Promise<T>;
+		throw error;
+	}
+}
+
+async function fetchReport(config: UmamiConfig, days: number, now: number): Promise<UmamiReport> {
+	const start = now - days * DAY;
+	const window = `startAt=${start}&endAt=${now}`;
+	const unit: Unit = days > 90 ? "month" : "day";
+	const metric = (type: string, limit = 10) =>
+		request<Metric[]>(config, `/metrics?${window}&type=${type}&limit=${limit}`);
+	const [stats, buckets, pages, referrers, countries, browsers, os, devices] = await Promise.all([
+		request<Pick<UmamiReport, "visitors" | "visits" | "pageviews" | "bounces" | "totaltime">>(
+			config,
+			`/stats?${window}`,
+		),
+		request<{ pageviews: Buckets; sessions: Buckets }>(
+			config,
+			`/pageviews?${window}&unit=${unit}&timezone=UTC`,
+		),
+		metric("path", 25),
+		metric("referrer", 25),
+		metric("country"),
+		metric("browser"),
+		metric("os"),
+		metric("device"),
+	]);
+	return {
+		days,
+		unit,
+		visitors: stats.visitors,
+		visits: stats.visits,
+		pageviews: stats.pageviews,
+		bounces: stats.bounces,
+		totaltime: stats.totaltime,
+		series: fillSeries(buckets.pageviews, buckets.sessions, start, now, unit),
+		pages,
+		referrers,
+		countries,
+		browsers,
+		os,
+		devices,
 	};
+}
+
+async function fetchStats(config: UmamiConfig, now: number): Promise<UmamiStats> {
+	const get = <T>(path: string) => request<T>(config, path);
 	const [active, ...ranges] = await Promise.all([
 		get<{ visitors: number }>("/active"),
 		...RANGES.map(async ({ label, ms, unit }) => {

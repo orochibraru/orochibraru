@@ -6,6 +6,7 @@ import {
 	getSearchConsole,
 	saveSearchConsole,
 	searchStats,
+	testSearchConsole,
 } from "../src/lib/server/search-console";
 import { freshSite } from "./helpers";
 
@@ -71,9 +72,15 @@ globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) =>
 	}
 	const body = JSON.parse(String(init?.body));
 	bodies.push(body);
-	const row = (keys: string[]) => ({ keys, clicks: 3, impressions: 40, ctr: 0.075, position: 8.2 });
+	const row = (keys?: string[]) => ({
+		keys,
+		clicks: 3,
+		impressions: 40,
+		ctr: 0.075,
+		position: 8.2,
+	});
 	const rows: Record<string, unknown[]> = {
-		"": [row([])],
+		"": [row()],
 		date: [row(["1970-01-11"])],
 		query: [row(["orochibraru"])],
 		page: [row(["https://orochibraru.test/blog/hello"])],
@@ -90,21 +97,29 @@ describe("the Search Console connection", () => {
 		expect(await getSearchConsole()).toBeNull();
 	});
 
-	test("won't save what doesn't connect, and says why", async () => {
+	test("won't save what isn't a service account key", async () => {
 		await expect(saveSearchConsole({ ...config, serviceAccount: "nope" })).rejects.toThrow(
 			"isn't JSON",
 		);
 		await expect(saveSearchConsole({ ...config, serviceAccount: "{}" })).rejects.toThrow(
 			"no client_email",
 		);
-		await expect(saveSearchConsole({ ...config, site: "sc-domain:other.test" })).rejects.toThrow(
-			"sufficient permission",
-		);
 		expect(await getSearchConsole()).toBeNull();
 	});
 
+	test("saves what Google turns down, and says why", async () => {
+		const other = { ...config, site: "sc-domain:other.test" };
+		expect(await saveSearchConsole(other)).toContain("sufficient permission");
+		expect(await getSearchConsole()).toEqual(other);
+
+		const stranger = JSON.stringify({ ...JSON.parse(serviceAccount), client_email: "who@else" });
+		expect(await saveSearchConsole({ ...config, serviceAccount: stranger })).toBe(
+			"Google refused the key (400): invalid_grant",
+		);
+	});
+
 	test("saves with the key sealed, and a blank key keeps it", async () => {
-		await saveSearchConsole({ ...config, site: ` ${config.site} ` });
+		expect(await saveSearchConsole({ ...config, site: ` ${config.site} ` })).toBeNull();
 		expect(await getSearchConsole()).toEqual(config);
 		expect(site.db.select().from(searchConsole).get()?.serviceAccount).not.toContain("PRIVATE KEY");
 
@@ -124,7 +139,7 @@ describe("searchStats", () => {
 
 	test("reads totals, 28 filled days, top queries and pages", async () => {
 		bodies.length = 0;
-		const stats = await searchStats(config, now);
+		const stats = await searchStats(config, 28, now);
 		expect(stats.totals).toMatchObject({ clicks: 3, impressions: 40, ctr: 0.075, position: 8.2 });
 		expect(stats.series).toHaveLength(28);
 		expect(stats.series.at(0)?.t).toBe(Date.parse("1969-12-16"));
@@ -138,11 +153,18 @@ describe("searchStats", () => {
 
 	test("serves the cache for an hour, then the last good result while Google is down", async () => {
 		bodies.length = 0;
-		await searchStats(config, now + 30 * 60 * 1000);
+		await searchStats(config, 28, now + 30 * 60 * 1000);
 		expect(bodies).toEqual([]);
 
 		down = true;
-		const stale = await searchStats(config, now + 2 * 60 * 60 * 1000);
+		const stale = await searchStats(config, 28, now + 2 * 60 * 60 * 1000);
 		expect(stale.totals.clicks).toBe(3);
+	});
+
+	test("a fresh test skips the cache: an outage shows instead of the last good result", async () => {
+		expect(await testSearchConsole(config)).toBeNull();
+		expect(await testSearchConsole(config, true)).toContain("Google refused the key (502)");
+		down = false;
+		expect(await testSearchConsole(config, true)).toBeNull();
 	});
 });

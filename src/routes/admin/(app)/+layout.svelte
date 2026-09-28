@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {
 		Boxes,
+		ChartLine,
 		ExternalLink,
 		FileText,
 		GitBranch,
@@ -9,6 +10,7 @@
 		LogOut,
 		Plug,
 		Search,
+		Settings,
 	} from "@lucide/svelte";
 	import { goto } from "$app/navigation";
 	import { resolve } from "$app/paths";
@@ -21,11 +23,13 @@
 
 	const NAV = [
 		[resolve("/admin"), "Overview", LayoutDashboard],
+		[resolve("/admin/analytics"), "Analytics", ChartLine],
 		[resolve("/admin/posts"), "Posts", FileText],
 		[resolve("/admin/projects"), "Projects", Boxes],
 		[resolve("/admin/images"), "Images", Images],
 		[resolve("/admin/github"), "GitHub", GitBranch],
 		[resolve("/admin/connections"), "Connections", Plug],
+		[resolve("/admin/settings"), "Settings", Settings],
 	] as const;
 
 	const current = (href: string) =>

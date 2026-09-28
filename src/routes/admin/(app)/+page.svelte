@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
 	import { ago, statusClass } from "$lib/admin";
 	import VisitorsChart from "$lib/components/admin/VisitorsChart.svelte";
 
-	let { data, form } = $props();
+	let { data } = $props();
 	const failed = $derived(data.runs.filter((run) => run.status === "failed").length);
 	// 20189 -> "20.2K", so every tile fits; the exact count is in the tooltip
 	// the range the chart shows: 30 days until a tile is picked
@@ -40,7 +39,7 @@
 				<header>
 					Visitors
 					{#if stats.active}<span class="text-xs font-normal text-cool">&bull; {stats.active} online</span>{/if}
-					<a class="ml-auto text-xs font-normal text-dim hover:text-fg" href={stats.url} target="_blank" rel="noopener">Umami</a>
+					<a class="ml-auto text-xs font-normal text-dim hover:text-fg" href={resolve("/admin/analytics")}>Details</a>
 				</header>
 				<div class="grid grid-cols-2 gap-2 p-3 sm:grid-cols-5">
 					{#each stats.ranges as range, index (range.label)}
@@ -69,59 +68,28 @@
 				{/if}
 			{:catch}
 				<header>Visitors</header>
-				<p class="px-3 py-6 text-center text-sm text-hot">Couldn&rsquo;t reach Umami. Check the connection below.</p>
+				<p class="px-3 py-6 text-center text-sm text-hot">
+					Couldn&rsquo;t reach Umami. <a class="text-cool" href={resolve("/admin/settings")}>Check the settings</a>.
+				</p>
 			{/await}
 		{:else}
 			<header>Visitors</header>
+			<p class="px-3 py-6 text-center text-sm text-dim">
+				<a class="text-cool" href={resolve("/admin/settings")}>Connect a self-hosted Umami</a> to see visitor stats here.
+			</p>
 		{/if}
-		<!-- open until a connection is saved; after that, tucked away under the stats -->
-		<details open={!data.umami}>
-			<summary class="cursor-pointer px-3 py-2 text-xs text-dim hover:text-fg">
-				{data.umami ? "Connection" : "Connect a self-hosted Umami v3 to see visitor stats here"}
-			</summary>
-			<form class="admin-form grid gap-3 p-3 pt-1 sm:grid-cols-3" method="POST" action="?/umami" use:enhance>
-				<label>
-					Umami URL
-					<input name="url" type="url" required placeholder="https://umami.example.com" value={data.umami?.url ?? ""}>
-				</label>
-				<label>
-					Website ID
-					<input name="websiteId" required placeholder="From the tracking script" value={data.umami?.websiteId ?? ""}>
-				</label>
-				<label>
-					API key
-					<input
-						name="apiKey"
-						type="password"
-						autocomplete="off"
-						required={!data.umami}
-						placeholder={data.umami ? "Saved: leave blank to keep it" : "Your Umami API key"}
-					>
-				</label>
-				{#if form?.umamiError}
-					<p class="text-sm text-hot sm:col-span-3" role="alert">{form.umamiError}</p>
-				{/if}
-				<div class="flex gap-2 sm:col-span-3">
-					<button class="abtn abtn-primary" type="submit">{data.umami ? "Save" : "Connect"}</button>
-					{#if data.umami}
-						<button class="abtn abtn-danger ml-auto" type="submit" formaction="?/forgetUmami" formnovalidate>Disconnect</button>
-					{/if}
-				</div>
-			</form>
-		</details>
 	</section>
 
 	<section class="apanel lg:col-span-2">
+		<header>
+			Search
+			<span class="text-xs font-normal text-dim">last 28 days</span>
+			<a class="ml-auto text-xs font-normal text-dim hover:text-fg" href={resolve("/admin/analytics")}>Details</a>
+		</header>
 		{#if data.search}
 			{#await data.search}
-				<header>Search</header>
 				<p class="px-3 py-6 text-center text-sm text-dim">Asking Search Console&hellip;</p>
 			{:then stats}
-				<header>
-					Search
-					<span class="text-xs font-normal text-dim">last {stats.days} days, the last two or three still filling in</span>
-					<a class="ml-auto text-xs font-normal text-dim hover:text-fg" href={stats.url} target="_blank" rel="noopener">Search Console</a>
-				</header>
 				<div class="grid grid-cols-2 gap-2 p-3 sm:grid-cols-4">
 					{#each [["Clicks", compact.format(stats.totals.clicks)], ["Impressions", compact.format(stats.totals.impressions)], ["CTR", percent.format(stats.totals.ctr)], ["Avg position", stats.totals.position.toFixed(1)]] as [label, value] (label)}
 						<div class="rounded-lg bg-fg/3 px-3 py-2.5 leading-tight">
@@ -130,85 +98,16 @@
 						</div>
 					{/each}
 				</div>
-				<VisitorsChart
-					series={stats.series}
-					unit="day"
-					rows={[
-						{ key: "clicks", title: "Clicks", noun: "click" },
-						{ key: "impressions", title: "Impressions", noun: "impression" },
-					]}
-				/>
-				<div class="grid border-t border-line lg:grid-cols-2">
-					{#each [["Top queries", stats.queries], ["Top pages", stats.pages]] as const as [title, rows] (title)}
-						<table class="atable">
-							<thead>
-								<tr>
-									<th class="w-full">{title}</th>
-									<th class="text-right">Clicks</th>
-									<th class="text-right">Impr.</th>
-									<th class="text-right">Pos.</th>
-								</tr>
-							</thead>
-							<tbody>
-								{#each rows as row (row.key)}
-									<tr>
-										<td class="max-w-0 truncate" title={row.key}>{row.key.replace(/^https?:\/\/[^/]+/, "") || "/"}</td>
-										<td class="text-right tabular-nums">{row.clicks}</td>
-										<td class="text-right tabular-nums text-dim">{row.impressions}</td>
-										<td class="text-right tabular-nums text-dim">{row.position.toFixed(1)}</td>
-									</tr>
-								{:else}
-									<tr><td class="py-6 text-center text-dim" colspan="4">Nothing yet.</td></tr>
-								{/each}
-							</tbody>
-						</table>
-					{/each}
-				</div>
 			{:catch}
-				<header>Search</header>
-				<p class="px-3 py-6 text-center text-sm text-hot">Couldn&rsquo;t reach Search Console. Check the connection below.</p>
+				<p class="px-3 py-6 text-center text-sm text-hot">
+					Couldn&rsquo;t reach Search Console. <a class="text-cool" href={resolve("/admin/settings")}>Check the settings</a>.
+				</p>
 			{/await}
 		{:else}
-			<header>Search</header>
+			<p class="px-3 py-6 text-center text-sm text-dim">
+				<a class="text-cool" href={resolve("/admin/settings")}>Connect Google Search Console</a> to see search stats here.
+			</p>
 		{/if}
-		<details open={!data.searchSite}>
-			<summary class="cursor-pointer px-3 py-2 text-xs text-dim hover:text-fg">
-				{data.searchSite ? "Connection" : "Connect Google Search Console to see search stats here"}
-			</summary>
-			<form class="admin-form grid gap-3 p-3 pt-1" method="POST" action="?/searchConsole" use:enhance>
-				{#if !data.searchSite}
-					<p class="text-xs text-dim">
-						In Google Cloud, enable the Search Console API, create a service account and download a JSON
-						key. Then in Search Console, add the service account&rsquo;s email as a user of the property.
-					</p>
-				{/if}
-				<label>
-					Property
-					<input name="site" required placeholder={data.searchPlaceholder} value={data.searchSite ?? ""}>
-				</label>
-				<label>
-					Service account key
-					<textarea
-						class="font-mono text-xs"
-						name="serviceAccount"
-						rows="3"
-						autocomplete="off"
-						spellcheck="false"
-						required={!data.searchSite}
-						placeholder={data.searchSite ? "Saved: leave blank to keep it" : "The whole JSON file"}
-					></textarea>
-				</label>
-				{#if form?.searchError}
-					<p class="text-sm text-hot" role="alert">{form.searchError}</p>
-				{/if}
-				<div class="flex gap-2">
-					<button class="abtn abtn-primary" type="submit">{data.searchSite ? "Save" : "Connect"}</button>
-					{#if data.searchSite}
-						<button class="abtn abtn-danger ml-auto" type="submit" formaction="?/forgetSearchConsole" formnovalidate>Disconnect</button>
-					{/if}
-				</div>
-			</form>
-		</details>
 	</section>
 
 	<section class="apanel">
