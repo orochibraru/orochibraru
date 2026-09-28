@@ -30,6 +30,23 @@
 </div>
 
 <div class="grid gap-4 lg:grid-cols-2">
+	{#if data.digest}
+		<section class="apanel lg:col-span-2">
+			<header>Today</header>
+			<div class="grid gap-2 p-3 text-sm leading-relaxed">
+				{#await data.digest}
+					<p class="text-dim">Reading the numbers&hellip;</p>
+				{:then paragraphs}
+					{#each paragraphs as paragraph, index (index)}
+						<p>{paragraph}</p>
+					{:else}
+						<p class="text-dim">Nothing to report.</p>
+					{/each}
+				{/await}
+			</div>
+		</section>
+	{/if}
+
 	<section class="apanel lg:col-span-2">
 		{#if data.analytics}
 			{#await data.analytics}
