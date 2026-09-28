@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/orochibraru/orochibraru/compare/v1.10.0...v1.11.0) (2026-09-28)
+
+### Features
+
+- **admin:** sidebar nav, Sentry, branded sign-in errors, dev bypass
+  ([199e2e3](https://github.com/orochibraru/orochibraru/commit/199e2e3c897b1471e1ca3df2e2c363933e421cf6))
+
 ## [1.10.0](https://github.com/orochibraru/orochibraru/compare/v1.9.0...v1.10.0) (2026-09-28)
 
 ### Features
