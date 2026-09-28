@@ -10,6 +10,7 @@
 	// the range the chart shows: 30 days until a tile is picked
 	let selected = $state(2);
 	const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
+	const percent = new Intl.NumberFormat("en", { style: "percent", maximumFractionDigits: 1 });
 </script>
 
 <svelte:head>
@@ -104,6 +105,106 @@
 					<button class="abtn abtn-primary" type="submit">{data.umami ? "Save" : "Connect"}</button>
 					{#if data.umami}
 						<button class="abtn abtn-danger ml-auto" type="submit" formaction="?/forgetUmami" formnovalidate>Disconnect</button>
+					{/if}
+				</div>
+			</form>
+		</details>
+	</section>
+
+	<section class="apanel lg:col-span-2">
+		{#if data.search}
+			{#await data.search}
+				<header>Search</header>
+				<p class="px-3 py-6 text-center text-sm text-dim">Asking Search Console&hellip;</p>
+			{:then stats}
+				<header>
+					Search
+					<span class="text-xs font-normal text-dim">last {stats.days} days, the last two or three still filling in</span>
+					<a class="ml-auto text-xs font-normal text-dim hover:text-fg" href={stats.url} target="_blank" rel="noopener">Search Console</a>
+				</header>
+				<div class="grid grid-cols-2 gap-2 p-3 sm:grid-cols-4">
+					{#each [["Clicks", compact.format(stats.totals.clicks)], ["Impressions", compact.format(stats.totals.impressions)], ["CTR", percent.format(stats.totals.ctr)], ["Avg position", stats.totals.position.toFixed(1)]] as [label, value] (label)}
+						<div class="rounded-lg bg-fg/3 px-3 py-2.5 leading-tight">
+							<div class="text-[11px] font-medium tracking-wide text-dim uppercase">{label}</div>
+							<div class="mt-1.5 text-xl font-bold">{value}</div>
+						</div>
+					{/each}
+				</div>
+				<VisitorsChart
+					series={stats.series}
+					unit="day"
+					rows={[
+						{ key: "clicks", title: "Clicks", noun: "click" },
+						{ key: "impressions", title: "Impressions", noun: "impression" },
+					]}
+				/>
+				<div class="grid border-t border-line lg:grid-cols-2">
+					{#each [["Top queries", stats.queries], ["Top pages", stats.pages]] as const as [title, rows] (title)}
+						<table class="atable">
+							<thead>
+								<tr>
+									<th class="w-full">{title}</th>
+									<th class="text-right">Clicks</th>
+									<th class="text-right">Impr.</th>
+									<th class="text-right">Pos.</th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each rows as row (row.key)}
+									<tr>
+										<td class="max-w-0 truncate" title={row.key}>{row.key.replace(/^https?:\/\/[^/]+/, "") || "/"}</td>
+										<td class="text-right tabular-nums">{row.clicks}</td>
+										<td class="text-right tabular-nums text-dim">{row.impressions}</td>
+										<td class="text-right tabular-nums text-dim">{row.position.toFixed(1)}</td>
+									</tr>
+								{:else}
+									<tr><td class="py-6 text-center text-dim" colspan="4">Nothing yet.</td></tr>
+								{/each}
+							</tbody>
+						</table>
+					{/each}
+				</div>
+			{:catch}
+				<header>Search</header>
+				<p class="px-3 py-6 text-center text-sm text-hot">Couldn&rsquo;t reach Search Console. Check the connection below.</p>
+			{/await}
+		{:else}
+			<header>Search</header>
+		{/if}
+		<details open={!data.searchSite}>
+			<summary class="cursor-pointer px-3 py-2 text-xs text-dim hover:text-fg">
+				{data.searchSite ? "Connection" : "Connect Google Search Console to see search stats here"}
+			</summary>
+			<form class="admin-form grid gap-3 p-3 pt-1" method="POST" action="?/searchConsole" use:enhance>
+				{#if !data.searchSite}
+					<p class="text-xs text-dim">
+						In Google Cloud, enable the Search Console API, create a service account and download a JSON
+						key. Then in Search Console, add the service account&rsquo;s email as a user of the property.
+					</p>
+				{/if}
+				<label>
+					Property
+					<input name="site" required placeholder={data.searchPlaceholder} value={data.searchSite ?? ""}>
+				</label>
+				<label>
+					Service account key
+					<textarea
+						class="font-mono text-xs"
+						name="serviceAccount"
+						rows="3"
+						autocomplete="off"
+						spellcheck="false"
+						required={!data.searchSite}
+						placeholder={data.searchSite ? "Saved: leave blank to keep it" : "The whole JSON file"}
+					></textarea>
+				</label>
+				{#if form?.searchError}
+					<p class="text-sm text-hot" role="alert">{form.searchError}</p>
+				{/if}
+				<div class="flex gap-2">
+					<button class="abtn abtn-primary" type="submit">{data.searchSite ? "Save" : "Connect"}</button>
+					{#if data.searchSite}
+						<button class="abtn abtn-danger ml-auto" type="submit" formaction="?/forgetSearchConsole" formnovalidate>Disconnect</button>
 					{/if}
 				</div>
 			</form>

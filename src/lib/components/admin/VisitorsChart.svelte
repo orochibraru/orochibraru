@@ -1,14 +1,20 @@
 <script lang="ts">
-	import type { Point } from "$lib/server/umami";
+	type Row = { key: string; title: string; noun: string };
 
-	let { series, unit }: { series: Point[]; unit: "hour" | "day" | "month" } = $props();
-
-	// Views and visits are an order of magnitude apart: two charts on one time axis,
-	// never two scales on one chart. Hovering a column reads out both.
-	const ROWS = [
-		{ key: "views", title: "Views" },
-		{ key: "visits", title: "Visits" },
-	] as const;
+	// Views and visits (clicks and impressions) are an order of magnitude apart: two
+	// charts on one time axis, never two scales on one chart. Hovering a column reads out both.
+	let {
+		series,
+		unit,
+		rows = [
+			{ key: "views", title: "Views", noun: "view" },
+			{ key: "visits", title: "Visits", noun: "visit" },
+		],
+	}: {
+		series: ({ t: number } & Record<string, number>)[];
+		unit: "hour" | "day" | "month";
+		rows?: Row[];
+	} = $props();
 
 	let hovered = $state<number | null>(null);
 	const point = $derived(hovered === null ? null : series[hovered]);
@@ -25,19 +31,22 @@
 		),
 	);
 	const count = (n: number, noun: string) => `${n} ${noun}${n === 1 ? "" : "s"}`;
-	const max = (key: "views" | "visits") => Math.max(1, ...series.map((p) => p[key]));
+	const max = (key: string) => Math.max(1, ...series.map((p) => p[key] ?? 0));
 </script>
 
 <div class="px-3 pb-3" role="presentation" onpointerleave={() => (hovered = null)}>
 	<p class="h-5 text-xs text-dim tabular-nums">
 		{#if point}
-			<span class="text-fg">{format.format(point.t)}</span> &middot; {count(point.views, "view")} &middot; {count(point.visits, "visit")}
+			<span class="text-fg">{format.format(point.t)}</span>{#each rows as row (row.key)}
+				&middot; {count(point[row.key] ?? 0, row.noun)}
+			{/each}
 		{:else if series.length}
 			{format.format(series.at(0)?.t)} &ndash; {format.format(series.at(-1)?.t)}
 		{/if}
 	</p>
-	{#each ROWS as row (row.key)}
+	{#each rows as row (row.key)}
 		{@const top = max(row.key)}
+		{@const value = (p: (typeof series)[number]) => p[row.key] ?? 0}
 		<div class="mt-2 flex justify-between text-[11px] text-dim">
 			<span>{row.title} per {unit}</span>
 			<span class="tabular-nums">max {top}</span>
@@ -55,7 +64,7 @@
 							"w-full max-w-8 rounded-t-sm bg-accent transition-opacity",
 							hovered !== null && hovered !== index && "opacity-35",
 						]}
-						style:height={p[row.key] ? `max(2px, ${(p[row.key] / top) * 100}%)` : "0"}
+						style:height={value(p) ? `max(2px, ${(value(p) / top) * 100}%)` : "0"}
 					></div>
 				</div>
 			{/each}

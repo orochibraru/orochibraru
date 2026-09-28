@@ -177,3 +177,12 @@ export const umami = sqliteTable("umami", {
 	/** Sealed with AES-GCM: see crypto.ts. */
 	apiKey: text("api_key").notNull(),
 });
+
+/** One row, id 1: the Search Console property the admin overview reads search stats from. */
+export const searchConsole = sqliteTable("search_console", {
+	id: integer("id").primaryKey(),
+	/** sc-domain:example.com, or a URL-prefix property's https://example.com/ */
+	site: text("site").notNull(),
+	/** The service account's JSON key, sealed with AES-GCM: see crypto.ts. */
+	serviceAccount: text("service_account").notNull(),
+});

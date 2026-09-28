@@ -36,6 +36,13 @@
 			"when": 1790599550989,
 			"tag": "0004_sync_history",
 			"breakpoints": true
+		},
+		{
+			"idx": 5,
+			"version": "6",
+			"when": 1790601278968,
+			"tag": "0005_search_console",
+			"breakpoints": true
 		}
 	]
 }
