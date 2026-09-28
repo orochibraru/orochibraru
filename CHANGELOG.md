@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/orochibraru/orochibraru/compare/v1.9.0...v1.10.0) (2026-09-28)
+
+### Features
+
+- better admin options
+  ([a45b77a](https://github.com/orochibraru/orochibraru/commit/a45b77adec6cb977ebcdedef1c6b9482143592dd))
+
 ## [1.9.0](https://github.com/orochibraru/orochibraru/compare/v1.8.0...v1.9.0) (2026-09-25)
 
 ### Features
