@@ -48,6 +48,12 @@ export const post = sqliteTable("post", {
 	updatedAt: timestamp("updated_at"),
 });
 
+/** The slugs of deleted posts: their URLs redirect to the blog instead of 404ing. */
+export const deletedPost = sqliteTable("deleted_post", {
+	slug: text("slug").primaryKey(),
+	deletedAt: timestamp("deleted_at"),
+});
+
 export type { Channel } from "../../projects";
 
 /**

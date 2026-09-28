@@ -5,8 +5,10 @@ import {
 	invalidate,
 	listProjectCards,
 	projectMarkdown,
+	wasPostDeleted,
 } from "../src/lib/server/content";
 import { guide, post, project } from "../src/lib/server/db/schema";
+import { createPost, deletePost, setPostStatus } from "../src/lib/server/editor";
 import { loadGuides } from "../src/lib/server/guides";
 import { storeImage } from "../src/lib/server/images";
 import { loadPosts } from "../src/lib/server/posts";
@@ -128,5 +130,16 @@ describe("posts", () => {
 		const slugs = (await loadPosts()).map((item) => item.slug);
 		expect(slugs).toContain("hello");
 		expect(slugs).not.toContain("secret");
+	});
+
+	test("a deleted post leaves the list but its slug is remembered", async () => {
+		const gone = setPostStatus(createPost({ title: "Gone soon" }).id, "published");
+		expect((await loadPosts()).map((item) => item.slug)).toContain(gone.slug);
+		deletePost(gone.id);
+		expect((await loadPosts()).map((item) => item.slug)).not.toContain(gone.slug);
+		expect(wasPostDeleted(gone.slug)).toBe(true);
+		expect(wasPostDeleted("hello")).toBe(false);
+		// deleting it twice, or a post that was never there, is harmless
+		deletePost(gone.id);
 	});
 });

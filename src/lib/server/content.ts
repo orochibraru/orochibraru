@@ -4,7 +4,7 @@
 import { and, asc, count, eq } from "drizzle-orm";
 import { SITE } from "$lib/seo";
 import { getDb } from "./db";
-import { guide, project } from "./db/schema";
+import { deletedPost, guide, project } from "./db/schema";
 import { invalidateGuides } from "./guides";
 import { imageByName } from "./images";
 import { invalidatePosts } from "./posts";
@@ -122,6 +122,10 @@ export const getPublishedProjectRow = (repo: string) =>
 		.from(project)
 		.where(and(eq(project.repo, repo), eq(project.published, true)))
 		.get();
+
+/** Whether a post used to live at this slug, so its URL can redirect instead of 404ing. */
+export const wasPostDeleted = (slug: string) =>
+	getDb().select().from(deletedPost).where(eq(deletedPost.slug, slug)).get() !== undefined;
 
 /** Every save and every sync ends here. */
 export function invalidate() {

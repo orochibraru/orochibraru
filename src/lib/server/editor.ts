@@ -4,7 +4,16 @@ import { and, asc, desc, eq, isNull, like, or } from "drizzle-orm";
 import { z } from "zod";
 import { invalidate } from "./content";
 import { getDb } from "./db";
-import { docsVersion, guide, image, installedRepo, post, project, syncRun } from "./db/schema";
+import {
+	deletedPost,
+	docsVersion,
+	guide,
+	image,
+	installedRepo,
+	post,
+	project,
+	syncRun,
+} from "./db/schema";
 import { imageUrl } from "./images";
 import { ProjectFields } from "./project-pages";
 
@@ -121,8 +130,14 @@ export function setPostStatus(id: number, status: PostRow["status"]): PostRow {
 	return row;
 }
 
+/** Its URL lives on as a redirect to the blog, unless a later post takes the slug. */
 export function deletePost(id: number) {
-	getDb().delete(post).where(eq(post.id, id)).run();
+	getDb().transaction((tx) => {
+		const [row] = tx.delete(post).where(eq(post.id, id)).returning().all();
+		if (row) {
+			tx.insert(deletedPost).values({ slug: row.slug }).onConflictDoNothing().run();
+		}
+	});
 	invalidate();
 }
 

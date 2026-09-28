@@ -313,6 +313,9 @@
 	.atable .row-link {
 		@apply font-medium after:absolute after:inset-0 after:content-[''];
 	}
+	.menu-item {
+		@apply flex w-full rounded-md px-2.5 py-1.5 text-left transition-colors hover:bg-fg/8;
+	}
 	.apanel {
 		@apply overflow-hidden rounded-xl border border-line bg-surface;
 	}
