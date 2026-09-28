@@ -9,9 +9,22 @@ export const load = async ({ request, url }) => {
 		throw error(404);
 	}
 	const session = await auth.api.getSession({ headers: request.headers });
-	// an OAuth authorization parks its query here: never short-circuit that one
-	if (session && isAdminEmail(session.user.email) && !url.searchParams.has("client_id")) {
+	// better-auth sends failed sign-ins and authorizations here as ?error=…
+	const failure = url.searchParams.get("error");
+	// an OAuth authorization parks its query here: never short-circuit that one, nor an error
+	if (
+		session &&
+		isAdminEmail(session.user.email) &&
+		!url.searchParams.has("client_id") &&
+		!failure
+	) {
 		throw redirect(303, url.searchParams.get("next") ?? "/admin");
 	}
-	return { signedInAs: session?.user.email ?? null };
+	return {
+		signedInAs: session?.user.email ?? null,
+		failure: failure && {
+			code: failure,
+			description: url.searchParams.get("error_description"),
+		},
+	};
 };

@@ -31,7 +31,7 @@
 	}}
 >
 	<div
-		class="sticky top-11 z-10 -mx-4 mb-8 flex h-12 items-center gap-2 border-b border-line bg-bg/85 px-4 backdrop-blur sm:-mx-8 sm:px-8"
+		class="sticky top-11 z-10 md:top-0 -mx-4 mb-8 flex h-12 items-center gap-2 border-b border-line bg-bg/85 px-4 backdrop-blur sm:-mx-8 sm:px-8"
 	>
 		<a
 			class="flex items-center gap-1.5 text-[.8125rem] text-dim hover:text-fg"
@@ -111,7 +111,7 @@
 					<Editor name="body" bind:value={body} />
 				{/key}
 			</div>
-			<div data-preview class={[!previewing && "hidden 2xl:block", "2xl:sticky 2xl:top-26 2xl:max-h-[calc(100dvh-7.5rem)] 2xl:overflow-y-auto 2xl:border-l 2xl:border-line 2xl:pl-8"]}>
+			<div data-preview class={[!previewing && "hidden 2xl:block", "2xl:sticky 2xl:top-15 2xl:max-h-[calc(100dvh-4.75rem)] 2xl:overflow-y-auto 2xl:border-l 2xl:border-line 2xl:pl-8"]}>
 				<Preview kind="post" markdown={body} />
 			</div>
 		</div>

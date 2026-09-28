@@ -49,6 +49,7 @@
 		"@lezer/highlight": "1.2.3",
 		"@milkdown/crepe": "7.22.1",
 		"@modelcontextprotocol/sdk": "1.30.0",
+		"@sentry/bun": "11.0.0",
 		"better-auth": "1.7.5",
 		"drizzle-orm": "0.45.2",
 		"lucide": "1.47.0",

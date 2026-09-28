@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/bun";
 import type { Handle, HandleServerError, ServerInit } from "@sveltejs/kit";
 import { building } from "$app/environment";
 import { unavailableAs503 } from "$lib/server/admin";
@@ -43,6 +44,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 export const handleError: HandleServerError = ({ error, event, status }) => {
 	if (status !== 404) {
 		console.error(`${event.request.method} ${event.url.pathname}`, error);
+		Sentry.captureException(error, {
+			extra: { method: event.request.method, path: event.url.pathname, status },
+		});
 	}
 };
 
@@ -51,6 +55,11 @@ const SIX_HOURS = 6 * 3600_000;
 export const init: ServerInit = () => {
 	if (building) {
 		return;
+	}
+	// Homerun injects SENTRY_DSN, SENTRY_RELEASE and SENTRY_ENVIRONMENT at deploy; without a DSN
+	// the SDK stays off. Errors only: no tracing, Homerun drops it anyway.
+	if (process.env.SENTRY_DSN) {
+		Sentry.init();
 	}
 	// Migrate before the first request, not during it: a schema that can't be brought
 	// up to date stops the process here, so the container never reports healthy on it.

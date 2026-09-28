@@ -3,6 +3,7 @@
 import { cimd } from "@better-auth/cimd";
 import { fetchClientMetadataResource } from "@better-auth/cimd/node";
 import { mcp } from "@better-auth/mcp";
+import * as Sentry from "@sentry/bun";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { genericOAuth, jwt } from "better-auth/plugins";
@@ -20,6 +21,24 @@ export function createAuth(db: DB, config: Env & { oidc: NonNullable<Env["oidc"]
 		trustedOrigins: [config.origin],
 		database: drizzleAdapter(db, { provider: "sqlite", schema }),
 		emailAndPassword: { enabled: false },
+		// failed sign-ins and authorizations land on our login page, not better-auth's stock one
+		onAPIError: { errorURL: `${config.origin}/admin/login` },
+		// better-auth logs failures like a token exchange the IdP rejected instead of
+		// throwing them: forward those to Sentry, or they only ever reach stdout
+		logger: {
+			log: (level, message, ...args) => {
+				console[level](`[Better Auth] ${message}`, ...args);
+				if (level === "error") {
+					// the token exchange logs the IdP's error body, an object, under an empty message
+					const body = args[0] as { error_description?: string } | undefined;
+					Sentry.captureException(
+						args.find((arg) => arg instanceof Error) ??
+							new Error(message || body?.error_description || "better-auth error"),
+						{ extra: { args } },
+					);
+				}
+			},
+		},
 		// the OAuth provider owns /oauth2/token; better-auth's own /token would shadow it
 		disabledPaths: ["/token"],
 		databaseHooks: {
@@ -40,6 +59,9 @@ export function createAuth(db: DB, config: Env & { oidc: NonNullable<Env["oidc"]
 						clientSecret: config.oidc.clientSecret,
 						scopes: ["openid", "profile", "email"],
 						pkce: true,
+						// the IdP's client is registered for client_secret_basic, the OAuth
+						// default; better-auth would otherwise send client_secret_post
+						authentication: "basic",
 						// identity comes from verified ID-token claims, never an unchecked decode
 						requireIdTokenVerification: true,
 					},

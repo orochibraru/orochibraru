@@ -17,12 +17,19 @@ export async function unavailableAs503<T>(auth: Promise<T> | null): Promise<T | 
 /**
  * The fence around /admin. No SSO configured: the area doesn't exist (404).
  * No session: off to the login page. A session whose email is no longer on
- * ADMIN_EMAILS: refused, even though better-auth still has it.
+ * ADMIN_EMAILS: refused, even though better-auth still has it. Under `vite dev`
+ * there is no fence at all.
  */
 export async function requireAdmin(
 	event: Pick<RequestEvent, "request" | "url">,
 	deps?: Deps,
 ): Promise<{ email: string; name: string }> {
+	// `vite dev` only: SvelteKit's `dev` is this constant, and a build compiles it to
+	// false. Not $app/environment itself, which `bun test` can't resolve. Tests pass
+	// deps and always get the real fence.
+	if (import.meta.env.DEV && !deps) {
+		return { email: "dev@localhost", name: "Dev" };
+	}
 	const auth = deps ? deps.auth : await unavailableAs503(getAuth());
 	if (!auth) {
 		throw error(404);

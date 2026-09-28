@@ -1,5 +1,15 @@
 <script lang="ts">
-	import { ExternalLink, LogOut, Search } from "@lucide/svelte";
+	import {
+		Boxes,
+		ExternalLink,
+		FileText,
+		GitBranch,
+		Images,
+		LayoutDashboard,
+		LogOut,
+		Plug,
+		Search,
+	} from "@lucide/svelte";
 	import { goto } from "$app/navigation";
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
@@ -10,12 +20,12 @@
 	let { data, children } = $props();
 
 	const NAV = [
-		[resolve("/admin"), "Overview"],
-		[resolve("/admin/posts"), "Posts"],
-		[resolve("/admin/projects"), "Projects"],
-		[resolve("/admin/images"), "Images"],
-		[resolve("/admin/github"), "GitHub"],
-		[resolve("/admin/connections"), "Connections"],
+		[resolve("/admin"), "Overview", LayoutDashboard],
+		[resolve("/admin/posts"), "Posts", FileText],
+		[resolve("/admin/projects"), "Projects", Boxes],
+		[resolve("/admin/images"), "Images", Images],
+		[resolve("/admin/github"), "GitHub", GitBranch],
+		[resolve("/admin/connections"), "Connections", Plug],
 	] as const;
 
 	const current = (href: string) =>
@@ -75,9 +85,10 @@
 
 <svelte:window onkeydown={onWindowKeydown} />
 
-<div data-admin class="flex min-h-dvh flex-col">
+<div data-admin class="flex min-h-dvh flex-col md:pl-56">
+	<!-- phones keep a top bar: the sidebar takes over from md up -->
 	<header
-		class="sticky top-0 z-20 flex h-11 shrink-0 items-center gap-2 border-b border-line bg-bg/85 pr-2 pl-3 backdrop-blur"
+		class="sticky top-0 z-20 flex h-11 shrink-0 items-center gap-2 border-b border-line bg-bg/85 pr-2 pl-3 backdrop-blur md:hidden"
 	>
 		<a
 			class="grid size-6 shrink-0 place-items-center rounded-md bg-spark text-onspark"
@@ -100,32 +111,69 @@
 		</nav>
 		<button
 			type="button"
-			class="ml-auto flex h-7 shrink-0 items-center gap-2 border border-line bg-surface px-2 text-[.8125rem] text-dim transition-colors hover:border-edge hover:text-fg sm:w-60"
+			class="ml-auto grid size-7 shrink-0 place-items-center text-dim transition-colors hover:text-fg"
+			aria-label="Jump to…"
 			onclick={() => palette?.open()}
 		>
 			<Search class="size-3.5" aria-hidden="true" />
-			<span class="hidden flex-1 text-left sm:inline">Jump to…</span>
-			<span class="kbd hidden sm:inline-grid">⌘K</span>
-		</button>
-		<a
-			class="grid size-7 shrink-0 place-items-center text-dim transition-colors hover:text-fg"
-			href={resolve("/")}
-			target="_blank"
-			title="Open the site"
-			aria-label="Open the site"
-		>
-			<ExternalLink class="size-3.5" aria-hidden="true" />
-		</a>
-		<button
-			type="button"
-			class="grid size-7 shrink-0 place-items-center text-dim transition-colors hover:text-hot"
-			title="Sign out {data.admin.email}"
-			aria-label="Sign out {data.admin.email}"
-			onclick={signOut}
-		>
-			<LogOut class="size-3.5" aria-hidden="true" />
 		</button>
 	</header>
+
+	<aside
+		class="fixed inset-y-0 left-0 z-20 hidden w-56 flex-col border-r border-line bg-surface md:flex"
+	>
+		<a class="flex h-14 shrink-0 items-center gap-2.5 px-4" href={resolve("/admin")}>
+			<span class="grid size-7 place-items-center rounded-md bg-spark text-onspark" aria-hidden="true"
+				><Logo mono class="size-4.5" /></span
+			>
+			<span class="text-sm font-semibold">orochibraru</span>
+		</a>
+		<div class="px-3 pb-3">
+			<button
+				type="button"
+				class="flex h-8 w-full items-center gap-2 rounded-lg border border-line bg-bg px-2 text-[.8125rem] text-dim transition-colors hover:border-edge hover:text-fg"
+				onclick={() => palette?.open()}
+			>
+				<Search class="size-3.5" aria-hidden="true" />
+				<span class="flex-1 text-left">Jump to…</span>
+				<span class="kbd">⌘K</span>
+			</button>
+		</div>
+		<nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3" aria-label="Admin">
+			{#each NAV as [href, label, Icon] (href)}
+				<a
+					{href}
+					class={[
+						"flex h-8 items-center gap-2.5 rounded-lg px-2 text-[.8125rem] transition-colors",
+						current(href) ? "bg-fg/8 font-medium text-fg" : "text-dim hover:bg-fg/4 hover:text-fg",
+					]}
+					aria-current={current(href) ? "page" : undefined}
+				>
+					<Icon class={["size-4", current(href) && "text-spark"]} aria-hidden="true" />
+					{label}
+				</a>
+			{/each}
+		</nav>
+		<div class="flex flex-col gap-0.5 border-t border-line p-3">
+			<a
+				class="flex h-8 items-center gap-2.5 rounded-lg px-2 text-[.8125rem] text-dim transition-colors hover:bg-fg/4 hover:text-fg"
+				href={resolve("/")}
+				target="_blank"
+			>
+				<ExternalLink class="size-4" aria-hidden="true" />
+				Open the site
+			</a>
+			<button
+				type="button"
+				class="flex h-8 items-center gap-2.5 rounded-lg px-2 text-left text-[.8125rem] text-dim transition-colors hover:bg-fg/4 hover:text-hot"
+				title="Sign out {data.admin.email}"
+				onclick={signOut}
+			>
+				<LogOut class="size-4 shrink-0" aria-hidden="true" />
+				<span class="min-w-0 flex-1 truncate">Sign out <span class="text-xs">{data.admin.email}</span></span>
+			</button>
+		</div>
+	</aside>
 
 	<main class="w-full flex-1 px-4 pt-6 pb-16 sm:px-8">
 		{@render children()}
