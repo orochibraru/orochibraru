@@ -3,6 +3,7 @@
 	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
 	import { statusClass } from "$lib/admin";
+	import Confirm from "$lib/components/admin/Confirm.svelte";
 
 	let { data } = $props();
 
@@ -12,6 +13,7 @@
 	let menu = $state<HTMLElement>();
 	let target = $state<Row>();
 	let at = $state({ x: 0, y: 0 });
+	let confirmer = $state<Confirm>();
 
 	function open(post: Row, x: number, y: number) {
 		target = post;
@@ -113,10 +115,7 @@
 		{@const post = target}
 		<form
 			method="POST"
-			use:enhance={({ action, cancel }) => {
-				if (action.search === "?/delete" && !confirm(`Delete “${post.title}”? Its URL will redirect to the blog.`)) {
-					cancel();
-				}
+			use:enhance={() => {
 				menu?.hidePopover();
 			}}
 		>
@@ -128,7 +127,21 @@
 			{:else}
 				<button class="menu-item" role="menuitem" formaction="?/publish">Publish</button>
 			{/if}
-			<button class="menu-item text-hot" role="menuitem" formaction="?/delete">Delete</button>
+			<button
+				class="menu-item text-hot"
+				role="menuitem"
+				formaction="?/delete"
+				onclick={(event) => {
+					menu?.hidePopover();
+					confirmer?.guard(event, {
+						title: `Delete “${post.title}”?`,
+						body: "This can't be undone. Its URL will redirect to the blog.",
+						action: "Delete post",
+					});
+				}}>Delete</button
+			>
 		</form>
 	{/if}
 </div>
+
+<Confirm bind:this={confirmer} />

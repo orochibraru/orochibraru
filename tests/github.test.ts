@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:tes
 import { createHmac, generateKeyPairSync } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { guide, image, project, syncRun } from "../src/lib/server/db/schema";
-import { docsStatuses, docsVersions } from "../src/lib/server/editor";
+import { docsStatuses, docsVersions, lastSyncs, syncHistory } from "../src/lib/server/editor";
 import { env } from "../src/lib/server/env";
 import {
 	appJwt,
@@ -11,7 +11,7 @@ import {
 	recordInstallation,
 	useGithubFetch,
 } from "../src/lib/server/github/app";
-import { reconcile, selectDocs, syncRepo } from "../src/lib/server/github/sync";
+import { diffOf, reconcile, selectDocs, syncRepo } from "../src/lib/server/github/sync";
 import { handleWebhook, verifySignature } from "../src/lib/server/github/webhook";
 import { loadGuides } from "../src/lib/server/guides";
 import { freshSite, SAMPLE_IMAGE } from "./helpers";
@@ -168,7 +168,8 @@ describe("sync", () => {
 			"docs/images/hero.webp": await Bun.file(SAMPLE_IMAGE).bytes(),
 		};
 		const first = await syncRepo("tool");
-		expect(first).toEqual({ status: "ok", changed: 3 });
+		// two guides, the screenshot and docs/config.json
+		expect(first).toEqual({ status: "ok", changed: 4 });
 		expect(site.db.select().from(guide).where(eq(guide.project, "tool")).all()).toHaveLength(2);
 		expect(site.db.select().from(image).where(eq(image.project, "tool")).get()?.name).toBe("hero");
 		const [version] = docsVersions("tool");
@@ -182,6 +183,23 @@ describe("sync", () => {
 		const second = await syncRepo("tool");
 		expect(second.changed).toBe(1);
 		expect(calls.filter((call) => call.includes("/git/blobs/"))).toHaveLength(2); // the guide and config
+
+		const [latest, previous] = syncHistory().find((group) => group.repo === "tool")?.runs ?? [];
+		expect(latest?.channel).toBe("latest");
+		expect(latest?.changes).toEqual([
+			expect.objectContaining({
+				path: "docs/setup.md",
+				kind: "changed",
+				diff: "@@ -1,3 +1,3 @@\n # Setup\n \n-Run it.\n+Run it twice.",
+			}),
+		]);
+		expect(previous?.changes.map((change) => [change.kind, change.path])).toEqual([
+			["added", "README.md"],
+			["added", "docs/config.json"],
+			["added", "docs/images/hero.webp"],
+			["added", "docs/setup.md"],
+		]);
+		expect(previous?.changes.find((change) => change.path.endsWith(".webp"))?.diff).toBeNull();
 	});
 
 	test("deletions upstream are deletions here", async () => {
@@ -200,6 +218,12 @@ describe("sync", () => {
 		).toEqual(["readme"]);
 		expect(site.db.select().from(image).where(eq(image.project, "tool")).all()).toHaveLength(0);
 		expect(docsStatuses().tool).toBe("valid");
+		const [latest] = syncHistory().find((group) => group.repo === "tool")?.runs ?? [];
+		expect(latest?.changes.map((change) => [change.kind, change.path])).toEqual([
+			["removed", "docs/images/hero"],
+			["removed", "docs/setup.md"],
+		]);
+		expect(diffOf("a\n", "")).toBe("@@ -1,1 +0,0 @@\n-a");
 	});
 
 	test("an invalid config changes nothing and says why", async () => {
@@ -241,9 +265,22 @@ describe("sync", () => {
 		expect(lines).toContain("tool: ✓ done, 1 change");
 
 		lines.length = 0;
-		await reconcile((line) => lines.push(line));
+		const done: [string, string | undefined][] = [];
+		await reconcile(
+			(line) => lines.push(line),
+			(repo, error) => done.push([repo, error]),
+		);
 		expect(lines).toContain("tool: me/tool@main is at c6, last synced c6, up to date");
 		expect(lines.at(-1)).toBe("Every project checked.");
+		// an up-to-date project is still reported done, so its spinner stops
+		expect(done).toEqual([["tool", undefined]]);
+		expect(lastSyncs()).toEqual([
+			expect.objectContaining({
+				repo: "tool",
+				githubRepo: "me/tool",
+				run: expect.objectContaining({ status: "ok", sha: "c6", changed: 1 }),
+			}),
+		]);
 	});
 });
 

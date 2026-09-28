@@ -142,12 +142,26 @@ export const installedRepo = sqliteTable("installed_repo", {
 export const syncRun = sqliteTable("sync_run", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
 	repo: text("repo").notNull(),
+	/** Null on a run that failed before it got to a channel, and on runs from before channels. */
+	channel: text("channel", { enum: CHANNELS }),
 	sha: text("sha"),
 	status: text("status", { enum: ["running", "ok", "failed", "skipped"] }).notNull(),
 	error: text("error"),
 	changed: integer("changed").notNull().default(0),
 	startedAt: timestamp("started_at"),
 	finishedAt: integer("finished_at", { mode: "timestamp_ms" }),
+});
+
+/** One file a sync run added, changed or removed. Images carry no diff. */
+export const syncChange = sqliteTable("sync_change", {
+	id: integer("id").primaryKey({ autoIncrement: true }),
+	runId: integer("run_id")
+		.notNull()
+		.references(() => syncRun.id, { onDelete: "cascade" }),
+	path: text("path").notNull(),
+	kind: text("kind", { enum: ["added", "changed", "removed"] }).notNull(),
+	/** Unified diff hunks, `@@` headers included, without the file header. */
+	diff: text("diff"),
 });
 
 export const webhookDelivery = sqliteTable("webhook_delivery", {

@@ -3,6 +3,7 @@
 	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
 	import { syncScroll } from "$lib/admin";
+	import Confirm from "$lib/components/admin/Confirm.svelte";
 	import Editor from "$lib/components/admin/Editor.svelte";
 	import Preview from "$lib/components/admin/Preview.svelte";
 
@@ -12,6 +13,7 @@
 	let status = $derived(data.post.status);
 	let previewing = $state(false);
 	let saving = $state(false);
+	let confirmer = $state<Confirm>();
 </script>
 
 <svelte:head>
@@ -122,12 +124,16 @@
 				class="abtn abtn-danger ml-auto"
 				type="submit"
 				formaction="?/delete"
-				onclick={(event) => {
-					if (!confirm(`Delete “${data.post.title}”? This can't be undone.`)) {
-						event.preventDefault();
-					}
-				}}>Delete post</button
+				onclick={(event) =>
+					confirmer?.guard(event, {
+						title: `Delete “${data.post.title}”?`,
+						body: "This can't be undone. Its URL will redirect to the blog.",
+						action: "Delete post",
+					})}>Delete post</button
 			>
 		</div>
 	</div>
 </form>
+
+<!-- outside the form above: the dialog carries a form of its own -->
+<Confirm bind:this={confirmer} />

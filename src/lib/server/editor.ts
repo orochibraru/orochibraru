@@ -1,6 +1,6 @@
 // Every write to posts, projects and images, for the admin UI and the MCP
 // tools alike: one place validates, one place clears the render cache.
-import { and, asc, desc, eq, isNull, like, or } from "drizzle-orm";
+import { and, asc, desc, eq, gt, inArray, isNotNull, isNull, like, max, or } from "drizzle-orm";
 import { z } from "zod";
 import { invalidate } from "./content";
 import { getDb } from "./db";
@@ -12,6 +12,7 @@ import {
 	installedRepo,
 	post,
 	project,
+	syncChange,
 	syncRun,
 } from "./db/schema";
 import { imageUrl } from "./images";
@@ -242,6 +243,72 @@ export const recentSyncRuns = (limit = 8, repo?: string) =>
 		.orderBy(desc(syncRun.startedAt))
 		.limit(limit)
 		.all();
+
+/** Every project with a linked repo and its most recent sync run, if it has one. */
+export function lastSyncs() {
+	const db = getDb();
+	const latest = db
+		.select({ id: max(syncRun.id) })
+		.from(syncRun)
+		.groupBy(syncRun.repo)
+		.all()
+		.flatMap((row) => (row.id ? [row.id] : []));
+	const runs = new Map(
+		(latest.length ? db.select().from(syncRun).where(inArray(syncRun.id, latest)).all() : []).map(
+			(run) => [run.repo, run],
+		),
+	);
+	return db
+		.select({ repo: project.repo, name: project.name, githubRepo: project.githubRepo })
+		.from(project)
+		.where(isNotNull(project.githubRepo))
+		.orderBy(asc(project.position), asc(project.name))
+		.all()
+		.map((row) => ({ ...row, run: runs.get(row.repo) ?? null }));
+}
+
+export type SyncChangeRow = typeof syncChange.$inferSelect;
+
+/**
+ * The runs that did something, changed files or failed, grouped by project with
+ * the newest first, each with the files it touched. A run with nothing to show is left out.
+ */
+export function syncHistory(perRepo = 5) {
+	const db = getDb();
+	const byRepo = new Map<string, (typeof syncRun.$inferSelect)[]>();
+	const runs = db
+		.select()
+		.from(syncRun)
+		.where(or(gt(syncRun.changed, 0), eq(syncRun.status, "failed")))
+		.orderBy(desc(syncRun.id))
+		.all();
+	for (const run of runs) {
+		const list = byRepo.get(run.repo) ?? [];
+		if (list.length < perRepo) {
+			list.push(run);
+			byRepo.set(run.repo, list);
+		}
+	}
+	const ids = [...byRepo.values()].flat().map((run) => run.id);
+	// ponytail: every diff is sent with the page; load them on demand if first syncs make it heavy
+	const changes = new Map<number, SyncChangeRow[]>();
+	for (const change of ids.length
+		? db
+				.select()
+				.from(syncChange)
+				.where(inArray(syncChange.runId, ids))
+				.orderBy(asc(syncChange.path))
+				.all()
+		: []) {
+		changes.set(change.runId, [...(changes.get(change.runId) ?? []), change]);
+	}
+	return [...byRepo]
+		.sort(([a], [b]) => a.localeCompare(b))
+		.map(([repo, list]) => ({
+			repo,
+			runs: list.map((run) => ({ ...run, changes: changes.get(run.id) ?? [] })),
+		}));
+}
 
 /** What each channel of a project's docs was last synced from, latest first. */
 export const docsVersions = (repo?: string) =>

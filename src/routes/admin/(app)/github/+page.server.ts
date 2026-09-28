@@ -1,5 +1,5 @@
 import { fail } from "@sveltejs/kit";
-import { listAddableRepos } from "$lib/server/editor";
+import { lastSyncs, listAddableRepos, syncHistory } from "$lib/server/editor";
 import { env } from "$lib/server/env";
 import {
 	forgetGithubApp,
@@ -40,6 +40,8 @@ export const load = async ({ url, cookies }) => {
 		target: state && manifestTarget(state),
 		orgTarget: state && manifestTarget(state, "ORG"),
 		repos: listAddableRepos().map((repo) => repo.fullName),
+		overview: current ? lastSyncs() : [],
+		history: current ? syncHistory() : [],
 	};
 };
 

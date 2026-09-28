@@ -3,13 +3,22 @@
 // then written in one transaction: a sync that fails part-way changes nothing,
 // and the error lands in sync_run for the admin to read.
 import { basename } from "node:path";
+import { structuredPatch } from "diff";
 import { and, eq, isNotNull, notInArray } from "drizzle-orm";
 import { z } from "zod";
 import { DocsConfig } from "$lib/docs-config";
 import { ROOT_GUIDES } from "$lib/projects";
 import { invalidate } from "../content";
 import { getDb } from "../db";
-import { type Channel, docsVersion, guide, image, project, syncRun } from "../db/schema";
+import {
+	type Channel,
+	docsVersion,
+	guide,
+	image,
+	project,
+	syncChange,
+	syncRun,
+} from "../db/schema";
 import { type Prepared, prepareImage, recordImage } from "../images";
 import { type App, GithubError, getGithubApp, github } from "./app";
 
@@ -80,6 +89,21 @@ async function targetsOf(app: App, row: ProjectRow): Promise<Target[]> {
 
 const labelOf = (repoKey: string, channel: Channel) =>
 	channel === "latest" ? repoKey : `${repoKey} ${channel}`;
+
+type Change = Omit<typeof syncChange.$inferInsert, "id" | "runId">;
+
+/** The hunks between two versions of a text file, `@@` headers and all. */
+export function diffOf(before: string, after: string): string {
+	return structuredPatch("", "", before, after, "", "", { context: 3 })
+		.hunks.flatMap((hunk) => [
+			// an empty side starts at line 0, as in any unified diff: jsdiff's raw hunks say 1
+			`@@ -${hunk.oldLines ? hunk.oldStart : hunk.oldStart - 1},${hunk.oldLines} +${hunk.newLines ? hunk.newStart : hunk.newStart - 1},${hunk.newLines} @@`,
+			...hunk.lines,
+		])
+		.join("\n");
+}
+
+const configText = (config: unknown) => (config ? `${JSON.stringify(config, null, 2)}\n` : "");
 
 const message = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 
@@ -164,7 +188,7 @@ async function syncChannel(
 	const ref = wanted ?? target.ref;
 	const [run] = db
 		.insert(syncRun)
-		.values({ repo: repoKey, sha: wanted ?? null, status: "running" })
+		.values({ repo: repoKey, channel, sha: wanted ?? null, status: "running" })
 		.returning()
 		.all();
 	const runId = (run as typeof syncRun.$inferSelect).id;
@@ -218,7 +242,7 @@ async function syncChannel(
 				.all()
 				.map((item) => [item.name as string, item]),
 		);
-		const images: { name: string; sha: string; prepared: Prepared }[] = [];
+		const images: { name: string; path: string; sha: string; prepared: Prepared }[] = [];
 		for (const entry of wantedDocs.images) {
 			const name = imageNameOf(entry.path);
 			if (storedImages.get(name)?.sourceSha === entry.sha) {
@@ -229,7 +253,7 @@ async function syncChannel(
 			const prepared = await prepareImage(await blob(app, fullName, entry.sha)).catch((cause) => {
 				throw new GithubError(`${entry.path}: ${cause instanceof Error ? cause.message : cause}`);
 			});
-			images.push({ name, sha: entry.sha, prepared });
+			images.push({ name, path: entry.path, sha: entry.sha, prepared });
 		}
 
 		let config: DocsConfig | null = null;
@@ -249,9 +273,37 @@ async function syncChannel(
 			log("  ✓ docs/config.json is valid");
 		}
 
+		// what the history shows: each file this run touches, with a diff for the text ones
+		const changes: Change[] = guides.map((item) => {
+			const before = stored.get(item.slug);
+			return {
+				path: item.path,
+				kind: before ? "changed" : "added",
+				diff: diffOf(before?.markdown ?? "", item.markdown),
+			};
+		});
+		for (const item of images) {
+			changes.push({ path: item.path, kind: storedImages.has(item.name) ? "changed" : "added" });
+		}
+		const previousConfig = configText(
+			db
+				.select({ config: docsVersion.config })
+				.from(docsVersion)
+				.where(and(eq(docsVersion.project, repoKey), eq(docsVersion.channel, channel)))
+				.get()?.config,
+		);
+		const nextConfig = configText(config);
+		if (previousConfig !== nextConfig) {
+			changes.push({
+				path: "docs/config.json",
+				kind: !previousConfig ? "added" : !nextConfig ? "removed" : "changed",
+				diff: diffOf(previousConfig, nextConfig),
+			});
+		}
+
 		const keepSlugs = wantedDocs.guides.map((entry) => slugOf(entry.path));
 		const keepImages = wantedDocs.images.map((entry) => imageNameOf(entry.path));
-		let changed = guides.length + images.length;
+		let changed = guides.length + images.length + (previousConfig !== nextConfig ? 1 : 0);
 		db.transaction((tx) => {
 			for (const item of guides) {
 				tx.insert(guide)
@@ -303,9 +355,16 @@ async function syncChannel(
 				.all();
 			for (const item of removedGuides) {
 				log(`  − ${item.sourcePath}, gone from the repo`);
+				changes.push({ path: item.sourcePath, kind: "removed", diff: diffOf(item.markdown, "") });
 			}
 			for (const item of removedImages) {
 				log(`  − image ${item.name}, gone from the repo`);
+				changes.push({ path: `docs/images/${item.name}`, kind: "removed" });
+			}
+			if (changes.length) {
+				tx.insert(syncChange)
+					.values(changes.map((change) => ({ ...change, runId })))
+					.run();
 			}
 			changed += removedGuides.length + removedImages.length;
 			tx.insert(docsVersion)
@@ -376,9 +435,10 @@ export const touchesDocs = (paths: string[]) =>
 
 /**
  * The safety net for missed webhooks: every project whose default branch or
- * Latest release moved since its last sync is synced again.
+ * Latest release moved since its last sync is synced again. `done` hears about
+ * each project as it is checked, synced or not, with the error if it failed.
  */
-export async function reconcile(log = quiet) {
+export async function reconcile(log = quiet, done?: (repo: string, error?: string) => void) {
 	const app = await getGithubApp();
 	if (!app?.installationId) {
 		log("The GitHub App isn't installed: nothing to sync.");
@@ -416,12 +476,12 @@ export async function reconcile(log = quiet) {
 					`${labelOf(row.repo, target.channel)}: ${row.githubRepo}@${target.ref} is at ${short(commit.sha)}, last synced ${short(last?.sha)}${current ? ", up to date" : ""}`,
 				);
 			}
-			if (stale) {
-				await syncRepo(row.repo, head, log);
-			}
+			const result = stale ? await syncRepo(row.repo, head, log) : undefined;
+			done?.(row.repo, result?.error);
 		} catch (cause) {
 			console.error(`reconcile ${row.repo}:`, cause);
 			log(`${row.repo}: ✗ ${message(cause)}`);
+			done?.(row.repo, message(cause));
 		}
 	}
 	log("Every project checked.");
