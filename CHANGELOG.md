@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/orochibraru/orochibraru/compare/v1.12.0...v1.13.0) (2026-09-28)
+
+### Features
+
+- search console integration
+  ([fdc6122](https://github.com/orochibraru/orochibraru/commit/fdc6122f49ea77ebcbfa1ac45b864dc36ab59c2a))
+
 ## [1.12.0](https://github.com/orochibraru/orochibraru/compare/v1.11.0...v1.12.0) (2026-09-28)
 
 ### Features
