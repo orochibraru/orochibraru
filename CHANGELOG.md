@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.0](https://github.com/orochibraru/orochibraru/compare/v1.14.0...v1.15.0) (2026-09-29)
+
+### Features
+
+- better analytics
+  ([f1b8d8b](https://github.com/orochibraru/orochibraru/commit/f1b8d8bce9e893eb3f9c60181180040798df2fc0))
+
 ## [1.14.0](https://github.com/orochibraru/orochibraru/compare/v1.13.1...v1.14.0) (2026-09-28)
 
 ### Features
