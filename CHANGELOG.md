@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.1](https://github.com/orochibraru/orochibraru/compare/v1.15.0...v1.15.1) (2026-09-29)
+
+### Bug Fixes
+
+- stats display
+  ([b799cdc](https://github.com/orochibraru/orochibraru/commit/b799cdc7215e94c60f409ee7c1b9b60fbc9177e7))
+
 ## [1.15.0](https://github.com/orochibraru/orochibraru/compare/v1.14.0...v1.15.0) (2026-09-29)
 
 ### Features
