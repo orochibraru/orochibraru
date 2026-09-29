@@ -27,6 +27,7 @@
 	--color-onspark: #fff3f6;
 	--color-hot: #c2183f; /* left channel: crimson */
 	--color-cool: #7d5a0b; /* right channel: gold, also links and code */
+	--color-up: #1a7f37; /* a number that got better, against hot for worse */
 	/* the heading fringes only work as light glowing off a dark page: on a light
 	   one any colour just blurs a black letter, so there they're switched off */
 	--stereo-hot: transparent;
@@ -88,6 +89,7 @@
 		--color-onspark: #fff3f6;
 		--color-hot: #ff5a78;
 		--color-cool: #e9c27b;
+		--color-up: #5fd38a;
 		--stereo-hot: var(--color-hot);
 		--stereo-cool: var(--color-cool);
 		--glow-1: rgba(255, 90, 120, 0.12);
@@ -110,6 +112,7 @@
 	--color-onspark: #fff3f6;
 	--color-hot: #ff5a78;
 	--color-cool: #e9c27b;
+	--color-up: #5fd38a;
 	--stereo-hot: var(--color-hot);
 	--stereo-cool: var(--color-cool);
 	--glow-1: rgba(255, 90, 120, 0.12);

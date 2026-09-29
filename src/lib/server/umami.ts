@@ -16,6 +16,8 @@ export type UmamiStats = {
 		unit: Unit;
 		visitors: number;
 		pageviews: number;
+		/** The same over the span before the range; null for all time, which has none. */
+		previous: { visitors: number; pageviews: number } | null;
 		/** One point per unit across the range, empty ones included, oldest first. */
 		series: Point[];
 	}[];
@@ -265,14 +267,19 @@ async function fetchStats(config: UmamiConfig, now: number): Promise<UmamiStats>
 			const start = ms === null ? null : now - ms;
 			const window = `startAt=${start ?? 0}&endAt=${now}`;
 			// ponytail: buckets are UTC days and months, off by the admin's offset; pass their timezone if that matters
-			const [{ visitors, pageviews }, buckets] = await Promise.all([
-				get<{ visitors: number; pageviews: number }>(`/stats?${window}`),
+			type Counts = { visitors: number; pageviews: number };
+			const [{ visitors, pageviews }, before, buckets] = await Promise.all([
+				get<Counts>(`/stats?${window}`),
+				start === null || ms === null
+					? null
+					: get<Counts>(`/stats?startAt=${start - ms}&endAt=${start}`),
 				get<{ pageviews: Buckets; sessions: Buckets }>(
 					`/pageviews?${window}&unit=${unit}&timezone=UTC`,
 				),
 			]);
 			const series = fillSeries(buckets.pageviews, buckets.sessions, start, now, unit);
-			return { label, unit, visitors, pageviews, series };
+			const previous = before && { visitors: before.visitors, pageviews: before.pageviews };
+			return { label, unit, visitors, pageviews, previous, series };
 		}),
 	]);
 	return {

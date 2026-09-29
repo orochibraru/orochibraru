@@ -106,6 +106,12 @@ describe("umamiStats", () => {
 		expect(requests).toContain(
 			"https://umami.test/api/websites/site/stats?startAt=0&endAt=1000000000",
 		);
+		// each range against the same span before it; all time has none
+		expect(stats.ranges[0]?.previous).toEqual({ visitors: 10, pageviews: 42 });
+		expect(requests).toContain(
+			"https://umami.test/api/websites/site/stats?startAt=827200000&endAt=913600000",
+		);
+		expect(stats.ranges.at(-1)?.previous).toBeNull();
 	});
 
 	test("serves the cache for a minute, then the last good result while Umami is down", async () => {

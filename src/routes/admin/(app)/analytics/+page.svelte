@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
+	import Delta from "$lib/components/admin/Delta.svelte";
 	import VisitorsChart from "$lib/components/admin/VisitorsChart.svelte";
 
 	let { data } = $props();
@@ -25,11 +26,6 @@
 		seconds >= 60
 			? `${Math.floor(seconds / 60)}m ${Math.round(seconds % 60)}s`
 			: `${Math.round(seconds)}s`;
-	const signed = new Intl.NumberFormat("en", {
-		style: "percent",
-		maximumFractionDigits: 0,
-		signDisplay: "exceptZero",
-	});
 	const ratio = (part: number, whole: number) => (whole ? part / whole : 0);
 	const href = (days: number) => {
 		const url = new URL(page.url);
@@ -47,18 +43,10 @@
 		{#each items as [label, value, hint, change] (label)}
 			<div class="rounded-lg bg-fg/3 px-3 py-2.5 leading-tight" title={hint}>
 				<div class="text-[11px] font-medium tracking-wide text-dim uppercase">{label}</div>
-				<div class="mt-1.5 flex items-baseline gap-2">
-					<span class="text-xl font-bold">{value}</span>
-					{#if change && (change[0] || change[1])}
-						{@const [now, before, lower] = change}
-						{@const delta = before ? now / before - 1 : 0}
-						<span
-							class={["text-xs font-medium tabular-nums", !delta ? "text-dim" : delta > 0 !== !!lower ? "text-cool" : "text-hot"]}
-							title="vs the {data.days} days before"
-							>{before ? `${delta > 0 ? "▲" : delta < 0 ? "▼" : ""} ${signed.format(delta)}` : "new"}</span
-						>
-					{/if}
-				</div>
+				<div class="mt-1.5 text-xl font-bold">{value}</div>
+				{#if change}
+					<Delta now={change[0]} before={change[1]} lower={change[2]} against="the {data.days} days before" />
+				{/if}
 			</div>
 		{/each}
 	</div>

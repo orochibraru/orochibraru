@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
 	import { ago, statusClass } from "$lib/admin";
+	import Delta from "$lib/components/admin/Delta.svelte";
 	import VisitorsChart from "$lib/components/admin/VisitorsChart.svelte";
 
 	let { data } = $props();
@@ -76,6 +77,9 @@
 							<div class="mt-0.5 text-sm" title="{range.pageviews} views">
 								{compact.format(range.pageviews)} <span class="text-xs text-dim">views</span>
 							</div>
+							{#if range.previous}
+								<Delta now={range.visitors} before={range.previous.visitors} against="the {range.label} before" />
+							{/if}
 						</button>
 					{/each}
 				</div>
@@ -107,11 +111,20 @@
 			{#await data.search}
 				<p class="px-3 py-6 text-center text-sm text-dim">Asking Search Console&hellip;</p>
 			{:then stats}
+				{@const { totals, previous } = stats}
+				{@const tiles: [string, string, number, number, boolean?][] = [
+					["Clicks", compact.format(totals.clicks), totals.clicks, previous.clicks],
+					["Impressions", compact.format(totals.impressions), totals.impressions, previous.impressions],
+					["CTR", percent.format(totals.ctr), totals.ctr, previous.ctr],
+					// position 1 is the top: lower is better
+					["Avg position", totals.position.toFixed(1), totals.position, previous.position, true],
+				]}
 				<div class="grid grid-cols-2 gap-2 p-3 sm:grid-cols-4">
-					{#each [["Clicks", compact.format(stats.totals.clicks)], ["Impressions", compact.format(stats.totals.impressions)], ["CTR", percent.format(stats.totals.ctr)], ["Avg position", stats.totals.position.toFixed(1)]] as [label, value] (label)}
+					{#each tiles as [label, value, now, before, lower] (label)}
 						<div class="rounded-lg bg-fg/3 px-3 py-2.5 leading-tight">
 							<div class="text-[11px] font-medium tracking-wide text-dim uppercase">{label}</div>
 							<div class="mt-1.5 text-xl font-bold">{value}</div>
+							<Delta {now} {before} {lower} against="the 28 days before" />
 						</div>
 					{/each}
 				</div>

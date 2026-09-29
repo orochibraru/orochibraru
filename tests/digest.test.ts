@@ -13,6 +13,7 @@ function umami(last24h: number, daily: number[], extra: Partial<UmamiStats> = {}
 		unit: "day" as const,
 		visitors: views.at(-1) ?? 0,
 		pageviews: views.at(-1) ?? 0,
+		previous: null,
 		series: views.map((n, i) => ({ t: START + i * DAY, views: n, visits: n })),
 	});
 	const stats: UmamiStats = {
