@@ -163,9 +163,7 @@ async function request<T>(config: UmamiConfig, path: string): Promise<T> {
 
 export type Metric = { x: string; y: number };
 
-export type UmamiReport = {
-	days: number;
-	unit: Unit;
+type Totals = {
 	visitors: number;
 	visits: number;
 	pageviews: number;
@@ -173,6 +171,13 @@ export type UmamiReport = {
 	bounces: number;
 	/** Seconds, summed over visits. */
 	totaltime: number;
+};
+
+export type UmamiReport = Totals & {
+	days: number;
+	unit: Unit;
+	/** The same totals over the `days` before the range. */
+	previous: Totals;
 	series: Point[];
 	pages: Metric[];
 	referrers: Metric[];
@@ -212,22 +217,21 @@ async function fetchReport(config: UmamiConfig, days: number, now: number): Prom
 	const unit: Unit = days > 90 ? "month" : "day";
 	const metric = (type: string, limit = 10) =>
 		request<Metric[]>(config, `/metrics?${window}&type=${type}&limit=${limit}`);
-	const [stats, buckets, pages, referrers, countries, browsers, os, devices] = await Promise.all([
-		request<Pick<UmamiReport, "visitors" | "visits" | "pageviews" | "bounces" | "totaltime">>(
-			config,
-			`/stats?${window}`,
-		),
-		request<{ pageviews: Buckets; sessions: Buckets }>(
-			config,
-			`/pageviews?${window}&unit=${unit}&timezone=UTC`,
-		),
-		metric("path", 25),
-		metric("referrer", 25),
-		metric("country"),
-		metric("browser"),
-		metric("os"),
-		metric("device"),
-	]);
+	const [stats, previous, buckets, pages, referrers, countries, browsers, os, devices] =
+		await Promise.all([
+			request<Totals>(config, `/stats?${window}`),
+			request<Totals>(config, `/stats?startAt=${start - days * DAY}&endAt=${start}`),
+			request<{ pageviews: Buckets; sessions: Buckets }>(
+				config,
+				`/pageviews?${window}&unit=${unit}&timezone=UTC`,
+			),
+			metric("path", 25),
+			metric("referrer", 25),
+			metric("country"),
+			metric("browser"),
+			metric("os"),
+			metric("device"),
+		]);
 	return {
 		days,
 		unit,
@@ -236,6 +240,13 @@ async function fetchReport(config: UmamiConfig, days: number, now: number): Prom
 		pageviews: stats.pageviews,
 		bounces: stats.bounces,
 		totaltime: stats.totaltime,
+		previous: {
+			visitors: previous.visitors,
+			visits: previous.visits,
+			pageviews: previous.pageviews,
+			bounces: previous.bounces,
+			totaltime: previous.totaltime,
+		},
 		series: fillSeries(buckets.pageviews, buckets.sessions, start, now, unit),
 		pages,
 		referrers,

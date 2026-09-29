@@ -17,6 +17,11 @@ export type SearchStats = {
 	url: string;
 	days: number;
 	totals: Totals;
+	/**
+	 * The totals over as many days before the range as the range has days with data:
+	 * the last two or three are still empty and would read as a drop.
+	 */
+	previous: Totals;
 	/** One point per day of the range, empty ones included, oldest first; t is UTC ms. */
 	series: { t: number; clicks: number; impressions: number }[];
 	queries: SearchRow[];
@@ -187,13 +192,17 @@ async function fetchStats(
 	// ponytail: UTC days, where Search Console counts Pacific days; off by a few hours at the edges
 	const start = Date.parse(isoDay(now - (span - 1) * DAY));
 	const range = { startDate: isoDay(start), endDate: isoDay(now), dataState: "all" };
-	const query = async (dimensions: string[], rowLimit = 25): Promise<Row[]> => {
+	const query = async (
+		dimensions: string[],
+		rowLimit = 25,
+		dates: Partial<typeof range> = {},
+	): Promise<Row[]> => {
 		const response = await fetch(
 			`https://searchconsole.googleapis.com/webmasters/v3/sites/${encodeURIComponent(config.site)}/searchAnalytics/query`,
 			{
 				method: "POST",
 				headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
-				body: JSON.stringify({ ...range, dimensions, rowLimit }),
+				body: JSON.stringify({ ...range, ...dates, dimensions, rowLimit }),
 				// Search Console takes seconds per query, more on long ranges
 				signal: AbortSignal.timeout(20_000),
 			},
@@ -226,10 +235,17 @@ async function fetchStats(
 	}
 	const keyed = (rows: Row[]) =>
 		rows.map(({ keys, ...rest }) => ({ key: keys?.[0] ?? "", ...rest }));
+	const empty = { clicks: 0, impressions: 0, ctr: 0, position: 0 };
+	// ponytail: a partly counted last day still counts in full; trim a day more if deltas skew low
+	const counted = series.findLastIndex((point) => point.impressions > 0) + 1;
+	const previous = counted
+		? await query([], 1, { startDate: isoDay(start - counted * DAY), endDate: isoDay(start - DAY) })
+		: [];
 	return {
 		url: `https://search.google.com/search-console/performance/search-analytics?resource_id=${encodeURIComponent(config.site)}`,
 		days: span,
-		totals: keyed(totals)[0] ?? { clicks: 0, impressions: 0, ctr: 0, position: 0 },
+		totals: keyed(totals)[0] ?? empty,
+		previous: keyed(previous)[0] ?? empty,
 		series,
 		queries: keyed(queries),
 		pages: keyed(pages),

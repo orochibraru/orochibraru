@@ -149,6 +149,13 @@ describe("searchStats", () => {
 		expect(stats.queries[0]).toMatchObject({ key: "orochibraru", clicks: 3 });
 		expect(stats.pages[0]?.key).toBe("https://orochibraru.test/blog/hello");
 		expect(bodies[0]).toMatchObject({ startDate: "1969-12-16", endDate: "1970-01-12" });
+		// the last day with data is Jan 11, the range's 27th: the 27 days before it
+		expect(bodies.at(-1)).toMatchObject({
+			startDate: "1969-11-19",
+			endDate: "1969-12-15",
+			dimensions: [],
+		});
+		expect(stats.previous).toMatchObject({ clicks: 3, impressions: 40 });
 	});
 
 	test("serves the cache for an hour, then the last good result while Google is down", async () => {

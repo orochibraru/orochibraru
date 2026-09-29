@@ -128,6 +128,11 @@ describe("umamiReport", () => {
 		expect(report.series).toHaveLength(8);
 		expect(report.pages).toEqual([{ x: "path", y: 4 }]);
 		expect(report.devices).toEqual([{ x: "device", y: 4 }]);
+		// the 7 days before: 1_000_000_000 - 7 days = 395_200_000
+		expect(report.previous).toMatchObject({ visitors: 10, visits: 12 });
+		expect(requests).toContain(
+			"https://umami.test/api/websites/site/stats?startAt=-209600000&endAt=395200000",
+		);
 	});
 
 	test("counts a year by month", async () => {

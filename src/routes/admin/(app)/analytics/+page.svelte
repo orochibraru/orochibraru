@@ -6,6 +6,8 @@
 	let { data } = $props();
 
 	type Item = { label: string; value: number; title?: string; cells?: string[] };
+	/** This range's number, the one for the range before it, and whether lower is better. */
+	type Change = [now: number, before: number, lower?: boolean];
 
 	const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
 	const percent = new Intl.NumberFormat("en", { style: "percent", maximumFractionDigits: 1 });
@@ -23,6 +25,12 @@
 		seconds >= 60
 			? `${Math.floor(seconds / 60)}m ${Math.round(seconds % 60)}s`
 			: `${Math.round(seconds)}s`;
+	const signed = new Intl.NumberFormat("en", {
+		style: "percent",
+		maximumFractionDigits: 0,
+		signDisplay: "exceptZero",
+	});
+	const ratio = (part: number, whole: number) => (whole ? part / whole : 0);
 	const href = (days: number) => {
 		const url = new URL(page.url);
 		url.searchParams.set("days", String(days));
@@ -34,12 +42,23 @@
 	<title>Analytics | orochibraru admin</title>
 </svelte:head>
 
-{#snippet tiles(items: [string, string, string?][])}
+{#snippet tiles(items: [string, string, string?, Change?][])}
 	<div class="grid grid-cols-2 gap-2 p-3 sm:grid-cols-3 lg:grid-cols-5">
-		{#each items as [label, value, hint] (label)}
+		{#each items as [label, value, hint, change] (label)}
 			<div class="rounded-lg bg-fg/3 px-3 py-2.5 leading-tight" title={hint}>
 				<div class="text-[11px] font-medium tracking-wide text-dim uppercase">{label}</div>
-				<div class="mt-1.5 text-xl font-bold">{value}</div>
+				<div class="mt-1.5 flex items-baseline gap-2">
+					<span class="text-xl font-bold">{value}</span>
+					{#if change && (change[0] || change[1])}
+						{@const [now, before, lower] = change}
+						{@const delta = before ? now / before - 1 : 0}
+						<span
+							class={["text-xs font-medium tabular-nums", !delta ? "text-dim" : delta > 0 !== !!lower ? "text-cool" : "text-hot"]}
+							title="vs the {data.days} days before"
+							>{before ? `${delta > 0 ? "▲" : delta < 0 ? "▼" : ""} ${signed.format(delta)}` : "new"}</span
+						>
+					{/if}
+				</div>
 			</div>
 		{/each}
 	</div>
@@ -106,12 +125,23 @@
 			{#await data.umami}
 				<p class="px-3 py-6 text-center text-sm text-dim">Asking Umami&hellip;</p>
 			{:then report}
+				{@const before = report.previous}
 				{@render tiles([
-					["Visitors", compact.format(report.visitors), `${report.visitors} visitors`],
-					["Visits", compact.format(report.visits), `${report.visits} visits`],
-					["Views", compact.format(report.pageviews), `${report.pageviews} views`],
-					["Bounce rate", report.visits ? percent.format(report.bounces / report.visits) : "–", "Visits that saw one page"],
-					["Visit duration", report.visits ? duration(report.totaltime / report.visits) : "–", "Average time per visit"],
+					["Visitors", compact.format(report.visitors), `${report.visitors} visitors`, [report.visitors, before.visitors]],
+					["Visits", compact.format(report.visits), `${report.visits} visits`, [report.visits, before.visits]],
+					["Views", compact.format(report.pageviews), `${report.pageviews} views`, [report.pageviews, before.pageviews]],
+					[
+						"Bounce rate",
+						report.visits ? percent.format(report.bounces / report.visits) : "–",
+						"Visits that saw one page",
+						[ratio(report.bounces, report.visits), ratio(before.bounces, before.visits), true],
+					],
+					[
+						"Visit duration",
+						report.visits ? duration(report.totaltime / report.visits) : "–",
+						"Average time per visit",
+						[ratio(report.totaltime, report.visits), ratio(before.totaltime, before.visits)],
+					],
 				])}
 				<VisitorsChart series={report.series} unit={report.unit} />
 				<div class="grid border-t border-line lg:grid-cols-2">
@@ -143,11 +173,18 @@
 			{#await data.search}
 				<p class="px-3 py-6 text-center text-sm text-dim">Asking Search Console&hellip;</p>
 			{:then stats}
+				{@const before = stats.previous}
 				{@render tiles([
-					["Clicks", compact.format(stats.totals.clicks), `${stats.totals.clicks} clicks`],
-					["Impressions", compact.format(stats.totals.impressions), `${stats.totals.impressions} impressions`],
-					["CTR", percent.format(stats.totals.ctr)],
-					["Avg position", stats.totals.position.toFixed(1)],
+					["Clicks", compact.format(stats.totals.clicks), `${stats.totals.clicks} clicks`, [stats.totals.clicks, before.clicks]],
+					[
+						"Impressions",
+						compact.format(stats.totals.impressions),
+						`${stats.totals.impressions} impressions`,
+						[stats.totals.impressions, before.impressions],
+					],
+					["CTR", percent.format(stats.totals.ctr), undefined, [stats.totals.ctr, before.ctr]],
+					// position 1 is the top: lower is better
+					["Avg position", stats.totals.position.toFixed(1), undefined, [stats.totals.position, before.position, true]],
 				])}
 				<VisitorsChart
 					series={stats.series}

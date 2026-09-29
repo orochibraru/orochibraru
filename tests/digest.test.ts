@@ -29,6 +29,7 @@ function umami(last24h: number, daily: number[], extra: Partial<UmamiStats> = {}
 		pageviews: 0,
 		bounces: 0,
 		totaltime: 0,
+		previous: { visitors: 0, visits: 0, pageviews: 0, bounces: 0, totaltime: 0 },
 		series: [],
 		pages: [],
 		referrers: [],
@@ -59,6 +60,7 @@ function search(
 		url: "",
 		days: 28,
 		totals: { clicks: 0, impressions: 0, ctr: 0, position: 0 },
+		previous: { clicks: 0, impressions: 0, ctr: 0, position: 0 },
 		series: Array.from({ length: 28 }, (_, i) => ({
 			t: START + i * DAY,
 			clicks: i < 25 ? 1 : 0,
