@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { project, user } from "../src/lib/server/db/schema";
+import { installedRepo, project, user } from "../src/lib/server/db/schema";
 import { createMcpServer } from "../src/lib/server/mcp";
 import { isTokenOnAllowlist } from "../src/lib/server/mcp-auth";
 import { freshSite } from "./helpers";
@@ -83,6 +83,66 @@ describe("projects over MCP", () => {
 		});
 		expect(bad.isError).toBe(true);
 		expect((await call("get_project", { repo: "baba" })).json().blurb).toBe("The lookout.");
+	});
+
+	test("get_project lists the screenshot names a body can use", async () => {
+		expect((await call("get_project", { repo: "baba" })).json().screenshots).toEqual({});
+	});
+
+	test("a repo the GitHub App can read becomes an unpublished project", async () => {
+		site.db.insert(installedRepo).values({ fullName: "me/tool", installationId: 7 }).run();
+		expect((await call("list_addable_repos")).json()).toEqual([
+			{ fullName: "me/tool", private: false },
+		]);
+		expect((await call("create_project", { github_repo: "me/nope" })).isError).toBe(true);
+		// no GitHub App in tests: the project is made, its first sync skipped
+		const created = (await call("create_project", { github_repo: "me/tool" })).json();
+		expect(created).toMatchObject({ repo: "tool", published: false, sync: { status: "skipped" } });
+		expect((await call("list_addable_repos")).json()).toEqual([]);
+	});
+
+	test("reorder_projects takes every project, once", async () => {
+		const partial = await call("reorder_projects", { repos: ["tool"] });
+		expect(partial.isError).toBe(true);
+		expect(partial.text).toContain("baba, tool");
+		expect((await call("reorder_projects", { repos: ["tool", "baba"] })).json()).toEqual([
+			"tool",
+			"baba",
+		]);
+	});
+
+	test("the /projects copy changes field by field", async () => {
+		expect((await call("get_projects_page")).json().others).toBe("Also in the box");
+		const updated = (await call("update_projects_page", { heading: "Stop renting" })).json();
+		expect(updated).toMatchObject({ heading: "Stop renting", others: "Also in the box" });
+		expect((await call("update_projects_page", { title: " " })).isError).toBe(true);
+	});
+});
+
+describe("docs and analytics over MCP", () => {
+	test("get_docs_status covers each project with a repo", async () => {
+		expect((await call("get_docs_status")).json()).toEqual([
+			{
+				repo: "tool",
+				githubRepo: "me/tool",
+				docs: "not synced",
+				guides: 0,
+				channels: [],
+				lastSync: null,
+			},
+		]);
+	});
+
+	test("sync_project says why it did nothing", async () => {
+		const result = (await call("sync_project", { repo: "baba" })).json();
+		expect(result.status).toBe("skipped");
+		expect(result.log).toEqual(["baba: skipped, no linked repo"]);
+	});
+
+	test("get_analytics says where to connect a source", async () => {
+		const result = await call("get_analytics", { days: 7 });
+		expect(result.isError).toBe(true);
+		expect(result.text).toContain("/admin/settings");
 	});
 });
 

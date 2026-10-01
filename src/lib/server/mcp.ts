@@ -1,23 +1,36 @@
-// The MCP server Claude talks to: posts and project pages, through the
+// The MCP server Claude talks to: posts, project pages, docs syncs and analytics, through the
 // same editor functions the admin UI uses. Stateless: every request builds a
 // fresh server and transport, so nothing lingers between calls.
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
 import { SITE } from "$lib/seo";
+import { getProjectsPage, guideCounts } from "./content";
 import {
 	createPost,
+	createProject,
+	docsStatuses,
+	docsVersions,
 	EditorError,
 	getPostBySlug,
 	getProject,
+	lastSyncs,
+	listAddableRepos,
 	listAllPosts,
 	listAllProjects,
 	type PostRow,
 	ProjectPatch,
+	ProjectsPageInput,
+	projectImages,
+	reorderProjects,
 	setPostStatus,
 	updatePost,
 	updateProject,
+	updateProjectsPage,
 } from "./editor";
+import { syncRepo } from "./github/sync";
+import { getSearchConsole, searchStats } from "./search-console";
+import { getUmami, umamiReport } from "./umami";
 
 type Result = { content: { type: "text"; text: string }[]; isError?: boolean };
 
@@ -172,7 +185,8 @@ export function createMcpServer(): McpServer {
 				"Every field of a project page. The body is Markdown with this site's conventions: the first " +
 				"paragraph is the lede; a ### heading followed by one paragraph is a feature tile; " +
 				"![alt](name) followed by a **Title** caption line is a synced repo screenshot; " +
-				"`## Heading {#id}` pins an anchor; a ### directly above a code block labels it.",
+				"`## Heading {#id}` pins an anchor; a ### directly above a code block labels it. " +
+				"`screenshots` maps the names synced from the repo's docs/images to their URLs.",
 			inputSchema: { repo: z.string() },
 			annotations: { readOnlyHint: true },
 		},
@@ -182,7 +196,7 @@ export function createMcpServer(): McpServer {
 				if (!row) {
 					throw new EditorError(`no project ${repo}; list_projects shows them all`);
 				}
-				return row;
+				return { ...row, screenshots: projectImages(repo) };
 			}),
 	);
 
@@ -199,6 +213,168 @@ export function createMcpServer(): McpServer {
 			run(() => {
 				const row = updateProject(repo, patch);
 				return { repo: row.repo, updated: Object.keys(patch), url: `${SITE}/${row.repo}` };
+			}),
+	);
+
+	server.registerTool(
+		"list_addable_repos",
+		{
+			title: "List repos that could become projects",
+			description:
+				"Repos the site's GitHub App can read that have no project page yet: what create_project takes.",
+			annotations: { readOnlyHint: true },
+		},
+		() =>
+			run(() =>
+				listAddableRepos().map(({ fullName, private: hidden }) => ({ fullName, private: hidden })),
+			),
+	);
+
+	server.registerTool(
+		"create_project",
+		{
+			title: "Create a project page",
+			description:
+				"Create an unpublished project page for a repo from list_addable_repos, and sync its docs. " +
+				"Fill it in with update_project, then publish it with update_project's `published`.",
+			inputSchema: { github_repo: z.string().describe("owner/name") },
+		},
+		({ github_repo }) =>
+			run(async () => {
+				const row = createProject(github_repo);
+				const sync = await syncRepo(row.repo);
+				return { repo: row.repo, published: false, sync };
+			}),
+	);
+
+	server.registerTool(
+		"reorder_projects",
+		{
+			title: "Reorder projects",
+			description:
+				"Set the order of the projects on the home page and /projects. List every repo (see " +
+				"list_projects), first shown first. On /projects, projects with a social image come first.",
+			inputSchema: { repos: z.array(z.string()) },
+		},
+		({ repos }) =>
+			run(() => {
+				reorderProjects(repos);
+				return listAllProjects().map((row) => row.repo);
+			}),
+	);
+
+	server.registerTool(
+		"get_projects_page",
+		{
+			title: "Get the /projects page copy",
+			description:
+				"The words around the project list on /projects: `title` and `description` for search " +
+				"engines, `tag` after the project count, `heading` and its highlighted second line " +
+				"`accent`, `intro`, and `others`, the heading over the projects without a social image.",
+			annotations: { readOnlyHint: true },
+		},
+		() => run(() => ({ ...getProjectsPage(), url: `${SITE}/projects` })),
+	);
+
+	server.registerTool(
+		"update_projects_page",
+		{
+			title: "Update the /projects page copy",
+			description:
+				"Change the /projects copy (see get_projects_page). Only the fields given change.",
+			inputSchema: ProjectsPageInput.partial().shape,
+		},
+		(patch) =>
+			run(() => {
+				updateProjectsPage(Object.assign({}, getProjectsPage(), patch));
+				return { ...getProjectsPage(), url: `${SITE}/projects` };
+			}),
+	);
+
+	server.registerTool(
+		"get_docs_status",
+		{
+			title: "Get the docs sync status",
+			description:
+				"Each project with a linked repo: what its docs/ looks like (config.json valid or not), " +
+				"its guide count, the ref and commit each channel was synced from, and its last sync run, " +
+				"with the error if it failed.",
+			annotations: { readOnlyHint: true },
+		},
+		() =>
+			run(() => {
+				const statuses = docsStatuses();
+				const guides = guideCounts();
+				const versions = docsVersions();
+				const syncs = new Map(lastSyncs().map((row) => [row.repo, row.run]));
+				return listAllProjects()
+					.filter((row) => row.githubRepo)
+					.map((row) => {
+						const last = syncs.get(row.repo);
+						return {
+							repo: row.repo,
+							githubRepo: row.githubRepo,
+							docs: statuses[row.repo],
+							guides: guides.get(row.repo) ?? 0,
+							channels: versions
+								.filter((version) => version.project === row.repo)
+								.map(({ channel, ref, sha }) => ({ channel, ref, sha })),
+							lastSync: last && {
+								status: last.status,
+								changed: last.changed,
+								error: last.error,
+								at: last.startedAt.toISOString(),
+							},
+						};
+					});
+			}),
+	);
+
+	server.registerTool(
+		"sync_project",
+		{
+			title: "Sync a project's docs",
+			description:
+				"Pull a project's guides, screenshots and docs/config.json from GitHub now, rather than " +
+				"waiting for the next push. Returns what it did, line by line.",
+			inputSchema: { repo: z.string() },
+		},
+		({ repo }) =>
+			run(async () => {
+				const log: string[] = [];
+				const result = await syncRepo(repo, undefined, (line) => log.push(line));
+				return { ...result, log };
+			}),
+	);
+
+	server.registerTool(
+		"get_analytics",
+		{
+			title: "Get the site's analytics",
+			description:
+				"Visitors from Umami (totals, the same over the period before, a series, top pages, " +
+				"referrers, countries, devices) and Google Search Console (clicks, impressions, CTR, " +
+				"position, top queries and pages) over the last `days` days. Either can be missing if " +
+				"it isn't connected, or carry an error if it couldn't be reached.",
+			inputSchema: { days: z.number().int().min(1).max(365).optional().describe("Defaults to 28") },
+			annotations: { readOnlyHint: true },
+		},
+		({ days = 28 }) =>
+			run(async () => {
+				const [umami, search] = await Promise.all([getUmami(), getSearchConsole()]);
+				if (!umami && !search) {
+					throw new EditorError(
+						"neither Umami nor Search Console is connected: they're set up in /admin/settings",
+					);
+				}
+				const failed = (cause: unknown) => ({
+					error: cause instanceof Error ? cause.message : String(cause),
+				});
+				const [visitors, searches] = await Promise.all([
+					umami && umamiReport(umami, days).catch(failed),
+					search && searchStats(search, days).catch(failed),
+				]);
+				return { days, visitors, search: searches };
 			}),
 	);
 

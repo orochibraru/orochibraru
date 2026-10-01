@@ -173,8 +173,12 @@ export function updateProject(repo: string, patch: ProjectPatch): ProjectRow {
 	return row as ProjectRow;
 }
 
-/** The order of the home page cards: repos listed first come first. */
+/** The order of the home page cards: repos listed first come first. Every project, once. */
 export function reorderProjects(repos: string[]) {
+	const current = listAllProjects().map((row) => row.repo);
+	if (repos.length !== current.length || !current.every((repo) => repos.includes(repo))) {
+		throw new EditorError(`list every project exactly once: ${current.join(", ")}`);
+	}
 	const db = getDb();
 	db.transaction((tx) => {
 		repos.forEach((repo, position) => {
