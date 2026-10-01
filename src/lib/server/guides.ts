@@ -73,7 +73,7 @@ const plain = (markdown: string) =>
  *   env.md, env.md#redis   another guide, here
  *   ../CONTRIBUTING.md     a root guide, here
  *   #redis                 same page, left alone
- *   images/hero.png        the vendored WebP
+ *   images/hero.png        the synced screenshot
  *   ../compose.yaml        a file only the repo has: send people to the repo
  *   https://…              left alone
  */
@@ -108,7 +108,7 @@ function rewrite(
 	return `${project.repo}/blob/${project.branch}/${inRepo}${anchor}`;
 }
 
-/** docs/images/hero.png -> hero, the name its WebP is vendored under. */
+/** docs/images/graphics/hero.png -> graphics/hero, the name it is synced under. */
 const imageName = (inRepo: string) =>
 	inRepo.match(/^docs\/images\/(.+)\.(?:png|jpe?g|webp)$/i)?.[1];
 

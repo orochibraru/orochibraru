@@ -43,6 +43,20 @@
 			"when": 1790601278968,
 			"tag": "0005_search_console",
 			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "6",
+			"when": 1790849276606,
+			"tag": "0006_screenshots_on_github",
+			"breakpoints": true
+		},
+		{
+			"idx": 7,
+			"version": "6",
+			"when": 1790852632355,
+			"tag": "0007_screenshots_from_github",
+			"breakpoints": true
 		}
 	]
 }

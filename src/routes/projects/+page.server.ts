@@ -1,3 +1,3 @@
-import { listProjectCards } from "$lib/server/content";
+import { getProjectsPage, listProjectCards } from "$lib/server/content";
 
-export const load = () => ({ projects: listProjectCards() });
+export const load = () => ({ projects: listProjectCards(), copy: getProjectsPage() });

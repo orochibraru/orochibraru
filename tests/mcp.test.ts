@@ -4,7 +4,7 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { project, user } from "../src/lib/server/db/schema";
 import { createMcpServer } from "../src/lib/server/mcp";
 import { isTokenOnAllowlist } from "../src/lib/server/mcp-auth";
-import { freshSite, SAMPLE_IMAGE } from "./helpers";
+import { freshSite } from "./helpers";
 
 const site = freshSite();
 const client = new Client({ name: "test", version: "1" });
@@ -73,21 +73,7 @@ describe("posts over MCP", () => {
 	});
 });
 
-describe("images and projects over MCP", () => {
-	test("upload_image returns ready-to-paste Markdown", async () => {
-		const base64 = Buffer.from(await Bun.file(SAMPLE_IMAGE).bytes()).toString("base64");
-		const stored = (await call("upload_image", { alt: "A dashboard", base64 })).json();
-		expect(stored.markdown).toMatch(/^!\[A dashboard\]\(\/images\/[0-9a-f]{64}\.webp\)$/);
-	});
-
-	test("upload_image refuses plain http and non-images", async () => {
-		expect((await call("upload_image", { alt: "x", url: "http://169.254.169.254/" })).isError).toBe(
-			true,
-		);
-		const junk = Buffer.from("not an image").toString("base64");
-		expect((await call("upload_image", { alt: "x", base64: junk })).isError).toBe(true);
-	});
-
+describe("projects over MCP", () => {
 	test("update_project validates like the admin form", async () => {
 		const ok = await call("update_project", { repo: "baba", blurb: "The lookout." });
 		expect(ok.isError).toBe(false);

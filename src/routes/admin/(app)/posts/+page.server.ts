@@ -6,6 +6,7 @@ import {
 	listAllPosts,
 	setPostStatus,
 } from "$lib/server/editor";
+import { getUmami, pathViews } from "$lib/server/umami";
 
 const postFrom = async (request: Request) => {
 	const post = getPostById(Number((await request.formData()).get("id")));
@@ -15,13 +16,32 @@ const postFrom = async (request: Request) => {
 	return post;
 };
 
-export const load = ({ url }) => {
-	const status = url.searchParams.get("status");
+export const load = async ({ url }) => {
+	const asked = url.searchParams.get("status");
+	const status = asked === "draft" || asked === "published" ? asked : null;
+	const all = listAllPosts();
+	const umami = await getUmami();
 	return {
 		status,
-		posts: listAllPosts(status === "draft" || status === "published" ? status : undefined).map(
-			({ id, slug, title, date, status }) => ({ id, slug, title, date, status }),
-		),
+		counts: {
+			all: all.length,
+			draft: all.filter((post) => post.status === "draft").length,
+			published: all.filter((post) => post.status === "published").length,
+		},
+		posts: all
+			.filter((post) => !status || post.status === status)
+			.map(({ id, slug, title, description, date, status, body, updatedAt }) => ({
+				id,
+				slug,
+				title,
+				description,
+				date,
+				status,
+				updatedAt,
+				words: body.split(/\s+/).filter(Boolean).length,
+			})),
+		// streamed: the list doesn't wait on Umami
+		views: umami ? pathViews(umami).catch(() => null) : undefined,
 	};
 };
 

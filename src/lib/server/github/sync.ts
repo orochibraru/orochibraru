@@ -19,8 +19,8 @@ import {
 	syncChange,
 	syncRun,
 } from "../db/schema";
-import { type Prepared, prepareImage, recordImage } from "../images";
-import { type App, GithubError, getGithubApp, github } from "./app";
+import { imageSize, recordScreenshot, type Size } from "../images";
+import { type App, GithubError, getGithubApp, github, githubBlob } from "./app";
 
 type TreeEntry = { path: string; type: string; sha: string };
 
@@ -34,7 +34,7 @@ export function selectDocs(tree: TreeEntry[]) {
 				roots.has(entry.path) ||
 				(/^docs\/[^/]+\.md$/.test(entry.path) && entry.path !== "docs/README.md"),
 		),
-		images: blobs.filter((entry) => /^docs\/images\/[^/]+\.(png|jpe?g|webp)$/i.test(entry.path)),
+		images: blobs.filter((entry) => /^docs\/images\/.+\.(png|jpe?g|webp)$/i.test(entry.path)),
 		config: blobs.find((entry) => entry.path === "docs/config.json"),
 	};
 }
@@ -42,15 +42,8 @@ export function selectDocs(tree: TreeEntry[]) {
 const slugOf = (path: string) =>
 	ROOT_GUIDES.find((root) => root.file === path)?.slug ?? basename(path, ".md");
 
-const imageNameOf = (path: string) => basename(path).replace(/\.[a-z]+$/i, "");
-
-async function blob(app: App, repo: string, sha: string): Promise<Uint8Array> {
-	const body = await github<{ content: string; encoding: string }>(
-		app,
-		`/repos/${repo}/git/blobs/${sha}`,
-	);
-	return Uint8Array.from(Buffer.from(body.content, body.encoding === "base64" ? "base64" : "utf8"));
-}
+/** docs/images/graphics/hero.png -> graphics/hero */
+const imageNameOf = (path: string) => path.slice("docs/images/".length).replace(/\.[a-z]+$/i, "");
 
 export type SyncResult = { status: "ok" | "failed" | "skipped"; changed: number; error?: string };
 
@@ -158,7 +151,7 @@ function dropChannel(repoKey: string, channel: Channel, log: Log): number {
 			.all();
 		const images = tx
 			.delete(image)
-			.where(and(eq(image.project, repoKey), eq(image.source, "sync"), eq(image.channel, channel)))
+			.where(and(eq(image.project, repoKey), eq(image.channel, channel)))
 			.returning()
 			.all();
 		tx.delete(docsVersion)
@@ -230,7 +223,7 @@ async function syncChannel(
 				slug,
 				path: entry.path,
 				sha: entry.sha,
-				markdown: new TextDecoder().decode(await blob(app, fullName, entry.sha)),
+				markdown: new TextDecoder().decode(await githubBlob(app, fullName, entry.sha)),
 			});
 		}
 
@@ -238,27 +231,28 @@ async function syncChannel(
 			db
 				.select()
 				.from(image)
-				.where(and(eq(image.project, repoKey), eq(image.channel, channel), isNotNull(image.name)))
+				.where(and(eq(image.project, repoKey), eq(image.channel, channel)))
 				.all()
-				.map((item) => [item.name as string, item]),
+				.map((item) => [item.name, item]),
 		);
-		const images: { name: string; path: string; sha: string; prepared: Prepared }[] = [];
+		const images: { name: string; path: string; sha: string; size: Size }[] = [];
 		for (const entry of wantedDocs.images) {
 			const name = imageNameOf(entry.path);
 			if (storedImages.get(name)?.sourceSha === entry.sha) {
 				log(`  = ${entry.path}`);
 				continue;
 			}
-			log(`  ↓ ${entry.path}, re-encoding to WebP`);
-			const prepared = await prepareImage(await blob(app, fullName, entry.sha)).catch((cause) => {
-				throw new GithubError(`${entry.path}: ${cause instanceof Error ? cause.message : cause}`);
-			});
-			images.push({ name, path: entry.path, sha: entry.sha, prepared });
+			log(`  ↓ ${entry.path}, measuring`);
+			const size = imageSize(await githubBlob(app, fullName, entry.sha));
+			if (!size) {
+				throw new GithubError(`${entry.path} isn't a PNG, JPEG or WebP this site can measure`);
+			}
+			images.push({ name, path: entry.path, sha: entry.sha, size });
 		}
 
 		let config: DocsConfig | null = null;
 		if (wantedDocs.config) {
-			const raw = new TextDecoder().decode(await blob(app, fullName, wantedDocs.config.sha));
+			const raw = new TextDecoder().decode(await githubBlob(app, fullName, wantedDocs.config.sha));
 			let json: unknown;
 			try {
 				json = JSON.parse(raw);
@@ -322,9 +316,15 @@ async function syncChannel(
 					.run();
 			}
 			for (const item of images) {
-				recordImage(
-					item.prepared,
-					{ source: "sync", project: repoKey, channel, name: item.name, sourceSha: item.sha },
+				recordScreenshot(
+					item.size,
+					{
+						project: repoKey,
+						channel,
+						name: item.name,
+						sourceSha: item.sha,
+						url: `https://raw.githubusercontent.com/${fullName}/${sha}/${item.path.split("/").map(encodeURIComponent).join("/")}`,
+					},
 					tx,
 				);
 			}
@@ -346,9 +346,8 @@ async function syncChannel(
 				.where(
 					and(
 						eq(image.project, repoKey),
-						eq(image.source, "sync"),
 						eq(image.channel, channel),
-						keepImages.length ? notInArray(image.name, keepImages) : isNotNull(image.name),
+						keepImages.length ? notInArray(image.name, keepImages) : undefined,
 					),
 				)
 				.returning()

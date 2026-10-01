@@ -94,25 +94,22 @@ export const guide = sqliteTable(
 	(table) => [primaryKey({ columns: [table.project, table.channel, table.slug] })],
 );
 
+/** A repo screenshot, addressed in Markdown by its name under docs/images: ![alt](hero). */
 export const image = sqliteTable(
 	"image",
 	{
 		id: integer("id").primaryKey({ autoIncrement: true }),
-		sha256: text("sha256").notNull(),
 		width: integer("width").notNull(),
 		height: integer("height").notNull(),
-		alt: text("alt").notNull().default(""),
-		source: text("source", { enum: ["upload", "sync"] }).notNull(),
-		/** Repo screenshots are addressed by (project, name): ![alt](hero). */
-		project: text("project").references(() => project.repo, {
-			onDelete: "cascade",
-			onUpdate: "cascade",
-		}),
-		name: text("name"),
-		/** Screenshots only: uploads keep the default. */
+		project: text("project")
+			.notNull()
+			.references(() => project.repo, { onDelete: "cascade", onUpdate: "cascade" }),
+		name: text("name").notNull(),
 		channel: channel(),
 		/** The upstream blob sha, so a sync only re-fetches what changed. */
-		sourceSha: text("source_sha"),
+		sourceSha: text("source_sha").notNull(),
+		/** raw.githubusercontent.com, pinned to the commit the sync read it from. */
+		url: text("url").notNull(),
 		createdAt: timestamp("created_at"),
 	},
 	(table) => [unique().on(table.project, table.channel, table.name)],
@@ -167,6 +164,18 @@ export const syncChange = sqliteTable("sync_change", {
 export const webhookDelivery = sqliteTable("webhook_delivery", {
 	id: text("id").primaryKey(),
 	receivedAt: timestamp("received_at"),
+});
+
+/** One row, id 1: the /projects page's copy. Without it the page uses PROJECTS_PAGE's. */
+export const projectsPage = sqliteTable("projects_page", {
+	id: integer("id").primaryKey(),
+	title: text("title").notNull(),
+	description: text("description").notNull(),
+	tag: text("tag").notNull(),
+	heading: text("heading").notNull(),
+	accent: text("accent").notNull(),
+	intro: text("intro").notNull(),
+	others: text("others").notNull(),
 });
 
 /** One row, id 1: the Umami instance the admin overview reads visitor stats from. */

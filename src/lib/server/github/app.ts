@@ -171,6 +171,15 @@ export async function github<T>(app: App, path: string): Promise<T> {
 	return (await response.json()) as T;
 }
 
+/** A file's bytes, by its blob sha. */
+export async function githubBlob(app: App, repo: string, sha: string): Promise<Uint8Array> {
+	const body = await github<{ content: string; encoding: string }>(
+		app,
+		`/repos/${repo}/git/blobs/${sha}`,
+	);
+	return Uint8Array.from(Buffer.from(body.content, body.encoding === "base64" ? "base64" : "utf8"));
+}
+
 type Repo = { full_name: string; default_branch: string; private: boolean };
 
 /** Record the installation, then the repos it grants: the ones that can become projects. */

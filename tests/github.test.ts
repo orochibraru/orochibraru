@@ -14,6 +14,7 @@ import {
 import { diffOf, reconcile, selectDocs, syncRepo } from "../src/lib/server/github/sync";
 import { handleWebhook, verifySignature } from "../src/lib/server/github/webhook";
 import { loadGuides } from "../src/lib/server/guides";
+import { imageByName } from "../src/lib/server/images";
 import { freshSite, SAMPLE_IMAGE } from "./helpers";
 
 env.authSecret = "test-secret-test-secret-test-secret";
@@ -148,6 +149,8 @@ describe("sync", () => {
 				"docs/deep/b.md",
 				"docs/images/x.png",
 				"docs/images/y.webp",
+				"docs/images/graphics/src/z.jpg",
+				"docs/images/README.md",
 				"src/y.md",
 			].map((path) => ({ path, type: "blob", sha: path })),
 		);
@@ -155,6 +158,7 @@ describe("sync", () => {
 		expect(picked.images.map((entry) => entry.path)).toEqual([
 			"docs/images/x.png",
 			"docs/images/y.webp",
+			"docs/images/graphics/src/z.jpg",
 		]);
 	});
 
@@ -166,12 +170,21 @@ describe("sync", () => {
 				categories: [{ title: "Start", pages: [{ slug: "setup" }] }],
 			}),
 			"docs/images/hero.webp": await Bun.file(SAMPLE_IMAGE).bytes(),
+			"docs/images/graphics/feature.webp": await Bun.file(SAMPLE_IMAGE).bytes(),
 		};
 		const first = await syncRepo("tool");
-		// two guides, the screenshot and docs/config.json
-		expect(first).toEqual({ status: "ok", changed: 4 });
+		// two guides, two screenshots and docs/config.json
+		expect(first).toEqual({ status: "ok", changed: 5 });
 		expect(site.db.select().from(guide).where(eq(guide.project, "tool")).all()).toHaveLength(2);
-		expect(site.db.select().from(image).where(eq(image.project, "tool")).get()?.name).toBe("hero");
+		// measured from its header, served by GitHub from the commit it was read at
+		expect(imageByName("tool", "hero")).toEqual({
+			width: 1200,
+			height: 1541,
+			url: "https://raw.githubusercontent.com/me/tool/c1/docs/images/hero.webp",
+		});
+		expect(imageByName("tool", "graphics/feature")?.url).toBe(
+			"https://raw.githubusercontent.com/me/tool/c1/docs/images/graphics/feature.webp",
+		);
 		const [version] = docsVersions("tool");
 		expect(version).toMatchObject({ channel: "latest", ref: "main", sha: "c1" });
 		expect(version?.config).toMatchObject({ categories: [{ title: "Start" }] });
@@ -196,6 +209,7 @@ describe("sync", () => {
 		expect(previous?.changes.map((change) => [change.kind, change.path])).toEqual([
 			["added", "README.md"],
 			["added", "docs/config.json"],
+			["added", "docs/images/graphics/feature.webp"],
 			["added", "docs/images/hero.webp"],
 			["added", "docs/setup.md"],
 		]);
@@ -206,6 +220,7 @@ describe("sync", () => {
 		head = "c3";
 		delete files["docs/setup.md"];
 		delete files["docs/images/hero.webp"];
+		delete files["docs/images/graphics/feature.webp"];
 		const result = await syncRepo("tool");
 		expect(result.status).toBe("ok");
 		expect(
@@ -220,6 +235,7 @@ describe("sync", () => {
 		expect(docsStatuses().tool).toBe("valid");
 		const [latest] = syncHistory().find((group) => group.repo === "tool")?.runs ?? [];
 		expect(latest?.changes.map((change) => [change.kind, change.path])).toEqual([
+			["removed", "docs/images/graphics/feature"],
 			["removed", "docs/images/hero"],
 			["removed", "docs/setup.md"],
 		]);

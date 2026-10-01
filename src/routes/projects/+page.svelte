@@ -1,20 +1,21 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
+	import BrandIcon from "$lib/components/BrandIcon.svelte";
 	import Meta from "$lib/components/Meta.svelte";
 	import { SITE, WEBSITE } from "$lib/seo";
 
 	let { data } = $props();
 
-	// projects with a screenshot get the big treatment; the rest share a grid
+	// projects with a screenshot get a card in the deck; the rest share a grid
 	const flagships = $derived(data.projects.filter((project) => project.shot));
 	const others = $derived(data.projects.filter((project) => !project.shot));
+	const description = $derived(data.copy.description);
 
-	const description =
-		"Free, open-source, self-hosted replacements for the subscriptions a homelab collects: a drive, a PaaS, server alerting, a start page, a media client and the tooling that ships them.";
+	const guidesLabel = (count: number) => `${count} guide${count === 1 ? "" : "s"}`;
 </script>
 
 <Meta
-	title="Projects: free, self-hosted software for your homelab"
+	title={data.copy.title}
 	{description}
 	path="/projects"
 	trail={[["Projects", "/projects"]]}
@@ -48,88 +49,94 @@
 
 <main class="mx-auto max-w-page px-6">
 	<div class="pt-15 pb-14">
-		<span class="tag">{data.projects.length} projects &middot; MIT &amp; AGPL</span>
+		<span class="tag">{data.projects.length} projects{data.copy.tag ? ` · ${data.copy.tag}` : ""}</span>
 		<h1 class="mt-6.5 text-[clamp(2.6rem,7.5vw,5.6rem)]/[.92] animate-rise stereo font-extrabold tracking-[-.045em]">
-			Each one replaces<br>
-			<span class="grad">a subscription.</span>
+			{data.copy.heading}{#if data.copy.accent}<br>
+				<span class="grad">{data.copy.accent}</span>{/if}
 		</h1>
-		<p class="mt-7 max-w-[68ch] text-[1.05rem] text-dim">
-			Every project here does a job people usually rent from someone else. Each one runs in a
-			container on a box you own, keeps its data in a volume you can back up, and costs nothing,
-			today or later.
-		</p>
+		{#if data.copy.intro}
+			<p class="mt-7 max-w-[68ch] text-[1.05rem] text-dim">{data.copy.intro}</p>
+		{/if}
 	</div>
 
 	<section class="zone zone-split mb-24">
-		<div class="flex flex-col gap-6">
+		<div class="deck" style:--count={flagships.length}>
 			{#each flagships as project, index (project.repo)}
-				<!-- odd ones swap sides -->
-				<article
-					class={[
-						"glass group grid items-center gap-8 overflow-hidden rounded-4xl p-7 sm:p-10 lg:grid-cols-[2fr_3fr]",
-						// each side is a channel: left slides glow crimson, right ones gold
-						index % 2 ? "[--ch:var(--color-cool)]" : "[--ch:var(--color-hot)]",
-					]}
-				>
-					<div class={["drift", index % 2 && "lg:order-2"]}>
-						<span class="label">{project.category}</span>
-						<h2 class="mt-2 text-[clamp(1.8rem,3.5vw,2.6rem)]/none font-extrabold tracking-[-.04em]">
-							{project.name}
-						</h2>
-						<p class="mt-4 mb-5 text-dim">{project.blurb}</p>
-						{@render chips(project.chips)}
-						<div class="mt-7 flex flex-wrap gap-2.5">
-							<a class="btn btn-primary" href={resolve("/[repo]", { repo: project.repo })}
-								>Open {project.name}</a
-							>
-							{#if project.guides}
-								<a class="btn" href={resolve("/[repo]/[[channel=channel]]/docs", { repo: project.repo })}
-									>{project.guides} guides</a
+				<article class="deck-card mb-6 lg:mb-[14svh] lg:last:mb-0" style:--index={index}>
+					<!-- the two channels take turns: crimson glows, then gold -->
+					<div
+						class="deck-face grid lg:min-h-128 lg:grid-cols-[5fr_7fr]"
+						style:--glow={index % 2 ? "var(--glow-2)" : "var(--glow-1)"}
+					>
+						<div class="self-center p-8 sm:p-10 lg:py-12 lg:pr-4 lg:pl-12">
+							<span class="label">{project.category}</span>
+							<h2 class="mt-2 text-[clamp(2.2rem,4.5vw,3.6rem)]/none font-extrabold tracking-[-.045em]">
+								{project.name}
+							</h2>
+							<p class="mt-5 mb-6 max-w-[52ch] text-[1.05rem] text-dim">{project.blurb}</p>
+							{@render chips(project.chips)}
+							<div class="mt-8 flex flex-wrap gap-2.5">
+								<a class="btn btn-primary" href={resolve("/[repo]", { repo: project.repo })}
+									>Details<span class="sr-only"> about {project.name}</span></a
 								>
-							{/if}
+								{#if project.guides}
+									<a class="btn" href={resolve("/[repo]/[[channel=channel]]/docs", { repo: project.repo })}
+										>{guidesLabel(project.guides)}</a
+									>
+								{/if}
+								{#if project.source}
+									<a class="btn px-4" href={project.source} target="_blank" rel="noopener" aria-label="{project.name} on GitHub"
+										><BrandIcon name="github" /></a
+									>
+								{/if}
+							</div>
 						</div>
+						{#if project.shot}
+							<!-- bleeds off the card's bottom-right corner, cropped by its edge -->
+							<a
+								class="tilt ml-8 block max-h-[min(30rem,55svh)] self-end overflow-hidden rounded-tl-2xl border-t border-l border-edge shadow-[-20px_-20px_60px_-30px_rgb(0_0_0/.35)] sm:ml-10 lg:mt-12 lg:ml-0"
+								href={resolve("/[repo]", { repo: project.repo })}
+								tabindex="-1"
+							>
+								<img
+									class="on-light block w-full"
+									src={project.shot.light}
+									width={project.shot.width}
+									height={project.shot.height}
+									alt={project.shot.alt}
+									loading={index ? "lazy" : "eager"}
+									decoding="async"
+								>
+								<img
+									class="on-dark block w-full"
+									src={project.shot.dark}
+									width={project.shot.width}
+									height={project.shot.height}
+									alt={project.shot.alt}
+									loading={index ? "lazy" : "eager"}
+									decoding="async"
+								>
+							</a>
+						{/if}
 					</div>
-					{#if project.shot}
-						<a
-							class="tilt block max-h-112 overflow-hidden rounded-2xl border border-line shadow-[0_30px_90px_-30px_var(--ch)]"
-							href={resolve("/[repo]", { repo: project.repo })}
-							tabindex="-1"
-						>
-							<img
-								class="on-light block w-full"
-								src={project.shot.light}
-								width={project.shot.width}
-								height={project.shot.height}
-								alt={project.shot.alt}
-								loading="lazy"
-								decoding="async"
-							>
-							<img
-								class="on-dark block w-full"
-								src={project.shot.dark}
-								width={project.shot.width}
-								height={project.shot.height}
-								alt={project.shot.alt}
-								loading="lazy"
-								decoding="async"
-							>
-						</a>
-					{/if}
 				</article>
 			{/each}
 		</div>
 
 		{#if others.length}
-			<h2 class="mt-16 mb-6 text-xl font-bold tracking-[-.02em]">Also in the box</h2>
-			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			<h2 class="mt-24 mb-6 text-[clamp(1.6rem,3vw,2.2rem)] font-bold tracking-[-.03em]">{data.copy.others}</h2>
+			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				{#each others as project (project.repo)}
-					<a class="card" href={resolve("/[repo]", { repo: project.repo })}>
+					<a class="card flex flex-col" href={resolve("/[repo]", { repo: project.repo })}>
 						<span class="label">{project.category}</span>
 						<h3 class="mt-2.5 mb-2 pr-10 text-[1.35rem] font-bold tracking-[-.02em]">
 							{project.name}
 						</h3>
-						<p class="mb-4.5 text-[.92rem] text-dim">{project.blurb}</p>
-						{@render chips(project.chips)}
+						<p class="mb-5 text-[.92rem] text-dim">{project.blurb}</p>
+						<div class="mt-auto">{@render chips(project.chips)}</div>
+						{#if project.guides}
+							<p class="mt-4 text-[13px] text-dim">{guidesLabel(project.guides)}</p>
+						{/if}
 					</a>
 				{/each}
 			</div>

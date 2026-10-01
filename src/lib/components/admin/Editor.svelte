@@ -25,16 +25,6 @@
 	const SHOT_ICON =
 		'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="m3 15 5-5 4 4 3-3 6 6"/></svg>';
 
-	async function upload(file: File): Promise<string> {
-		const body = new FormData();
-		body.append("file", file);
-		const response = await fetch("/admin/images/upload", { method: "POST", body });
-		if (!response.ok) {
-			throw new Error(await response.text());
-		}
-		return ((await response.json()) as { url: string }).url;
-	}
-
 	// Crepe only exists in the browser: it is built when the element mounts and
 	// torn down with it. The initial value is read once; after that the editor owns it.
 	function crepe(node: HTMLElement) {
@@ -72,8 +62,10 @@
 					// tok-* classes, coloured below with the site's Shiki themes
 					[CrepeFeature.CodeMirror]: { extensions: [syntaxHighlighting(classHighlighter)] },
 					[CrepeFeature.ListItem]: { bulletIcon: BULLET_ICON },
+					// images are hosted elsewhere (GitHub): a link, never an upload
 					[CrepeFeature.ImageBlock]: {
-						onUpload: upload,
+						blockUploadPlaceholderText: "Paste the image link",
+						inlineUploadPlaceholderText: "Paste the image link",
 						// display only: the Markdown keeps the name. Screenshots have a -dark twin.
 						proxyDomURL: (url: string) => (dark() && images[`${url}-dark`]) || images[url] || url,
 					},
@@ -472,5 +464,9 @@
 	}
 	.project-look :global(.milkdown .ProseMirror > .spacer.tall) {
 		grid-row: span 2;
+	}
+	/* nothing is uploaded here: the image block only takes a link */
+	.editor :global(.milkdown .uploader) {
+		display: none;
 	}
 </style>

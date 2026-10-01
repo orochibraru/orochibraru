@@ -1,4 +1,4 @@
-// The MCP server Claude talks to: posts, images and project pages, through the
+// The MCP server Claude talks to: posts and project pages, through the
 // same editor functions the admin UI uses. Stateless: every request builds a
 // fresh server and transport, so nothing lingers between calls.
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -18,9 +18,6 @@ import {
 	updatePost,
 	updateProject,
 } from "./editor";
-import { storeImage } from "./images";
-
-const IMAGE_LIMIT = 20 * 1024 * 1024;
 
 type Result = { content: { type: "text"; text: string }[]; isError?: boolean };
 
@@ -57,29 +54,6 @@ const summary = (row: PostRow) => ({
 	status: row.status,
 	url: row.status === "published" ? `${SITE}/blog/${row.slug}` : undefined,
 });
-
-async function fetchImage(url: string): Promise<Uint8Array> {
-	if (!url.startsWith("https://")) {
-		throw new EditorError("only https:// image URLs are fetched");
-	}
-	const response = await fetch(url, {
-		signal: AbortSignal.timeout(15_000),
-		redirect: "follow",
-	}).catch(() => {
-		throw new EditorError(`couldn't fetch ${url}`);
-	});
-	if (!response.ok) {
-		throw new EditorError(`${url} answered ${response.status}`);
-	}
-	if (Number(response.headers.get("content-length") ?? 0) > IMAGE_LIMIT) {
-		throw new EditorError("images are limited to 20 MB");
-	}
-	const bytes = new Uint8Array(await response.arrayBuffer());
-	if (bytes.length > IMAGE_LIMIT) {
-		throw new EditorError("images are limited to 20 MB");
-	}
-	return bytes;
-}
 
 export function createMcpServer(): McpServer {
 	const server = new McpServer({ name: "orochibraru.com", version: "1.0.0" });
@@ -169,42 +143,6 @@ export function createMcpServer(): McpServer {
 			inputSchema: { slug: z.string() },
 		},
 		({ slug }) => run(() => summary(setPostStatus(postOr(slug).id, "draft"))),
-	);
-
-	server.registerTool(
-		"upload_image",
-		{
-			title: "Upload an image",
-			description:
-				"Store an image (PNG, JPEG, WebP or TIFF, from an https URL or base64) and get back the " +
-				"Markdown to put in a post or page.",
-			inputSchema: {
-				alt: z.string().describe("What the image shows, for screen readers"),
-				url: z.string().optional(),
-				base64: z.string().optional(),
-			},
-		},
-		({ alt, url, base64 }) =>
-			run(async () => {
-				if (!url === !base64) {
-					throw new EditorError("give exactly one of url or base64");
-				}
-				const bytes = url
-					? await fetchImage(url)
-					: Uint8Array.from(Buffer.from(base64 ?? "", "base64"));
-				if (bytes.length > IMAGE_LIMIT) {
-					throw new EditorError("images are limited to 20 MB");
-				}
-				const stored = await storeImage(bytes, { source: "upload", alt }).catch((cause) => {
-					throw new EditorError(cause instanceof Error ? cause.message : "not an image");
-				});
-				return {
-					url: stored.url,
-					markdown: `![${alt}](${stored.url})`,
-					width: stored.width,
-					height: stored.height,
-				};
-			}),
 	);
 
 	server.registerTool(

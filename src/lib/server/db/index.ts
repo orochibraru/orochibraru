@@ -13,7 +13,7 @@ const migrationsFolder = join(process.cwd(), "drizzle");
 
 /** Opens (creating if needed) DIR/site.db. Migrating is its own step: see migrateDatabase. */
 export function openDatabase(dir: string): DB {
-	mkdirSync(join(dir, "images"), { recursive: true });
+	mkdirSync(dir, { recursive: true });
 	const client = new Database(join(dir, "site.db"), { create: true, strict: true });
 	client.run("PRAGMA journal_mode = WAL");
 	client.run("PRAGMA foreign_keys = ON");
@@ -36,7 +36,7 @@ const open = () => {
 /** Opened on first use, so building never touches DATA_DIR. */
 export const getDb = () => open().db;
 
-/** Where site.db and images/ live: DATA_DIR, or whatever a test set. */
+/** Where site.db lives: DATA_DIR, or whatever a test set. */
 export const getDataDir = () => open().dir;
 
 /** Tests point the app at a directory and database of their own. */

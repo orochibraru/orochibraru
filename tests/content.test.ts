@@ -2,17 +2,24 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { eq } from "drizzle-orm";
 import {
 	getProjectPage,
+	getProjectsPage,
 	invalidate,
 	listProjectCards,
+	PROJECTS_PAGE,
 	projectMarkdown,
 	wasPostDeleted,
 } from "../src/lib/server/content";
 import { guide, post, project } from "../src/lib/server/db/schema";
-import { createPost, deletePost, setPostStatus } from "../src/lib/server/editor";
+import {
+	createPost,
+	deletePost,
+	setPostStatus,
+	updateProjectsPage,
+} from "../src/lib/server/editor";
 import { loadGuides } from "../src/lib/server/guides";
-import { storeImage } from "../src/lib/server/images";
+import { recordScreenshot } from "../src/lib/server/images";
 import { loadPosts } from "../src/lib/server/posts";
-import { freshSite, SAMPLE_IMAGE } from "./helpers";
+import { freshSite } from "./helpers";
 
 const site = freshSite();
 afterAll(() => site.cleanup());
@@ -22,6 +29,9 @@ const BODY = `A start page for your homelab.
 ![The dashboard](dashboard)
 **The dashboard** Links and vitals.
 
+![A graphic](graphics/feature)
+**From a subfolder** Of docs/images.
+
 ## Alternatives {#alternatives}
 
 ### Homepage
@@ -29,6 +39,9 @@ const BODY = `A start page for your homelab.
 YAML files instead of a UI.
 
 See the [showcase](/demo/docs/showcase).`;
+
+const raw = (sha: string, name: string) =>
+	`https://raw.githubusercontent.com/me/demo/${sha.repeat(40)}/docs/images/${name}.png`;
 
 const row = (repo: string, position: number, body: string) => ({
 	repo,
@@ -46,9 +59,21 @@ beforeAll(async () => {
 		.insert(project)
 		.values([row("demo", 0, BODY), row("other", 1, "Another one.")])
 		.run();
-	const bytes = await Bun.file(SAMPLE_IMAGE).bytes();
-	for (const name of ["dashboard", "dashboard-dark"]) {
-		await storeImage(bytes, { source: "sync", project: "demo", name });
+	for (const [name, sha] of [
+		["dashboard", "a"],
+		["dashboard-dark", "b"],
+		["graphics/feature", "c"],
+	] as const) {
+		recordScreenshot(
+			{ width: 1200, height: 675 },
+			{
+				project: "demo",
+				channel: "latest",
+				name,
+				sourceSha: sha.repeat(40),
+				url: raw(sha, name),
+			},
+		);
 	}
 	site.db
 		.insert(post)
@@ -64,22 +89,24 @@ describe("project pages", () => {
 
 	test("cards carry their screenshot and guide count", () => {
 		const [demo, other] = listProjectCards();
-		expect(demo?.shot?.light).toMatch(/^\/images\/[0-9a-f]{64}\.webp$/);
+		expect(demo?.shot?.light).toBe(raw("a", "dashboard"));
+		expect(demo?.shot?.dark).toBe(raw("b", "dashboard-dark"));
 		expect(demo?.shot?.alt).toBe("The dashboard");
 		expect(other?.shot).toBeUndefined();
 		expect(demo?.guides).toBe(0);
 	});
 
-	test("render tiles, screenshots from the image store, and the lede", async () => {
+	test("render tiles, screenshots hosted on GitHub, and the lede", async () => {
 		const page = await getProjectPage("demo");
 		expect(page?.lede).toBe("A start page for your homelab.");
 		// a `-dark` twin: one <img> per theme, so the site's toggle picks, not just the OS
 		expect(page?.html).toMatch(
-			/<figure class="shot"><img class="on-light" src="\/images\/[0-9a-f]{64}\.webp"[^>]*><img class="on-dark" /,
+			/<figure class="shot"><img class="on-light" src="https:\/\/raw\.githubusercontent\.com\/me\/demo\/a{40}\/docs\/images\/dashboard\.png" width="1200" height="675"[^>]*><img class="on-dark" /,
 		);
+		expect(page?.html).toContain(`<img src="${raw("c", "graphics/feature")}"`);
 		expect(page?.html).toContain('<section id="alternatives" class="ruled">');
 		expect(page?.html).toContain('<div class="tiles"><div class="feat">');
-		expect(page?.image?.url).toMatch(/^https:\/\/orochibraru\.com\/images\/[0-9a-f]{64}\.webp$/);
+		expect(page?.image?.url).toBe(raw("b", "dashboard-dark"));
 	});
 
 	test("an unpublished project is not there, and invalidate() makes that true at once", () => {
@@ -93,9 +120,19 @@ describe("project pages", () => {
 	test("the Markdown twin has absolute image URLs and no anchor syntax", () => {
 		const twin = projectMarkdown({ repo: "demo", name: "Demo", body: BODY });
 		expect(twin).toStartWith("# Demo\n");
-		expect(twin).toMatch(/\]\(https:\/\/orochibraru\.com\/images\/[0-9a-f]{64}\.webp\)/);
+		expect(twin).toContain(`](${raw("a", "dashboard")})`);
+		expect(twin).toContain(`](${raw("c", "graphics/feature")})`);
 		expect(twin).toContain("](https://orochibraru.com/demo/docs/showcase)");
 		expect(twin).not.toContain("{#alternatives}");
+	});
+});
+
+describe("the /projects page", () => {
+	test("reads the built-in copy until the admin saves its own", () => {
+		expect(getProjectsPage()).toEqual(PROJECTS_PAGE);
+		updateProjectsPage({ ...PROJECTS_PAGE, heading: "Stop renting", accent: "" });
+		expect(getProjectsPage()).toMatchObject({ heading: "Stop renting", accent: "" });
+		expect(() => updateProjectsPage({ ...PROJECTS_PAGE, title: " " })).toThrow();
 	});
 });
 

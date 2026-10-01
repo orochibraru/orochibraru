@@ -621,6 +621,28 @@
 	.card:hover :is(h3, h4) {
 		@apply text-accent;
 	}
+	/* /projects: the flagships stick and stack as the page scrolls. Opaque, so the
+	   card underneath never shows through; the two channels alternate as glows. */
+	.deck {
+		view-timeline: --deck;
+	}
+	.deck-card {
+		top: calc(6rem + var(--index) * 1.5rem);
+		@apply lg:sticky;
+	}
+	.deck-face {
+		@apply relative isolate overflow-hidden rounded-4xl border border-line;
+		background:
+			radial-gradient(48rem 30rem at 100% 100%, var(--glow), transparent 70%), var(--color-surface);
+		box-shadow:
+			inset 0 1px 0 var(--glass-rim),
+			0 40px 80px -50px rgb(0 0 0 / 0.6);
+	}
+	/* the card underneath dims as the next one covers it */
+	.deck-face::after {
+		content: "";
+		@apply pointer-events-none absolute inset-0 bg-bg opacity-0;
+	}
 }
 
 /* Shiki writes both themes' colours on every token; show the one that matches the page */
@@ -792,24 +814,32 @@
 			animation-timeline: scroll(root);
 			animation-range: 0 75svh;
 		}
-		/* a flagship's text drifts up faster than its screenshot: parallax */
-		.drift {
-			animation: drift linear both;
-			animation-timeline: view();
-			animation-range: cover 0% cover 100%;
-		}
 		/* a rented price gets crossed out as it scrolls into view */
 		.strike::after {
 			animation: strike linear both;
 			animation-timeline: view();
 			animation-range: entry 100% cover 45%;
 		}
+		/* each flagship shrinks back and dims while the next slides over it; the last stays */
+		.deck-card:not(:last-child) .deck-face,
+		.deck-card:not(:last-child) .deck-face::after {
+			animation: recede linear both;
+			animation-timeline: --deck;
+			animation-range: exit-crossing calc(var(--index) / var(--count) * 100%) exit-crossing
+				calc((var(--index) + 1) / var(--count) * 100%);
+		}
+		.deck-card:not(:last-child) .deck-face {
+			transform-origin: 50% 0;
+		}
+		.deck-card:not(:last-child) .deck-face::after {
+			animation-name: dim;
+		}
 		/* screenshots lie back in 3D and stand up as they scroll into view */
 		.tilt {
 			transform-origin: 50% 100%;
 			animation: tilt linear both;
 			animation-timeline: view();
-			animation-range: entry 0% cover 45%;
+			animation-range: entry 0% entry 100%;
 		}
 	}
 }
@@ -839,25 +869,24 @@
 @keyframes tilt {
 	from {
 		opacity: 0.4;
-		transform: perspective(1600px) rotateX(16deg) scale(0.94);
+		transform: perspective(1600px) rotateX(18deg) scale(0.94);
 		animation-timing-function: var(--ease-apple);
 	}
+}
+/* the further back in the stack, the smaller: 4% per card that will land on top */
+@keyframes recede {
 	to {
-		opacity: 1;
-		transform: perspective(1600px) rotateX(0) scale(1);
+		transform: scale(calc(1 - (var(--count) - var(--index) - 1) * 0.04));
+	}
+}
+@keyframes dim {
+	to {
+		opacity: 0.45;
 	}
 }
 @keyframes strike {
 	from {
 		transform: scaleX(0);
-	}
-}
-@keyframes drift {
-	from {
-		transform: translateY(1.5rem);
-	}
-	to {
-		transform: translateY(-1.5rem);
 	}
 }
 

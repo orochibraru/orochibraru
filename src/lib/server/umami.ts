@@ -82,6 +82,7 @@ export function fillSeries(
 const TTL = 60 * 1000;
 
 let cache: { stats: UmamiStats; until: number } | undefined;
+let views: { counts: Record<string, number>; until: number } | undefined;
 
 /** The saved connection, key unsealed; null until one is saved. */
 export async function getUmami(): Promise<UmamiConfig | null> {
@@ -116,6 +117,7 @@ export async function saveUmami(input: UmamiConfig): Promise<string | null> {
 export async function testUmami(config: UmamiConfig, fresh = false): Promise<string | null> {
 	if (fresh) {
 		cache = undefined;
+		views = undefined;
 		reports.clear();
 	}
 	try {
@@ -130,6 +132,7 @@ export async function testUmami(config: UmamiConfig, fresh = false): Promise<str
 export function forgetUmami() {
 	getDb().delete(umami).run();
 	cache = undefined;
+	views = undefined;
 	reports.clear();
 }
 
@@ -145,6 +148,29 @@ export async function umamiStats(config: UmamiConfig, now = Date.now()): Promise
 	} catch (error) {
 		if (cache) {
 			return cache.stats;
+		}
+		throw error;
+	}
+}
+
+/** Pageviews per path over the last 30 days, for the admin's lists: cached like umamiStats. */
+export async function pathViews(
+	config: UmamiConfig,
+	now = Date.now(),
+): Promise<Record<string, number>> {
+	if (views && views.until > now) {
+		return views.counts;
+	}
+	try {
+		const metrics = await request<Metric[]>(
+			config,
+			`/metrics?startAt=${now - 30 * DAY}&endAt=${now}&type=path&limit=1000`,
+		);
+		views = { counts: Object.fromEntries(metrics.map(({ x, y }) => [x, y])), until: now + TTL };
+		return views.counts;
+	} catch (error) {
+		if (views) {
+			return views.counts;
 		}
 		throw error;
 	}

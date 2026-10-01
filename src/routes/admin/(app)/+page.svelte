@@ -20,8 +20,7 @@
 <div class="mb-5 flex min-h-8 flex-wrap items-center gap-x-4 gap-y-2">
 	<h1 class="text-base font-semibold">Overview</h1>
 	<p class="text-sm text-dim">
-		{data.projects.filter((project) => project.published).length} of {data.projects.length} projects live,
-		{data.uploads} loose image{data.uploads === 1 ? "" : "s"}{#if failed}, <span class="text-hot"
+		{data.projects.filter((project) => project.published).length} of {data.projects.length} projects live{#if failed}, <span class="text-hot"
 				>{failed} failed sync{failed === 1 ? "" : "s"}</span
 			>{/if}
 	</p>

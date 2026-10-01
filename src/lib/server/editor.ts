@@ -1,6 +1,6 @@
-// Every write to posts, projects and images, for the admin UI and the MCP
+// Every write to posts and projects, for the admin UI and the MCP
 // tools alike: one place validates, one place clears the render cache.
-import { and, asc, desc, eq, gt, inArray, isNotNull, isNull, like, max, or } from "drizzle-orm";
+import { and, asc, desc, eq, gt, inArray, isNotNull, like, max, or } from "drizzle-orm";
 import { z } from "zod";
 import { invalidate } from "./content";
 import { getDb } from "./db";
@@ -12,10 +12,10 @@ import {
 	installedRepo,
 	post,
 	project,
+	projectsPage,
 	syncChange,
 	syncRun,
 } from "./db/schema";
-import { imageUrl } from "./images";
 import { ProjectFields } from "./project-pages";
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -184,6 +184,28 @@ export function reorderProjects(repos: string[]) {
 	invalidate();
 }
 
+export const ProjectsPageInput = z
+	.object({
+		title: z.string().trim().min(1),
+		description: z.string().trim().min(1),
+		tag: z.string().trim(),
+		heading: z.string().trim().min(1),
+		accent: z.string().trim(),
+		intro: z.string().trim(),
+		others: z.string().trim().min(1),
+	})
+	.strict();
+
+export function updateProjectsPage(input: z.input<typeof ProjectsPageInput>) {
+	const copy = parse(ProjectsPageInput, input);
+	getDb()
+		.insert(projectsPage)
+		.values({ id: 1, ...copy })
+		.onConflictDoUpdate({ target: projectsPage.id, set: copy })
+		.run();
+	invalidate();
+}
+
 /** Repos the GitHub App can see that aren't projects yet. */
 export const listAddableRepos = () => {
 	const taken = new Set(listAllProjects().map((row) => row.githubRepo));
@@ -339,7 +361,6 @@ export function docsStatuses(): Record<string, DocsStatus> {
 		...db
 			.selectDistinct({ project: image.project })
 			.from(image)
-			.where(eq(image.source, "sync"))
 			.all()
 			.map((row) => row.project),
 	]);
@@ -371,62 +392,20 @@ export function docsStatuses(): Record<string, DocsStatus> {
 	return statuses;
 }
 
-// ---- images
-
-export type ImageRow = typeof image.$inferSelect;
-
-/** Uploads, and each project's synced screenshots, newest first. */
-export const listImages = () => getDb().select().from(image).orderBy(desc(image.createdAt)).all();
-
-/** Where an image is used: posts and project pages that reference its URL or, for screenshots, its name. */
-export function imageUsages(row: ImageRow): string[] {
-	const db = getDb();
-	const url = imageUrl(row.sha256);
-	const posts = db
-		.select({ id: post.id, title: post.title })
-		.from(post)
-		.where(like(post.body, `%${url}%`))
-		.all()
-		.map((item) => `post: ${item.title}`);
-	const projects = db
-		.select({ repo: project.repo })
-		.from(project)
-		.where(
-			row.project && row.name
-				? and(
-						eq(project.repo, row.project),
-						or(
-							like(project.body, `%](${row.name})%`),
-							like(project.body, `%](${row.name.replace(/-dark$/, "")})%`),
-						),
-					)
-				: like(project.body, `%${url}%`),
-		)
-		.all()
-		.map((item) => `project: ${item.repo}`);
-	return [...posts, ...projects];
-}
-
 /** A project's screenshots by name, for the editor to show them. */
 export const projectImages = (repo: string): Record<string, string> =>
 	Object.fromEntries(
 		getDb()
-			.select({ name: image.name, sha256: image.sha256 })
+			.select({ name: image.name, url: image.url })
 			.from(image)
 			.where(and(eq(image.project, repo), eq(image.channel, "latest")))
 			.all()
-			.flatMap((row) => (row.name ? [[row.name, imageUrl(row.sha256)]] : [])),
+			.map((row) => [row.name, row.url]),
 	);
-
-export function setImageAlt(id: number, alt: string) {
-	getDb().update(image).set({ alt }).where(eq(image.id, id)).run();
-	invalidate();
-}
 
 /** The admin overview: a glance at everything. */
 export const overview = () => ({
 	posts: listAllPosts().slice(0, 5),
 	projects: listAllProjects(),
 	runs: recentSyncRuns(),
-	uploads: getDb().select().from(image).where(isNull(image.project)).all().length,
 });

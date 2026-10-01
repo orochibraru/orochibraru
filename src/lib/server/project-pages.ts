@@ -101,8 +101,7 @@ export async function renderProjectPage(row: ProjectRow): Promise<ProjectPage> {
 	const lede = html.match(/^<p>([\s\S]*?)<\/p>\n?/);
 
 	const dark = row.image ? image(`${row.image.src}-dark`) : undefined;
-	const card =
-		row.image && dark ? { ...dark, url: `${SITE}${dark.url}`, alt: row.image.alt } : undefined;
+	const card = row.image && dark ? { ...dark, alt: row.image.alt } : undefined;
 	const url = `${SITE}/${row.repo}`;
 	const source = row.githubRepo ? `https://github.com/${row.githubRepo}` : undefined;
 
@@ -182,7 +181,7 @@ function tiles(html: string, image: Image, lazy: boolean): string {
 				'<div class="feat"><h3>$1</h3><p>$2</p></div>',
 			)
 			.replace(
-				/<p><img src="([\w-]+)" alt="([^"]*)" \/>\s*(?:<strong>([\s\S]*?)<\/strong>)?\s*([\s\S]*?)<\/p>/g,
+				/<p><img src="([\w/-]+)" alt="([^"]*)" \/>\s*(?:<strong>([\s\S]*?)<\/strong>)?\s*([\s\S]*?)<\/p>/g,
 				(_m, name: string, alt: string, title = "", caption: string) => {
 					const light = image(name);
 					if (!light) {

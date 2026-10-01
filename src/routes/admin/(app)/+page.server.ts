@@ -4,7 +4,7 @@ import { getSearchConsole, searchStats } from "$lib/server/search-console";
 import { getUmami, umamiReport, umamiStats } from "$lib/server/umami";
 
 export const load = async () => {
-	const { posts, projects, runs, uploads } = overview();
+	const { posts, projects, runs } = overview();
 	const synced = new Map(
 		docsVersions()
 			.filter((version) => version.channel === "latest")
@@ -32,7 +32,6 @@ export const load = async () => {
 			docsSyncedSha: synced.get(repo),
 		})),
 		runs,
-		uploads,
 		// streamed: the page doesn't wait on Umami or Google
 		analytics,
 		search: searched,
