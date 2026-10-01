@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.2](https://github.com/orochibraru/orochibraru/compare/v1.15.1...v1.15.2) (2026-10-01)
+
+### Bug Fixes
+
+- simplify image handling & design
+  ([6289b01](https://github.com/orochibraru/orochibraru/commit/6289b01818e23f5c9de0a4f06305e6004272df95))
+
 ## [1.15.1](https://github.com/orochibraru/orochibraru/compare/v1.15.0...v1.15.1) (2026-09-29)
 
 ### Bug Fixes
