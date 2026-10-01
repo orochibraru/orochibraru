@@ -100,7 +100,7 @@ export async function renderProjectPage(row: ProjectRow): Promise<ProjectPage> {
 	// no lede is an unfinished page, not a broken one: the editor shows it as it is
 	const lede = html.match(/^<p>([\s\S]*?)<\/p>\n?/);
 
-	const dark = row.image ? image(`${row.image.src}-dark`) : undefined;
+	const dark = row.image ? (image(`${row.image.src}-dark`) ?? image(row.image.src)) : undefined;
 	const card = row.image && dark ? { ...dark, alt: row.image.alt } : undefined;
 	const url = `${SITE}/${row.repo}`;
 	const source = row.githubRepo ? `https://github.com/${row.githubRepo}` : undefined;
