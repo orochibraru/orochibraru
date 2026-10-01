@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.0](https://github.com/orochibraru/orochibraru/compare/v1.15.2...v1.16.0) (2026-10-01)
+
+### Features
+
+- more mcp tooling
+  ([3cdc14e](https://github.com/orochibraru/orochibraru/commit/3cdc14e450cc8fc71cbb3cddc8d266a89e123abc))
+
 ## [1.15.2](https://github.com/orochibraru/orochibraru/compare/v1.15.1...v1.15.2) (2026-10-01)
 
 ### Bug Fixes
