@@ -1,3 +1,4 @@
+import { enhancedImages } from "@sveltejs/enhanced-img";
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, loadEnv } from "vite";
@@ -11,5 +12,5 @@ export default defineConfig(({ command, mode }) => {
 			process.env[key] ??= value;
 		}
 	}
-	return { plugins: [tailwindcss(), sveltekit()] };
+	return { plugins: [enhancedImages(), tailwindcss(), sveltekit()] };
 });

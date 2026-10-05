@@ -101,7 +101,9 @@ export async function renderProjectPage(row: ProjectRow): Promise<ProjectPage> {
 	const lede = html.match(/^<p>([\s\S]*?)<\/p>\n?/);
 
 	const dark = row.image ? (image(`${row.image.src}-dark`) ?? image(row.image.src)) : undefined;
-	const card = row.image && dark ? { ...dark, alt: row.image.alt } : undefined;
+	// og:image and the schema's screenshot are read off-site: absolute
+	const card =
+		row.image && dark ? { ...dark, url: `${SITE}${dark.url}`, alt: row.image.alt } : undefined;
 	const url = `${SITE}/${row.repo}`;
 	const source = row.githubRepo ? `https://github.com/${row.githubRepo}` : undefined;
 

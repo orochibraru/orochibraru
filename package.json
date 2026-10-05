@@ -22,6 +22,7 @@
 		"@j178/prek": "^0.5.3",
 		"@lucide/svelte": "^1.46.0",
 		"@orochibraru/svelte-smol": "1.8.1",
+		"@sveltejs/enhanced-img": "^1.0.0",
 		"@sveltejs/kit": "^2.70.3",
 		"@sveltejs/vite-plugin-svelte": "^7.3.0",
 		"@tailwindcss/language-server": "^0.16.0",

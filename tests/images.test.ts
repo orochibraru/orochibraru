@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, expect, test } from "bun:test";
+import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { image } from "../src/lib/server/db/schema";
-import { imageByName, imageSize, recordScreenshot } from "../src/lib/server/images";
+import { imageByName, imageSize, recordScreenshot, screenshotWebp } from "../src/lib/server/images";
 import { freshSite, SAMPLE_IMAGE } from "./helpers";
 
 let site: ReturnType<typeof freshSite>;
@@ -29,7 +29,7 @@ test("measures a WebP, a PNG and a JPEG from their headers", async () => {
 	).toBeNull();
 });
 
-test("a screenshot is a row, replaced in place by name, served from its GitHub URL", () => {
+test("a screenshot is a row, replaced in place by name, served under its blob sha", () => {
 	site.db.$client.run("INSERT INTO project (repo, name) VALUES ('bercail', 'Bercail')");
 	const shot = (sourceSha: string) =>
 		({
@@ -45,7 +45,66 @@ test("a screenshot is a row, replaced in place by name, served from its GitHub U
 	expect(imageByName("bercail", "graphics/dashboard")).toEqual({
 		width: 1280,
 		height: 720,
-		url: "https://raw.githubusercontent.com/me/bercail/b/docs/images/graphics/dashboard.png",
+		url: "/images/b.webp",
 	});
 	expect(imageByName("bercail", "graphics/dashboard", "canary")).toBeUndefined();
+});
+
+const SHA = "0123456789abcdef0123456789abcdef01234567";
+
+function recordPng() {
+	site.db.$client.run("INSERT INTO project (repo, name) VALUES ('bercail', 'Bercail')");
+	recordScreenshot(
+		{ width: 1200, height: 1541 },
+		{
+			project: "bercail",
+			channel: "latest",
+			name: "hero",
+			sourceSha: SHA,
+			url: "https://raw.githubusercontent.com/me/bercail/main/docs/images/hero.png",
+		},
+	);
+}
+
+test("a screenshot is fetched once, re-encoded to WebP, then served from the cache", async () => {
+	recordPng();
+	const png = await new Bun.Image(await Bun.file(SAMPLE_IMAGE).bytes()).png().blob();
+	const github = spyOn(globalThis, "fetch").mockResolvedValue(new Response(png));
+	try {
+		for (let request = 0; request < 2; request++) {
+			const webp = await screenshotWebp(SHA);
+			expect(webp).toBeDefined();
+			const format = (await new Bun.Image(await (webp as Blob).bytes()).metadata()).format;
+			expect(format).toBe("webp");
+		}
+		expect(github).toHaveBeenCalledTimes(1);
+	} finally {
+		github.mockRestore();
+	}
+});
+
+test("an unknown sha, or anything but a sha, is not found without asking GitHub", async () => {
+	recordPng();
+	const github = spyOn(globalThis, "fetch");
+	try {
+		expect(await screenshotWebp("f".repeat(40))).toBeUndefined();
+		expect(await screenshotWebp(`../../${SHA}`)).toBeUndefined();
+		expect(github).not.toHaveBeenCalled();
+	} finally {
+		github.mockRestore();
+	}
+});
+
+test("a GitHub failure throws and caches nothing", async () => {
+	recordPng();
+	const github = spyOn(globalThis, "fetch").mockResolvedValue(
+		new Response("gone", { status: 404 }),
+	);
+	try {
+		await expect(screenshotWebp(SHA)).rejects.toThrow("GitHub answered 404");
+		await expect(screenshotWebp(SHA)).rejects.toThrow();
+		expect(github).toHaveBeenCalledTimes(2);
+	} finally {
+		github.mockRestore();
+	}
 });

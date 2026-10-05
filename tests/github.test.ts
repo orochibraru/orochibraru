@@ -176,15 +176,24 @@ describe("sync", () => {
 		// two guides, two screenshots and docs/config.json
 		expect(first).toEqual({ status: "ok", changed: 5 });
 		expect(site.db.select().from(guide).where(eq(guide.project, "tool")).all()).toHaveLength(2);
-		// measured from its header, served by GitHub from the commit it was read at
+		// measured from its header, fetched from GitHub at the commit it was read at
+		const shot = (name: string) =>
+			site.db
+				.select()
+				.from(image)
+				.where(and(eq(image.project, "tool"), eq(image.name, name)))
+				.get();
+		expect(shot("hero")?.url).toBe(
+			"https://raw.githubusercontent.com/me/tool/c1/docs/images/hero.webp",
+		);
+		expect(shot("graphics/feature")?.url).toBe(
+			"https://raw.githubusercontent.com/me/tool/c1/docs/images/graphics/feature.webp",
+		);
 		expect(imageByName("tool", "hero")).toEqual({
 			width: 1200,
 			height: 1541,
-			url: "https://raw.githubusercontent.com/me/tool/c1/docs/images/hero.webp",
+			url: `/images/${shot("hero")?.sourceSha}.webp`,
 		});
-		expect(imageByName("tool", "graphics/feature")?.url).toBe(
-			"https://raw.githubusercontent.com/me/tool/c1/docs/images/graphics/feature.webp",
-		);
 		const [version] = docsVersions("tool");
 		expect(version).toMatchObject({ channel: "latest", ref: "main", sha: "c1" });
 		expect(version?.config).toMatchObject({ categories: [{ title: "Start" }] });

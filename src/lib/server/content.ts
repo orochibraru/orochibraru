@@ -134,7 +134,7 @@ export function getProjectPage(repo: string): Promise<ProjectPage> | undefined {
 
 /**
  * A project page as its Markdown twin: the stored body, with screenshot names
- * turned into their GitHub URLs and site-relative links made absolute.
+ * turned into their image URLs and site-relative links made absolute.
  */
 export function projectMarkdown(row: Pick<ProjectRow, "repo" | "name" | "body">): string {
 	const body = row.body

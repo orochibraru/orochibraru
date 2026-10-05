@@ -16,6 +16,7 @@ import {
 	syncChange,
 	syncRun,
 } from "./db/schema";
+import { imageUrl } from "./images";
 import { ProjectFields } from "./project-pages";
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -400,11 +401,11 @@ export function docsStatuses(): Record<string, DocsStatus> {
 export const projectImages = (repo: string): Record<string, string> =>
 	Object.fromEntries(
 		getDb()
-			.select({ name: image.name, url: image.url })
+			.select({ name: image.name, sourceSha: image.sourceSha })
 			.from(image)
 			.where(and(eq(image.project, repo), eq(image.channel, "latest")))
 			.all()
-			.map((row) => [row.name, row.url]),
+			.map((row) => [row.name, imageUrl(row.sourceSha)]),
 	);
 
 /** The admin overview: a glance at everything. */

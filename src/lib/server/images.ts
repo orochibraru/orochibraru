@@ -1,7 +1,10 @@
 // Repo screenshots stay on GitHub: the site keeps only a row per screenshot, with
-// its size for the <img> and the raw.githubusercontent.com URL it is served from.
+// its size for the <img> and the raw.githubusercontent.com URL it is fetched from.
+// Pages point at /images/<blob sha>.webp, re-encoded on first request and cached.
+import { rename } from "node:fs/promises";
+import { join } from "node:path";
 import { and, eq } from "drizzle-orm";
-import { getDb } from "./db";
+import { getDataDir, getDb } from "./db";
 import { type Channel, image } from "./db/schema";
 
 export type Size = { width: number; height: number };
@@ -72,14 +75,55 @@ export function recordScreenshot(size: Size, shot: Screenshot, db: Writer = getD
 		.run();
 }
 
+/** Where the site serves a screenshot: the blob sha is its content, so the URL never goes stale. */
+export const imageUrl = (sourceSha: string) => `/images/${sourceSha}.webp`;
+
 export function imageByName(
 	project: string,
 	name: string,
 	channel: Channel = "latest",
 ): Image | undefined {
-	return getDb()
-		.select({ width: image.width, height: image.height, url: image.url })
+	const row = getDb()
+		.select({ width: image.width, height: image.height, sourceSha: image.sourceSha })
 		.from(image)
 		.where(and(eq(image.project, project), eq(image.channel, channel), eq(image.name, name)))
 		.get();
+	return row && { width: row.width, height: row.height, url: imageUrl(row.sourceSha) };
+}
+
+/**
+ * A screenshot as WebP, by blob sha: fetched from GitHub and re-encoded the first
+ * time, then read from DATA_DIR/cache. Undefined when no screenshot has that sha.
+ */
+export async function screenshotWebp(sourceSha: string): Promise<Blob | undefined> {
+	// it names a file below: a sha1 or sha256 blob id and nothing else
+	if (!/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(sourceSha)) {
+		return undefined;
+	}
+	const path = join(getDataDir(), "cache", "images", `${sourceSha}.webp`);
+	if (await Bun.file(path).exists()) {
+		return Bun.file(path);
+	}
+	const row = getDb()
+		.select({ url: image.url })
+		.from(image)
+		.where(eq(image.sourceSha, sourceSha))
+		.get();
+	if (!row) {
+		return undefined;
+	}
+	const response = await fetch(row.url, { signal: AbortSignal.timeout(10_000) });
+	if (!response.ok) {
+		throw new Error(`${row.url}: GitHub answered ${response.status}`);
+	}
+	const bytes = await response.bytes();
+	const webp =
+		(await new Bun.Image(bytes).metadata()).format === "webp"
+			? bytes
+			: await new Bun.Image(bytes).webp({ quality: 80 }).bytes();
+	// written aside, then renamed: a request racing this one never reads half a file
+	const partial = `${path}.${crypto.randomUUID()}`;
+	await Bun.write(partial, webp);
+	await rename(partial, path);
+	return Bun.file(path);
 }

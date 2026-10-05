@@ -39,14 +39,12 @@
 			>
 			<span class="tag ml-3.5">Self-taught &middot; 10 years</span>
 			<div class="mt-4.5 flex flex-wrap items-center gap-7">
-				<img
-					src="/avatar.jpg"
-					width="112"
-					height="112"
+				<enhanced:img
+					src="$lib/assets/avatar.jpg"
 					alt="orochibraru&rsquo;s avatar"
-					class="size-28 shrink-0 rounded-4xl border border-line object-cover shadow-[0_0_40px_-8px_var(--color-accent)]"
+					class="block size-28 shrink-0 rounded-4xl border border-line object-cover shadow-[0_0_40px_-8px_var(--color-accent)]"
 					loading="eager"
-				>
+				/>
 				<h1 class="text-[clamp(2.4rem,6.5vw,4rem)]/none animate-rise stereo font-extrabold tracking-[-.045em]">
 					Who&rsquo;s writing<br>
 					<span class="grad"

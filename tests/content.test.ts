@@ -42,6 +42,7 @@ See the [showcase](/demo/docs/showcase).`;
 
 const raw = (sha: string, name: string) =>
 	`https://raw.githubusercontent.com/me/demo/${sha.repeat(40)}/docs/images/${name}.png`;
+const served = (sha: string) => `/images/${sha.repeat(40)}.webp`;
 
 const row = (repo: string, position: number, body: string) => ({
 	repo,
@@ -89,24 +90,24 @@ describe("project pages", () => {
 
 	test("cards carry their screenshot and guide count", () => {
 		const [demo, other] = listProjectCards();
-		expect(demo?.shot?.light).toBe(raw("a", "dashboard"));
-		expect(demo?.shot?.dark).toBe(raw("b", "dashboard-dark"));
+		expect(demo?.shot?.light).toBe(served("a"));
+		expect(demo?.shot?.dark).toBe(served("b"));
 		expect(demo?.shot?.alt).toBe("The dashboard");
 		expect(other?.shot).toBeUndefined();
 		expect(demo?.guides).toBe(0);
 	});
 
-	test("render tiles, screenshots hosted on GitHub, and the lede", async () => {
+	test("render tiles, screenshots served as WebP by their blob sha, and the lede", async () => {
 		const page = await getProjectPage("demo");
 		expect(page?.lede).toBe("A start page for your homelab.");
 		// a `-dark` twin: one <img> per theme, so the site's toggle picks, not just the OS
 		expect(page?.html).toMatch(
-			/<figure class="shot"><img class="on-light" src="https:\/\/raw\.githubusercontent\.com\/me\/demo\/a{40}\/docs\/images\/dashboard\.png" width="1200" height="675"[^>]*><img class="on-dark" /,
+			/<figure class="shot"><img class="on-light" src="\/images\/a{40}\.webp" width="1200" height="675"[^>]*><img class="on-dark" /,
 		);
-		expect(page?.html).toContain(`<img src="${raw("c", "graphics/feature")}"`);
+		expect(page?.html).toContain(`<img src="${served("c")}"`);
 		expect(page?.html).toContain('<section id="alternatives" class="ruled">');
 		expect(page?.html).toContain('<div class="tiles"><div class="feat">');
-		expect(page?.image?.url).toBe(raw("b", "dashboard-dark"));
+		expect(page?.image?.url).toBe(`https://orochibraru.com${served("b")}`);
 	});
 
 	test("an unpublished project is not there, and invalidate() makes that true at once", () => {
@@ -120,8 +121,8 @@ describe("project pages", () => {
 	test("the Markdown twin has absolute image URLs and no anchor syntax", () => {
 		const twin = projectMarkdown({ repo: "demo", name: "Demo", body: BODY });
 		expect(twin).toStartWith("# Demo\n");
-		expect(twin).toContain(`](${raw("a", "dashboard")})`);
-		expect(twin).toContain(`](${raw("c", "graphics/feature")})`);
+		expect(twin).toContain(`](https://orochibraru.com${served("a")})`);
+		expect(twin).toContain(`](https://orochibraru.com${served("c")})`);
 		expect(twin).toContain("](https://orochibraru.com/demo/docs/showcase)");
 		expect(twin).not.toContain("{#alternatives}");
 	});
