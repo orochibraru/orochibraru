@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.0](https://github.com/orochibraru/orochibraru/compare/v1.16.1...v1.17.0) (2026-10-05)
+
+### Features
+
+- serve images same-origin as cached WebP
+  ([c7e7c3f](https://github.com/orochibraru/orochibraru/commit/c7e7c3f9c69936fe73c7b886fb4ad498ed41c797))
+
 ## [1.16.1](https://github.com/orochibraru/orochibraru/compare/v1.16.0...v1.16.1) (2026-10-01)
 
 ### Bug Fixes
