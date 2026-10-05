@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.1](https://github.com/orochibraru/orochibraru/compare/v1.16.0...v1.16.1) (2026-10-01)
+
+### Bug Fixes
+
+- image fallback
+  ([e2f4de0](https://github.com/orochibraru/orochibraru/commit/e2f4de0fc69bd94027df7530623eaa209ccdd3b2))
+
 ## [1.16.0](https://github.com/orochibraru/orochibraru/compare/v1.15.2...v1.16.0) (2026-10-01)
 
 ### Features
