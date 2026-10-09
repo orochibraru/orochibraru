@@ -597,6 +597,11 @@
 	.tiles:has(> :nth-child(2)) {
 		@apply sm:grid-cols-2;
 	}
+	/* a lone screenshot or an embedded video would otherwise span the whole page */
+	.tiles:not(:has(> :nth-child(2))),
+	.project section > iframe {
+		@apply max-w-4xl;
+	}
 	.project small {
 		@apply text-[.85rem];
 	}
