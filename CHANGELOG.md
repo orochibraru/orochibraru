@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.1](https://github.com/orochibraru/orochibraru/compare/v1.17.0...v1.17.1) (2026-10-09)
+
+### Bug Fixes
+
+- cap lone project screenshots and embedded videos at 4xl (#3)
+  ([d57cec6](https://github.com/orochibraru/orochibraru/commit/d57cec6d1298931aa2e7161974ebbf36b981ebd1))
+
 ## [1.17.0](https://github.com/orochibraru/orochibraru/compare/v1.16.1...v1.17.0) (2026-10-05)
 
 ### Features
