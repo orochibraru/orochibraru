@@ -175,11 +175,13 @@ function sections(html: string, image: Image): string {
 		.join("\n");
 }
 
-function tiles(html: string, image: Image, lazy: boolean): string {
+export function tiles(html: string, image: Image, lazy: boolean): string {
 	return (
 		html
 			.replace(
-				/<h3>([\s\S]*?)<\/h3>\s*<p>([\s\S]*?)<\/p>/g,
+				// the title can't run past its own </h3>, or a ### over a code block
+				// swallows everything up to the next ### that does have a paragraph
+				/<h3>((?:(?!<\/h3>)[\s\S])*?)<\/h3>\s*<p>([\s\S]*?)<\/p>/g,
 				'<div class="feat"><h3>$1</h3><p>$2</p></div>',
 			)
 			.replace(
