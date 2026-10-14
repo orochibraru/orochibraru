@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.2](https://github.com/orochibraru/orochibraru/compare/v1.17.1...v1.17.2) (2026-10-14)
+
+### Bug Fixes
+
+- **projects:** stop a code-block label from swallowing the next tile (#4)
+  ([4e422e6](https://github.com/orochibraru/orochibraru/commit/4e422e63846bc9b68f26d5658e07b60f10461bf4))
+
 ## [1.17.1](https://github.com/orochibraru/orochibraru/compare/v1.17.0...v1.17.1) (2026-10-09)
 
 ### Bug Fixes
