@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@fontsource-variable/geist";
+@import "@fontsource-variable/space-grotesk";
 @import "@fontsource-variable/geist-mono";
 
 /* ---------------------------------------------------------------
@@ -8,8 +8,8 @@
    Everything theme-dependent lives here so the rest is utilities.
    --------------------------------------------------------------- */
 @theme {
-	--font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
-	--font-display: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+	--font-sans: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+	--font-display: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
 	--font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
 	--container-page: 120rem; /* the one page-width knob: max-w-page */
@@ -186,7 +186,7 @@
 		color: inherit;
 		text-decoration: none;
 	}
-	/* mono is for code only: headings are Geist, heavy and tight */
+	/* mono is for code only: headings are Space Grotesk, heavy and tight */
 	h1,
 	h2 {
 		font-family: var(--font-display);
