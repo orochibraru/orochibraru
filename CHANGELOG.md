@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.0](https://github.com/orochibraru/orochibraru/compare/v1.17.2...v1.18.0) (2026-10-15)
+
+### Features
+
+- privacy pages for Homerun and Penombre
+  ([7128990](https://github.com/orochibraru/orochibraru/commit/71289904fb285a5f768e76f9c86f9dd6bb4c1245))
+
 ## [1.17.2](https://github.com/orochibraru/orochibraru/compare/v1.17.1...v1.17.2) (2026-10-14)
 
 ### Bug Fixes
