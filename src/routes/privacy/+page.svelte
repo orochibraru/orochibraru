@@ -129,6 +129,15 @@
 		</section>
 
 		<section class="mb-22.5">
+			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">The apps</h2>
+			<p>
+				This page covers this site only. The self-hosted apps have their own:
+				<a class="text-accent" href={resolve("/privacy/homerun")}>Homerun</a> and
+				<a class="text-accent" href={resolve("/privacy/penombre")}>Penombre</a>.
+			</p>
+		</section>
+
+		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Changes</h2>
 			<p>
 				If what this site collects changes, this page changes with it, and the date at the top gets
