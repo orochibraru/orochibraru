@@ -173,6 +173,14 @@ describe("guides", () => {
 					"# Troubleshooting\n\n## Nothing saves\n\nAlmost always the origin.\n\n### Behind a proxy\n\nSet it.\n\n## Why is the feed empty?\n\nNo addons.\n",
 				),
 				values("setup", "# Setup\n\nInstall it with one command.\n\n## Docker\n\nRun it.\n"),
+				values(
+					"api",
+					"# API\n\n## REST API\n\n`/api/v1/*` is a thin JSON wrapper over the same layer the dashboard is built on, nothing more.\n\n## CLI\n\nInstall it.\n",
+				),
+				values(
+					"faq",
+					"# FAQ\n\n## How do I change the language?\n\nIn Settings, under General, where every other preference this app has already lives.\n\n## Is a file kept as a version?\n\nYes.\n",
+				),
 			])
 			.run();
 		invalidate();
@@ -180,6 +188,9 @@ describe("guides", () => {
 		const intro = (slug: string) => guides.find((guide) => guide.slug === slug)?.intro;
 		expect(intro("troubleshooting")).toBe("Nothing saves. Why is the feed empty?");
 		expect(intro("setup")).toBe("Install it with one command.");
+		// a real first paragraph beats the headings, even when it opens with code
+		expect(intro("api")).toStartWith("/api/v1/* is a thin JSON wrapper");
+		expect(intro("faq")).toBe("How do I change the language? Is a file kept as a version?");
 	});
 });
 

@@ -63,7 +63,10 @@ const plain = (markdown: string) =>
 	markdown
 		.replace(/!\[[^\]]*\]\([^)]*\)/g, "")
 		.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
-		.replace(/[*_`]/g, "")
+		// inside a code span `*` and `_` are literal: /api/v1/*, node_modules
+		.split(/(`[^`\n]+`)/)
+		.map((part) => (part.startsWith("`") ? part.slice(1, -1) : part.replace(/[*_`]/g, "")))
+		.join("")
 		.replace(/\s+/g, " ")
 		.trim();
 
@@ -112,28 +115,28 @@ function rewrite(
 const imageName = (inRepo: string) =>
 	inRepo.match(/^docs\/images\/(.+)\.(?:png|jpe?g|webp)$/i)?.[1];
 
-/** Split the body by heading: one search result should land on a section. */
 /**
- * The meta description and index blurb: the lede, the first paragraph above the first
- * section. A guide that opens straight into its sections (troubleshooting, a FAQ) has
- * none, and its first paragraph answers one question out of context ("Almost always
- * the origin."), so it is described by the questions its sections answer instead:
- * those are what people search for.
+ * The meta description and index blurb: the first paragraph, as plain text. A guide
+ * that opens straight into its sections (troubleshooting, a FAQ) has no lede, and its
+ * first paragraph answers one question out of context ("Almost always the origin."):
+ * when that paragraph is that short, or the sections are questions, the guide is
+ * described by its section headings instead, since those are what people search for.
  */
 function introOf(body: string, found: Section[]): string {
-	const lede = body
-		.split(/^##\s/m)[0]
-		?.split(/\n\s*\n/)
-		.find((block) => block.trim() && !/^(?:[#`|\-!<]|\[!)/.test(block.trim()));
-	if (lede) {
-		return plain(lede);
+	// inline code can open a paragraph (`/api/v1/*` is…); a fence can't
+	const first =
+		body.split(/\n\s*\n/).find((block) => !/^(?:[#|\-!<]|```|\[!)/.test(block.trim())) ?? "";
+	const start = body.search(/^##\s/m);
+	const lede = start === -1 || body.indexOf(first) < start;
+	const headings = found.filter((section) => section.level === 2).map(({ heading }) => heading);
+	const faq = headings.every((heading) => heading.endsWith("?"));
+	if (lede || headings.length < 2 || (plain(first).length >= 80 && !faq)) {
+		return plain(first);
 	}
-	return found
-		.filter((section) => section.level === 2)
-		.map(({ heading }) => (/[.?!:]$/.test(heading) ? heading : `${heading}.`))
-		.join(" ");
+	return headings.map((heading) => (/[.?!:]$/.test(heading) ? heading : `${heading}.`)).join(" ");
 }
 
+/** Split the body by heading: one search result should land on a section. */
 function sections(body: string, title: string): Section[] {
 	const found: Section[] = [{ id: "", heading: title, text: "", level: 1 }];
 	let fenced = false;
