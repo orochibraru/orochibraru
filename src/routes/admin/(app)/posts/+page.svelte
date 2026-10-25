@@ -4,22 +4,20 @@
 	import { resolve } from "$app/paths";
 	import { ago, statusClass } from "$lib/admin";
 	import Confirm from "$lib/components/admin/Confirm.svelte";
+	import ContextMenu from "$lib/components/admin/ContextMenu.svelte";
 
 	let { data } = $props();
 
 	type Row = (typeof data.posts)[number];
 
 	// one menu for the whole table, opened by a row's ⋯ button or a right-click on the row
-	let menu = $state<HTMLElement>();
+	let menu = $state<ContextMenu>();
 	let target = $state<Row>();
-	let at = $state({ x: 0, y: 0 });
 	let confirmer = $state<Confirm>();
 
 	function open(post: Row, x: number, y: number) {
 		target = post;
-		// keep it on screen: the menu is 12rem wide and about 7.5rem tall
-		at = { x: Math.min(x, innerWidth - 200), y: Math.min(y, innerHeight - 130) };
-		menu?.showPopover();
+		menu?.open(x, y);
 	}
 
 	const FILTERS = [
@@ -132,20 +130,13 @@
 	</table>
 </div>
 
-<div
-	bind:this={menu}
-	popover
-	role="menu"
-	class="inset-auto m-0 w-48 rounded-lg border border-edge bg-surface p-1 text-[13px] text-fg shadow-2xl"
-	style:left="{at.x}px"
-	style:top="{at.y}px"
->
+<ContextMenu bind:this={menu} title={target?.title}>
 	{#if target}
 		{@const post = target}
 		<form
 			method="POST"
 			use:enhance={() => {
-				menu?.hidePopover();
+				menu?.close();
 			}}
 		>
 			<input type="hidden" name="id" value={post.id} />
@@ -161,7 +152,7 @@
 				role="menuitem"
 				formaction="?/delete"
 				onclick={(event) => {
-					menu?.hidePopover();
+					menu?.close();
 					confirmer?.guard(event, {
 						title: `Delete “${post.title}”?`,
 						body: "This can't be undone. Its URL will redirect to the blog.",
@@ -171,6 +162,6 @@
 			>
 		</form>
 	{/if}
-</div>
+</ContextMenu>
 
 <Confirm bind:this={confirmer} />

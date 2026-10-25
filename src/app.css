@@ -1016,44 +1016,64 @@
 	-webkit-user-select: none;
 }
 
-/* "More": a bottom sheet that slides up over a dimmed page */
-.admin-sheet {
-	margin: auto 0 0;
+/* A drawer: the phone's bottom sheet, for More and for every context menu. Its
+   panel is opaque, so what it lists reads cleanly over whatever page is under it. */
+.drawer {
+	position: fixed;
+	inset: auto 0 0;
+	margin: 0;
 	width: 100%;
 	max-width: 100%;
 	max-height: 85dvh;
+	overflow-y: auto;
+	overscroll-behavior: contain;
 	border: 0;
-	background: transparent;
+	border-top: 1px solid var(--color-line);
+	border-radius: 1.5rem 1.5rem 0 0;
+	background: var(--color-bg);
 	color: var(--color-fg);
-	padding: 0 0.75rem calc(0.75rem + env(safe-area-inset-bottom));
+	box-shadow: 0 -12px 40px rgb(0 0 0 / 0.35);
+	padding: 0.5rem max(0.75rem, env(safe-area-inset-right)) calc(1rem + env(safe-area-inset-bottom))
+		max(0.75rem, env(safe-area-inset-left));
 	transition:
 		translate 0.35s var(--ease-out-expo),
 		display 0.35s allow-discrete,
 		overlay 0.35s allow-discrete;
 	translate: 0 100%;
 }
-.admin-sheet[open] {
+.drawer:is([open], :popover-open) {
 	translate: 0 0;
 }
 @starting-style {
-	.admin-sheet[open] {
+	.drawer:is([open], :popover-open) {
 		translate: 0 100%;
 	}
 }
-.admin-sheet::backdrop {
+.drawer::backdrop {
 	background: rgb(0 0 0 / 0);
 	transition:
 		background 0.35s,
 		display 0.35s allow-discrete,
 		overlay 0.35s allow-discrete;
 }
-.admin-sheet[open]::backdrop {
-	background: rgb(0 0 0 / 0.45);
+.drawer:is([open], :popover-open)::backdrop {
+	background: rgb(0 0 0 / 0.55);
 }
 @starting-style {
-	.admin-sheet[open]::backdrop {
+	.drawer:is([open], :popover-open)::backdrop {
 		background: rgb(0 0 0 / 0);
 	}
+}
+/* a drawer's rows: grouped like a settings list, sized for a thumb */
+.drawer-group {
+	@apply overflow-hidden rounded-2xl border border-line bg-surface;
+}
+.drawer-group > :where(a, button),
+.drawer-group :where(.menu-item) {
+	@apply flex h-13 w-full items-center gap-3 rounded-none border-b border-line px-4 text-left text-[1rem] last:border-b-0 active:bg-fg/6;
+}
+.drawer-handle {
+	@apply mx-auto mt-1 mb-3 h-1.25 w-9 rounded-full bg-edge;
 }
 
 /* the admin's pages move like a navigation stack; its bars hold still */
@@ -1110,8 +1130,8 @@ html[data-nav="same"]::view-transition-new(admin-page) {
 	::view-transition-new(admin-page) {
 		animation: none;
 	}
-	.admin-sheet,
-	.admin-sheet::backdrop {
+	.drawer,
+	.drawer::backdrop {
 		transition: none;
 	}
 }

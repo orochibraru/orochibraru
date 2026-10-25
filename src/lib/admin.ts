@@ -91,3 +91,47 @@ export function interpolate(line: number, from: number[], to: number[]): number 
 	}
 	return 0;
 }
+
+/**
+ * A drawer follows a finger dragging it down and closes past a short distance, as
+ * a phone's sheets do. Only from its top: a drawer scrolled into its content
+ * scrolls instead.
+ */
+export function swipeToClose(node: HTMLElement, close: () => void) {
+	let start: number | undefined;
+	let moved = 0;
+	const down = (event: TouchEvent) => {
+		start = node.scrollTop <= 0 ? event.touches[0]?.clientY : undefined;
+		moved = 0;
+	};
+	const move = (event: TouchEvent) => {
+		const y = event.touches[0]?.clientY;
+		if (start === undefined || y === undefined) {
+			return;
+		}
+		moved = Math.max(0, y - start);
+		node.style.transition = "none";
+		node.style.translate = `0 ${moved}px`;
+	};
+	const up = () => {
+		if (start === undefined) {
+			return;
+		}
+		start = undefined;
+		node.style.transition = "";
+		node.style.translate = "";
+		if (moved > 80) {
+			close();
+		}
+	};
+	node.addEventListener("touchstart", down, { passive: true });
+	node.addEventListener("touchmove", move, { passive: true });
+	node.addEventListener("touchend", up);
+	node.addEventListener("touchcancel", up);
+	return () => {
+		node.removeEventListener("touchstart", down);
+		node.removeEventListener("touchmove", move);
+		node.removeEventListener("touchend", up);
+		node.removeEventListener("touchcancel", up);
+	};
+}

@@ -17,6 +17,7 @@
 	import { afterNavigate, goto, onNavigate } from "$app/navigation";
 	import { asset, resolve } from "$app/paths";
 	import { page } from "$app/state";
+	import { swipeToClose } from "$lib/admin";
 	import { authClient } from "$lib/auth-client";
 	import Palette, { type Command } from "$lib/components/admin/Palette.svelte";
 	import PullToRefresh from "$lib/components/admin/PullToRefresh.svelte";
@@ -238,24 +239,25 @@
 	</aside>
 
 	<main
-		class="w-full flex-1 pt-6 pr-[max(1rem,env(safe-area-inset-right))] pb-[calc(6rem+env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] sm:px-8 md:pb-16"
+		class="w-full flex-1 pt-6 pr-[max(1rem,env(safe-area-inset-right))] pb-[calc(7.5rem+env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] sm:px-8 md:pb-16"
 		style:view-transition-name="admin-page"
 	>
 		{@render children()}
 	</main>
 
+	<!-- floats over the page, clear of the home indicator and the screen's rounded corners -->
 	<nav
-		class="admin-chrome fixed inset-x-0 bottom-0 z-30 border-t border-line bg-bg/80 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
+		class="admin-chrome fixed right-[max(0.75rem,env(safe-area-inset-right))] bottom-[max(1rem,calc(env(safe-area-inset-bottom)+0.25rem))] left-[max(0.75rem,env(safe-area-inset-left))] z-30 rounded-[1.75rem] border border-line bg-surface/85 p-1.5 shadow-2xl shadow-black/40 backdrop-blur-xl md:hidden"
 		style:view-transition-name="admin-tabs"
 		aria-label="Admin"
 	>
-		<div class="grid h-14 grid-cols-5">
+		<div class="grid h-15 grid-cols-5 gap-1">
 			{#each TABS as [href, label, Icon] (href)}
 				<a
 					{href}
 					class={[
-						"flex flex-col items-center justify-center gap-1 text-[.625rem] font-medium transition-colors active:opacity-50",
-						current(href) ? "text-spark" : "text-dim",
+						"flex flex-col items-center justify-center gap-1 rounded-[1.375rem] text-[.6875rem] font-medium transition-colors active:scale-95",
+						current(href) ? "bg-spark/15 text-spark" : "text-dim",
 					]}
 					aria-current={current(href) ? "page" : undefined}
 				>
@@ -266,8 +268,8 @@
 			<button
 				type="button"
 				class={[
-					"flex flex-col items-center justify-center gap-1 text-[.625rem] font-medium active:opacity-50",
-					inMore ? "text-spark" : "text-dim",
+					"flex flex-col items-center justify-center gap-1 rounded-[1.375rem] text-[.6875rem] font-medium transition-colors active:scale-95",
+					inMore ? "bg-spark/15 text-spark" : "text-dim",
 				]}
 				aria-haspopup="dialog"
 				onclick={() => sheet?.showModal()}
@@ -281,7 +283,7 @@
 
 <dialog
 	bind:this={sheet}
-	class="admin-sheet"
+	class="drawer"
 	aria-label="More"
 	onclick={(event) => {
 		// a tap on the dimmed backdrop lands on the dialog itself
@@ -289,38 +291,31 @@
 			sheet?.close();
 		}
 	}}
+	{@attach (node) => swipeToClose(node, () => sheet?.close())}
 >
-	<div class="mx-auto mt-2 mb-3 h-1.25 w-9 rounded-full bg-edge" aria-hidden="true"></div>
-	<div class="overflow-hidden rounded-2xl border border-line bg-surface">
+	<div class="drawer-handle" aria-hidden="true"></div>
+	<div class="drawer-group">
 		{#each MORE as [href, label, Icon] (href)}
-			<a
-				{href}
-				class="flex h-13 items-center gap-3 border-b border-line px-4 text-[1rem] active:bg-fg/6"
-				aria-current={current(href) ? "page" : undefined}
-			>
+			<a {href} aria-current={current(href) ? "page" : undefined}>
 				<Icon class={["size-5", current(href) ? "text-spark" : "text-dim"]} aria-hidden="true" />
 				<span class="flex-1">{label}</span>
 				<ChevronRight class="size-4 text-dim" aria-hidden="true" />
 			</a>
 		{/each}
-		<a class="flex h-13 items-center gap-3 px-4 text-[1rem] active:bg-fg/6" href={resolve("/")} target="_blank">
+		<a href={resolve("/")} target="_blank">
 			<ExternalLink class="size-5 text-dim" aria-hidden="true" />
 			<span class="flex-1">Open the site</span>
 		</a>
 	</div>
-	<button
-		type="button"
-		class="mt-3 flex h-13 w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 text-left text-[1rem] text-hot active:bg-fg/6"
-		onclick={signOut}
-	>
-		<LogOut class="size-5" aria-hidden="true" />
-		<span class="min-w-0 flex-1 truncate">Sign out <span class="text-sm text-dim">{data.admin.email}</span></span>
-	</button>
-	<button
-		type="button"
-		class="mt-3 h-13 w-full rounded-2xl border border-line bg-surface text-[1rem] font-semibold active:bg-fg/6"
-		onclick={() => sheet?.close()}>Cancel</button
-	>
+	<div class="drawer-group mt-3">
+		<button type="button" class="text-hot" onclick={signOut}>
+			<LogOut class="size-5" aria-hidden="true" />
+			<span class="min-w-0 flex-1 truncate">Sign out <span class="text-sm text-dim">{data.admin.email}</span></span>
+		</button>
+	</div>
+	<div class="drawer-group mt-3">
+		<button type="button" class="justify-center font-semibold" onclick={() => sheet?.close()}>Cancel</button>
+	</div>
 </dialog>
 
 <PullToRefresh enabled={atTabRoot} />
@@ -329,7 +324,7 @@
 <Palette bind:this={palette} {commands} />
 <p
 	class={[
-		"fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-30 rounded-full border border-line bg-surface px-3 py-2 shadow-lg transition duration-200 md:bottom-4 md:rounded-none",
+		"fixed right-4 bottom-[calc(7rem+env(safe-area-inset-bottom))] z-30 rounded-full border border-line bg-surface px-3 py-2 shadow-lg transition duration-200 md:bottom-4 md:rounded-none",
 		saved ? "opacity-100" : "pointer-events-none translate-y-2 opacity-0",
 	]}
 	role="status"
