@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.19.0](https://github.com/orochibraru/orochibraru/compare/v1.18.1...v1.19.0) (2026-10-25)
+
+### Features
+
+- **admin:** make the admin feel like a phone app
+  ([a73eeff](https://github.com/orochibraru/orochibraru/commit/a73eeff8e6817236092926a548a0d7f2041dc417))
+- **sync:** run docs syncs on a background worker with a durable queue
+  ([7cad869](https://github.com/orochibraru/orochibraru/commit/7cad869bc5a50b30480a9b5e9cc73e80dba11a78))
+
 ## [1.18.1](https://github.com/orochibraru/orochibraru/compare/v1.18.0...v1.18.1) (2026-10-25)
 
 ### Bug Fixes
