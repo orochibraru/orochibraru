@@ -113,6 +113,27 @@ const imageName = (inRepo: string) =>
 	inRepo.match(/^docs\/images\/(.+)\.(?:png|jpe?g|webp)$/i)?.[1];
 
 /** Split the body by heading: one search result should land on a section. */
+/**
+ * The meta description and index blurb: the lede, the first paragraph above the first
+ * section. A guide that opens straight into its sections (troubleshooting, a FAQ) has
+ * none, and its first paragraph answers one question out of context ("Almost always
+ * the origin."), so it is described by the questions its sections answer instead:
+ * those are what people search for.
+ */
+function introOf(body: string, found: Section[]): string {
+	const lede = body
+		.split(/^##\s/m)[0]
+		?.split(/\n\s*\n/)
+		.find((block) => block.trim() && !/^(?:[#`|\-!<]|\[!)/.test(block.trim()));
+	if (lede) {
+		return plain(lede);
+	}
+	return found
+		.filter((section) => section.level === 2)
+		.map(({ heading }) => (/[.?!:]$/.test(heading) ? heading : `${heading}.`))
+		.join(" ");
+}
+
 function sections(body: string, title: string): Section[] {
 	const found: Section[] = [{ id: "", heading: title, text: "", level: 1 }];
 	let fenced = false;
@@ -365,9 +386,7 @@ async function readGuides(channel: Channel): Promise<Loaded> {
 				),
 			);
 
-			const firstParagraph =
-				body.split(/\n\s*\n/).find((block) => !/^(?:[#`|\-!<]|\[!)/.test(block.trim())) ?? "";
-			const intro = plain(firstParagraph);
+			const found = sections(body, title);
 
 			guides.push({
 				project,
@@ -376,7 +395,7 @@ async function readGuides(channel: Channel): Promise<Loaded> {
 				title,
 				label: root?.label ?? pages.get(slug)?.title ?? title,
 				icon: lucideIcon(root?.icon ?? pages.get(slug)?.icon ?? "file"),
-				intro,
+				intro: introOf(body, found),
 				html,
 				// edits land on the default branch, whatever ref this channel reads
 				source: `${project.repo}/blob/${row.defaultBranch ?? "main"}/${file}`,
@@ -387,7 +406,7 @@ async function readGuides(channel: Channel): Promise<Loaded> {
 						/ (src|srcset)="([^"]*)"/g,
 						(_attr, name: string, target: string) => ` ${name}="${absolute(target)}"`,
 					),
-				sections: sections(body, title),
+				sections: found,
 			});
 		}
 	}

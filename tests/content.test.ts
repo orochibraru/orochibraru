@@ -156,6 +156,31 @@ describe("guides", () => {
 		expect(readme?.html).not.toContain("<source");
 		expect(readme?.html).toMatch(/<img class="on-light" [^>]*><img class="on-dark" /);
 	});
+
+	test("a guide with no lede is described by its sections, not its first answer", async () => {
+		const values = (slug: string, markdown: string) => ({
+			project: "demo",
+			slug,
+			sourcePath: `docs/${slug}.md`,
+			sha: "x",
+			markdown,
+		});
+		site.db
+			.insert(guide)
+			.values([
+				values(
+					"troubleshooting",
+					"# Troubleshooting\n\n## Nothing saves\n\nAlmost always the origin.\n\n### Behind a proxy\n\nSet it.\n\n## Why is the feed empty?\n\nNo addons.\n",
+				),
+				values("setup", "# Setup\n\nInstall it with one command.\n\n## Docker\n\nRun it.\n"),
+			])
+			.run();
+		invalidate();
+		const guides = await loadGuides();
+		const intro = (slug: string) => guides.find((guide) => guide.slug === slug)?.intro;
+		expect(intro("troubleshooting")).toBe("Nothing saves. Why is the feed empty?");
+		expect(intro("setup")).toBe("Install it with one command.");
+	});
 });
 
 describe("posts", () => {
