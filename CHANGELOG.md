@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.20.0](https://github.com/orochibraru/orochibraru/compare/v1.19.0...v1.20.0) (2026-10-25)
+
+### Features
+
+- **admin:** weekly report, pushed to the admin's browsers
+  ([539405e](https://github.com/orochibraru/orochibraru/commit/539405e21c3fde251e10da532422e00f7bf8bd61))
+- **admin:** floating tab bar and drawers for menus on phones
+  ([cf9c7b4](https://github.com/orochibraru/orochibraru/commit/cf9c7b47fc425b555673f0c0850391731b5fa7e0))
+
 ## [1.19.0](https://github.com/orochibraru/orochibraru/compare/v1.18.1...v1.19.0) (2026-10-25)
 
 ### Features
