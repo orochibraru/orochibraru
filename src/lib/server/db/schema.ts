@@ -1,7 +1,14 @@
 // Content, GitHub and sync tables. better-auth's own tables are generated into
 // auth-schema.ts by `bunx @better-auth/cli generate` and re-exported here.
 import { sql } from "drizzle-orm";
-import { integer, primaryKey, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
+import {
+	integer,
+	primaryKey,
+	sqliteTable,
+	text,
+	unique,
+	uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import { CHANNELS } from "../../projects";
 
 export * from "./auth-schema";
@@ -160,6 +167,37 @@ export const syncChange = sqliteTable("sync_change", {
 	/** Unified diff hunks, `@@` headers included, without the file header. */
 	diff: text("diff"),
 });
+
+export const SYNC_REASONS = ["push", "release", "manual", "reconcile", "mcp"] as const;
+
+/**
+ * A sync for the background worker (`github/worker.ts`). At most one job per repo
+ * waits at a time: a second request for it joins that one instead.
+ */
+export const syncJob = sqliteTable(
+	"sync_job",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		repo: text("repo").notNull(),
+		/** The pushed commit to pin the default branch to; null reads the branch head. */
+		sha: text("sha"),
+		reason: text("reason", { enum: SYNC_REASONS }).notNull(),
+		status: text("status", {
+			enum: ["queued", "running", "ok", "failed", "skipped"],
+		}).notNull(),
+		attempts: integer("attempts").notNull().default(0),
+		changed: integer("changed").notNull().default(0),
+		error: text("error"),
+		queuedAt: timestamp("queued_at"),
+		/** A job retried after GitHub failed waits until then. */
+		runAfter: integer("run_after", { mode: "timestamp_ms" }),
+		startedAt: integer("started_at", { mode: "timestamp_ms" }),
+		finishedAt: integer("finished_at", { mode: "timestamp_ms" }),
+	},
+	(table) => [
+		uniqueIndex("sync_job_one_queued").on(table.repo).where(sql`${table.status} = 'queued'`),
+	],
+);
 
 export const webhookDelivery = sqliteTable("webhook_delivery", {
 	id: text("id").primaryKey(),

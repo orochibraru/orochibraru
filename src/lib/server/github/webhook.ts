@@ -5,7 +5,8 @@ import { lt } from "drizzle-orm";
 import { getDb } from "../db";
 import { webhookDelivery } from "../db/schema";
 import { forgetInstallation, getGithubApp, recordInstallation, refreshInstalledRepos } from "./app";
-import { projectsForPush, projectsForRelease, syncRepo, touchesDocs } from "./sync";
+import { projectsForPush, projectsForRelease, touchesDocs } from "./sync";
+import { queueSync } from "./worker";
 
 /** X-Hub-Signature-256 is "sha256=" + the hex HMAC of the raw body. */
 export function verifySignature(secret: string, body: string, header: string | null): boolean {
@@ -84,12 +85,12 @@ export async function handleWebhook(request: Request): Promise<Response> {
 		const relevant = (push.commits?.length ?? 0) >= 20 || touchesDocs(paths);
 		if (relevant) {
 			for (const repo of projectsForPush(push.repository.full_name, push.ref)) {
-				background(syncRepo(repo, push.after));
+				queueSync(repo, { sha: push.after, reason: "push" });
 			}
 		}
 	} else if (event === "release") {
 		for (const repo of projectsForRelease((payload as Release).repository.full_name)) {
-			background(syncRepo(repo));
+			queueSync(repo, { reason: "release" });
 		}
 	}
 	return new Response("Accepted", { status: 202 });

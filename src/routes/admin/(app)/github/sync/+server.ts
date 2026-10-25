@@ -1,5 +1,5 @@
 import { requireAdmin } from "$lib/server/admin";
-import { reconcile } from "$lib/server/github/sync";
+import { reconcile } from "$lib/server/github/worker";
 
 export type SyncEvent = { repo: string; error?: string };
 

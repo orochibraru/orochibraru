@@ -31,6 +31,42 @@
 		return rows;
 	});
 
+	type SyncState = { job: typeof data.job; runs: typeof data.runs };
+	// the sync's own state, polled apart from the page: reloading the page would reset unsaved edits
+	let sync = $derived<SyncState>({ job: data.job, runs: data.runs });
+	const busy = $derived(sync.job?.status === "queued" || sync.job?.status === "running");
+	let asking = $state(false);
+	const syncUrl = $derived(
+		resolve("/admin/(app)/projects/[repo]/sync", { repo: data.project.repo }),
+	);
+
+	async function refreshSync(method: "GET" | "POST" = "GET") {
+		const response = await fetch(syncUrl, { method });
+		if (response.ok) {
+			// JSON carries dates as strings; the page reads them as Dates
+			sync = JSON.parse(await response.text(), (key, value) =>
+				(key.endsWith("At") || key === "runAfter") && typeof value === "string"
+					? new Date(value)
+					: value,
+			) as SyncState;
+		}
+	}
+
+	async function resync() {
+		asking = true;
+		await refreshSync("POST").finally(() => {
+			asking = false;
+		});
+	}
+
+	$effect(() => {
+		if (!busy) {
+			return;
+		}
+		const timer = setInterval(() => void refreshSync(), 2000);
+		return () => clearInterval(timer);
+	});
+
 	function move(from: number, to: number) {
 		const [button] = buttons.splice(from, 1);
 		if (button) {
@@ -95,10 +131,6 @@
 	<div>
 		{#if form?.message}
 			<pre class="mb-6 border border-hot/40 bg-hot/8 px-3 py-2 text-sm whitespace-pre-wrap text-hot" role="alert">{form.message}</pre>
-		{:else if form && "synced" in form}
-			<p class="mb-6 border border-line bg-surface px-3 py-2 text-sm" role="status">
-				<span class="status status-on">Synced</span>, {form.synced} file{form.synced === 1 ? "" : "s"} changed.
-			</p>
 		{/if}
 
 		<section hidden={tab !== "Page"}>
@@ -234,14 +266,30 @@
 							nothing yet
 						{/each}.
 					</p>
-					<button class="abtn ml-auto" type="submit" formaction="?/resync">
-						<RefreshCw class="size-3.5" aria-hidden="true" /> Resync now
+					<button class="abtn ml-auto" type="button" onclick={resync} disabled={asking || busy}>
+						<RefreshCw class={["size-3.5", busy && "animate-spin"]} aria-hidden="true" />
+						{busy ? (sync.job?.status === "running" ? "Syncing…" : "Queued…") : "Resync now"}
 					</button>
 				</div>
+				{#if sync.job && sync.job.status !== "ok"}
+					<p class="mb-4 border border-line bg-surface px-3 py-2 text-sm" role="status">
+						{#if sync.job.status === "queued" && sync.job.runAfter}
+							<span class="status status-busy">retrying</span>
+							GitHub failed{sync.job.error ? `: ${sync.job.error}` : ""}. The worker tries again
+							{ago(sync.job.runAfter)}.
+						{:else if busy}
+							<span class="status status-busy">{sync.job.status}</span>
+							The sync runs in the background; this page can be left.
+						{:else}
+							<span class={statusClass(sync.job.status)}>{sync.job.status}</span>
+							{sync.job.error ?? ""}
+						{/if}
+					</p>
+				{/if}
 				<div class="apanel overflow-x-auto">
 					<table class="atable">
 						<tbody>
-							{#each data.runs as run (run.id)}
+							{#each sync.runs as run (run.id)}
 								<tr>
 									<td class="w-24"><span class={statusClass(run.status)}>{run.status}</span></td>
 									<td class="font-mono text-xs text-dim">{run.sha?.slice(0, 7) ?? ""}</td>

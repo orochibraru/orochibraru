@@ -7,7 +7,7 @@ import {
 	recentSyncRuns,
 	updateProject,
 } from "$lib/server/editor";
-import { syncRepo } from "$lib/server/github/sync";
+import { latestJob } from "$lib/server/github/worker";
 
 const projectOr404 = (repo: string) => {
 	const row = getProject(repo);
@@ -20,6 +20,7 @@ const projectOr404 = (repo: string) => {
 export const load = ({ params }) => ({
 	project: projectOr404(params.repo),
 	runs: recentSyncRuns(10, params.repo),
+	job: latestJob(params.repo) ?? null,
 	versions: docsVersions(params.repo).map(({ channel, ref, sha }) => ({ channel, ref, sha })),
 	images: projectImages(params.repo),
 });
@@ -68,14 +69,5 @@ export const actions = {
 			throw cause;
 		}
 		return { saved: true };
-	},
-	resync: async ({ params }) => {
-		const result = await syncRepo(projectOr404(params.repo).repo);
-		if (result.status !== "ok") {
-			return fail(result.status === "failed" ? 502 : 409, {
-				message: result.error ?? "Sync failed",
-			});
-		}
-		return { synced: result.changed };
 	},
 };

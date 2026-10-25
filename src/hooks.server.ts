@@ -4,7 +4,7 @@ import { building } from "$app/environment";
 import { unavailableAs503 } from "$lib/server/admin";
 import { getAuth } from "$lib/server/auth";
 import { getDataDir, getDb, migrateDatabase } from "$lib/server/db";
-import { reconcile } from "$lib/server/github/sync";
+import { reconcile, startSyncWorker } from "$lib/server/github/worker";
 import { canonical, isCrossSiteForm, withHeaders } from "$lib/server/http";
 
 // better-auth answers /api/auth/*, and the OAuth discovery documents MCP clients
@@ -70,6 +70,8 @@ export const init: ServerInit = () => {
 		console.error("Could not migrate the database. Exiting.", cause);
 		process.exit(1);
 	}
+
+	startSyncWorker();
 
 	// Webhooks get missed (the site was down, GitHub had a bad day): every six hours,
 	// and a minute after boot, any project whose branch moved since its last sync syncs.

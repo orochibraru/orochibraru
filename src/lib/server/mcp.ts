@@ -28,7 +28,8 @@ import {
 	updateProject,
 	updateProjectsPage,
 } from "./editor";
-import { syncRepo } from "./github/sync";
+import { quiet } from "./github/sync";
+import { syncRepo } from "./github/worker";
 import { getSearchConsole, searchStats } from "./search-console";
 import { getUmami, umamiReport } from "./umami";
 
@@ -242,7 +243,7 @@ export function createMcpServer(): McpServer {
 		({ github_repo }) =>
 			run(async () => {
 				const row = createProject(github_repo);
-				const sync = await syncRepo(row.repo);
+				const sync = await syncRepo(row.repo, undefined, quiet, "mcp");
 				return { repo: row.repo, published: false, sync };
 			}),
 	);
@@ -342,7 +343,7 @@ export function createMcpServer(): McpServer {
 		({ repo }) =>
 			run(async () => {
 				const log: string[] = [];
-				const result = await syncRepo(repo, undefined, (line) => log.push(line));
+				const result = await syncRepo(repo, undefined, (line) => log.push(line), "mcp");
 				return { ...result, log };
 			}),
 	);

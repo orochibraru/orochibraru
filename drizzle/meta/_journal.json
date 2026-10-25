@@ -57,6 +57,13 @@
 			"when": 1790852632355,
 			"tag": "0007_screenshots_from_github",
 			"breakpoints": true
+		},
+		{
+			"idx": 8,
+			"version": "6",
+			"when": 1792955298442,
+			"tag": "0008_sync_queue",
+			"breakpoints": true
 		}
 	]
 }

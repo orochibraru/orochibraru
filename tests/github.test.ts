@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { createHmac, generateKeyPairSync } from "node:crypto";
 import { and, eq } from "drizzle-orm";
-import { guide, image, project, syncRun } from "../src/lib/server/db/schema";
+import { guide, image, project, syncJob, syncRun } from "../src/lib/server/db/schema";
 import { docsStatuses, docsVersions, lastSyncs, syncHistory } from "../src/lib/server/editor";
 import { env } from "../src/lib/server/env";
 import {
@@ -11,8 +11,15 @@ import {
 	recordInstallation,
 	useGithubFetch,
 } from "../src/lib/server/github/app";
-import { diffOf, reconcile, selectDocs, syncRepo } from "../src/lib/server/github/sync";
+import { diffOf, selectDocs } from "../src/lib/server/github/sync";
 import { handleWebhook, verifySignature } from "../src/lib/server/github/webhook";
+import {
+	latestJob,
+	queueSync,
+	reconcile,
+	startSyncWorker,
+	syncRepo,
+} from "../src/lib/server/github/worker";
 import { loadGuides } from "../src/lib/server/guides";
 import { imageByName } from "../src/lib/server/images";
 import { freshSite, SAMPLE_IMAGE } from "./helpers";
@@ -28,6 +35,8 @@ const sha = (text: string) => new Bun.CryptoHasher("sha1").update(text).digest("
 // A GitHub with one repo whose files the tests edit, and maybe a Latest release.
 let files: Record<string, string | Uint8Array> = {};
 let head = "c1";
+// a GitHub that answers 502 for commits, until the test lets it recover
+let outage = false;
 let release: { tag: string; sha: string; files: Record<string, string> } | null = null;
 const calls: string[] = [];
 const filesAt = (commit: string) => (release && commit === release.sha ? release.files : files);
@@ -67,6 +76,9 @@ useGithubFetch(async (input, init) => {
 		return release
 			? Response.json({ tag_name: release.tag })
 			: new Response("no release", { status: 404 });
+	}
+	if (outage && path.startsWith("/repos/me/tool/commits/")) {
+		return new Response("bad gateway", { status: 502 });
 	}
 	if (path.startsWith("/repos/me/tool/commits/")) {
 		const commit = release && path.endsWith(`/${release.tag}`) ? release.sha : head;
@@ -406,5 +418,69 @@ describe("versions", () => {
 		]);
 		expect(readme("canary")).toBeUndefined();
 		expect(readme("latest")).toBe(files["README.md"] as string);
+	});
+});
+
+describe("the sync worker", () => {
+	const settled = async () => {
+		for (let tries = 0; tries < 50; tries++) {
+			const status = latestJob("tool")?.status;
+			if (status !== "queued" && status !== "running") {
+				return;
+			}
+			await Bun.sleep(20);
+		}
+	};
+
+	test("queueing answers before the sync runs, and the sync still happens", async () => {
+		await settled();
+		head = "w1";
+		const id = queueSync("tool", { reason: "manual" });
+		expect(latestJob("tool")).toMatchObject({ id, status: "running", reason: "manual" });
+		await settled();
+		expect(latestJob("tool")).toMatchObject({ id, status: "ok" });
+		expect(docsVersions("tool").find((version) => version.channel === "latest")?.sha).toBe("w1");
+	});
+
+	test("GitHub failing puts the job back with a delay; anything else does not", async () => {
+		outage = true;
+		const result = await syncRepo("tool");
+		outage = false;
+		expect(result).toMatchObject({ status: "failed", retry: true });
+		const job = latestJob("tool");
+		expect(job).toMatchObject({ status: "queued", attempts: 1 });
+		expect(job?.runAfter?.getTime()).toBeGreaterThan(Date.now() + 30_000);
+
+		// someone asking again runs it now, rather than after the delay
+		head = "w2";
+		expect(await syncRepo("tool")).toMatchObject({ status: "ok" });
+		expect(latestJob("tool")).toMatchObject({ id: job?.id, status: "ok", attempts: 2 });
+
+		files["docs/config.json"] = "{ not json";
+		expect(await syncRepo("tool")).toMatchObject({ status: "failed" });
+		expect(latestJob("tool")?.status).toBe("failed");
+		delete files["docs/config.json"];
+	});
+
+	test("a restart picks up the job it was running", async () => {
+		await settled();
+		head = "w3";
+		const { id } = site.db
+			.insert(syncJob)
+			.values({ repo: "tool", reason: "push", status: "running", attempts: 1 })
+			.returning()
+			.get();
+		const run = site.db
+			.insert(syncRun)
+			.values({ repo: "tool", status: "running" })
+			.returning()
+			.get();
+		startSyncWorker();
+		await settled();
+		expect(latestJob("tool")).toMatchObject({ id, status: "ok", attempts: 2 });
+		expect(site.db.select().from(syncRun).where(eq(syncRun.id, run.id)).get()).toMatchObject({
+			status: "failed",
+			error: "interrupted by a restart",
+		});
 	});
 });

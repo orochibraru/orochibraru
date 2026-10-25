@@ -4,7 +4,7 @@
 // and the error lands in sync_run for the admin to read.
 import { basename } from "node:path";
 import { structuredPatch } from "diff";
-import { and, eq, isNotNull, notInArray } from "drizzle-orm";
+import { and, eq, notInArray } from "drizzle-orm";
 import { z } from "zod";
 import { DocsConfig } from "$lib/docs-config";
 import { ROOT_GUIDES } from "$lib/projects";
@@ -45,13 +45,19 @@ const slugOf = (path: string) =>
 /** docs/images/graphics/hero.png -> graphics/hero */
 const imageNameOf = (path: string) => path.slice("docs/images/".length).replace(/\.[a-z]+$/i, "");
 
-export type SyncResult = { status: "ok" | "failed" | "skipped"; changed: number; error?: string };
+export type SyncResult = {
+	status: "ok" | "failed" | "skipped";
+	changed: number;
+	error?: string;
+	/** The failure was GitHub's (down, rate-limiting, unreachable): worth another try later. */
+	retry?: boolean;
+};
 
 /** Where a sync narrates what it does: the admin's progress dialog, or nowhere. */
 export type Log = (line: string) => void;
-const quiet: Log = () => {};
+export const quiet: Log = () => {};
 
-const short = (sha: string | null | undefined) => sha?.slice(0, 7) ?? "never";
+export const short = (sha: string | null | undefined) => sha?.slice(0, 7) ?? "never";
 
 type ProjectRow = typeof project.$inferSelect;
 type Target = { channel: Channel; ref: string };
@@ -61,7 +67,7 @@ type Target = { channel: Channel; ref: string };
  * publishes that tag as latest and its default branch as canary: unreleased
  * work never reads as released. Without one, latest is the default branch.
  */
-async function targetsOf(app: App, row: ProjectRow): Promise<Target[]> {
+export async function targetsOf(app: App, row: ProjectRow): Promise<Target[]> {
 	const branch = row.defaultBranch ?? "main";
 	const release = await github<{ tag_name: string }>(
 		app,
@@ -80,7 +86,7 @@ async function targetsOf(app: App, row: ProjectRow): Promise<Target[]> {
 		: [{ channel: "latest", ref: branch }];
 }
 
-const labelOf = (repoKey: string, channel: Channel) =>
+export const labelOf = (repoKey: string, channel: Channel) =>
 	channel === "latest" ? repoKey : `${repoKey} ${channel}`;
 
 type Change = Omit<typeof syncChange.$inferInsert, "id" | "runId">;
@@ -98,9 +104,15 @@ export function diffOf(before: string, after: string): string {
 
 const configText = (config: unknown) => (config ? `${JSON.stringify(config, null, 2)}\n` : "");
 
-const message = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
+export const message = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 
-async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<SyncResult> {
+/** GitHub failed rather than the repo: a 5xx, a 429, or no answer at all. */
+const transient = (cause: unknown) =>
+	cause instanceof GithubError
+		? cause.status === 429 || (cause.status ?? 0) >= 500
+		: typeof (cause as { code?: unknown } | null)?.code === "string";
+
+export async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<SyncResult> {
 	const db = getDb();
 	const row = db.select().from(project).where(eq(project.repo, repoKey)).get();
 	if (!row?.githubRepo) {
@@ -121,7 +133,7 @@ async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<S
 			.values({ repo: repoKey, status: "failed", error, finishedAt: new Date() })
 			.run();
 		log(`${repoKey}: ✗ failed, nothing written: ${error}`);
-		return { status: "failed", changed: 0, error };
+		return { status: "failed", changed: 0, error, retry: transient(cause) };
 	}
 
 	const result: SyncResult = { status: "ok", changed: 0 };
@@ -133,6 +145,7 @@ async function runSync(repoKey: string, wanted?: string, log = quiet): Promise<S
 		if (one.status === "failed") {
 			result.status = "failed";
 			result.error ??= one.error;
+			result.retry = (result.retry ?? true) && one.retry === true;
 		}
 	}
 	if (!targets.some((target) => target.channel === "canary")) {
@@ -388,32 +401,8 @@ async function syncChannel(
 			.where(eq(syncRun.id, runId))
 			.run();
 		log(`${label}: ✗ failed, nothing written: ${error}`);
-		return { status: "failed", changed: 0, error };
+		return { status: "failed", changed: 0, error, retry: transient(cause) };
 	}
-}
-
-// One sync per repo at a time. A push that arrives mid-sync doesn't queue a sync of
-// its own: it marks the repo dirty, and one more run follows the current one.
-const running = new Map<string, Promise<SyncResult>>();
-const dirty = new Set<string>();
-
-export function syncRepo(repoKey: string, sha?: string, log = quiet): Promise<SyncResult> {
-	const current = running.get(repoKey);
-	if (current) {
-		log(`${repoKey}: already syncing, one more run will follow it`);
-		dirty.add(repoKey);
-		return current;
-	}
-	const work = (async () => {
-		let result = await runSync(repoKey, sha, log);
-		while (dirty.delete(repoKey)) {
-			log(`${repoKey}: pushed to again meanwhile, syncing once more`);
-			result = await runSync(repoKey, undefined, log);
-		}
-		return result;
-	})().finally(() => running.delete(repoKey));
-	running.set(repoKey, work);
-	return work;
 }
 
 const linked = (fullName: string) =>
@@ -431,57 +420,3 @@ export const projectsForRelease = (fullName: string) => linked(fullName).map((ro
 /** Paths a push touched that the docs are built from. */
 export const touchesDocs = (paths: string[]) =>
 	paths.some((path) => path.startsWith("docs/") || ROOT_GUIDES.some((root) => root.file === path));
-
-/**
- * The safety net for missed webhooks: every project whose default branch or
- * Latest release moved since its last sync is synced again. `done` hears about
- * each project as it is checked, synced or not, with the error if it failed.
- */
-export async function reconcile(log = quiet, done?: (repo: string, error?: string) => void) {
-	const app = await getGithubApp();
-	if (!app?.installationId) {
-		log("The GitHub App isn't installed: nothing to sync.");
-		return;
-	}
-	const db = getDb();
-	const rows = db.select().from(project).where(isNotNull(project.githubRepo)).all();
-	log(`Checking ${rows.length} project${rows.length === 1 ? "" : "s"} with a linked repo.`);
-	for (const row of rows) {
-		try {
-			const targets = await targetsOf(app, row);
-			const synced = new Map(
-				db
-					.select()
-					.from(docsVersion)
-					.where(eq(docsVersion.project, row.repo))
-					.all()
-					.map((version) => [version.channel, version]),
-			);
-			// a channel stored but no longer wanted is stale too
-			let stale = synced.size > targets.length;
-			let head: string | undefined;
-			for (const target of targets) {
-				const commit = await github<{ sha: string }>(
-					app,
-					`/repos/${row.githubRepo}/commits/${encodeURIComponent(target.ref)}`,
-				);
-				if (target.ref === (row.defaultBranch ?? "main")) {
-					head = commit.sha;
-				}
-				const last = synced.get(target.channel);
-				const current = last?.sha === commit.sha && last.ref === target.ref;
-				stale ||= !current;
-				log(
-					`${labelOf(row.repo, target.channel)}: ${row.githubRepo}@${target.ref} is at ${short(commit.sha)}, last synced ${short(last?.sha)}${current ? ", up to date" : ""}`,
-				);
-			}
-			const result = stale ? await syncRepo(row.repo, head, log) : undefined;
-			done?.(row.repo, result?.error);
-		} catch (cause) {
-			console.error(`reconcile ${row.repo}:`, cause);
-			log(`${row.repo}: ✗ ${message(cause)}`);
-			done?.(row.repo, message(cause));
-		}
-	}
-	log("Every project checked.");
-}
