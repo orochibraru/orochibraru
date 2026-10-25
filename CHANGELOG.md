@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.1](https://github.com/orochibraru/orochibraru/compare/v1.18.0...v1.18.1) (2026-10-25)
+
+### Bug Fixes
+
+- **docs:** keep doc descriptions that open with inline code
+  ([9cd4353](https://github.com/orochibraru/orochibraru/commit/9cd4353829e02f12270db11267d5823354b8dec0))
+- **docs:** describe a guide with no lede by its section headings
+  ([a7f1fe9](https://github.com/orochibraru/orochibraru/commit/a7f1fe9d6140132ba2bf5b440cc2af8d7d6d8e82))
+
 ## [1.18.0](https://github.com/orochibraru/orochibraru/compare/v1.17.2...v1.18.0) (2026-10-15)
 
 ### Features
