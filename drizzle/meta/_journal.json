@@ -64,6 +64,13 @@
 			"when": 1792955298442,
 			"tag": "0008_sync_queue",
 			"breakpoints": true
+		},
+		{
+			"idx": 9,
+			"version": "6",
+			"when": 1792956872944,
+			"tag": "0009_weekly_report_push",
+			"breakpoints": true
 		}
 	]
 }

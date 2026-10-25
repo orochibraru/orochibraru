@@ -9,6 +9,9 @@ const config = {
 		// hooks.server.ts runs the same check with those endpoints left out.
 		csrf: { trustedOrigins: ["*"] },
 		paths: { relative: false },
+		// the service worker is the admin's alone: the admin layout registers it under
+		// /admin, so the public site never installs one
+		serviceWorker: { register: false },
 		typescript: {
 			config: (tsconfig) => {
 				tsconfig.include.push("../scripts/**/*.ts", "../tests/**/*.ts");

@@ -233,3 +233,34 @@ export const searchConsole = sqliteTable("search_console", {
 	/** The service account's JSON key, sealed with AES-GCM: see crypto.ts. */
 	serviceAccount: text("service_account").notNull(),
 });
+
+/** One row, id 1: the VAPID key pair push messages are signed with. */
+export const pushKeys = sqliteTable("push_keys", {
+	id: integer("id").primaryKey(),
+	publicKey: text("public_key").notNull(),
+	/** Sealed with AES-GCM: see crypto.ts. */
+	privateKey: text("private_key").notNull(),
+});
+
+/** A browser an admin turned notifications on in. */
+export const pushSubscription = sqliteTable("push_subscription", {
+	endpoint: text("endpoint").primaryKey(),
+	p256dh: text("p256dh").notNull(),
+	auth: text("auth").notNull(),
+	email: text("email").notNull(),
+	/** What the browser said it was, so the admin can tell their devices apart. */
+	device: text("device").notNull().default(""),
+	createdAt: timestamp("created_at"),
+	lastSentAt: integer("last_sent_at", { mode: "timestamp_ms" }),
+});
+
+/** A week's report, kept so its notification has something to open. One per week. */
+export const weeklyReport = sqliteTable("weekly_report", {
+	id: integer("id").primaryKey({ autoIncrement: true }),
+	/** The Monday the week starts on, YYYY-MM-DD, UTC. */
+	weekStart: text("week_start").notNull().unique(),
+	data: text("data", { mode: "json" }).$type<Record<string, unknown>>().notNull(),
+	createdAt: timestamp("created_at"),
+	/** How many browsers its notification reached. */
+	delivered: integer("delivered").notNull().default(0),
+});

@@ -6,6 +6,7 @@ import { getAuth } from "$lib/server/auth";
 import { getDataDir, getDb, migrateDatabase } from "$lib/server/db";
 import { reconcile, startSyncWorker } from "$lib/server/github/worker";
 import { canonical, isCrossSiteForm, withHeaders } from "$lib/server/http";
+import { startReportSchedule } from "$lib/server/report";
 
 // better-auth answers /api/auth/*, and the OAuth discovery documents MCP clients
 // look for at the root: /.well-known/oauth-{authorization-server,protected-resource}/…
@@ -72,6 +73,7 @@ export const init: ServerInit = () => {
 	}
 
 	startSyncWorker();
+	startReportSchedule();
 
 	// Webhooks get missed (the site was down, GitHub had a bad day): every six hours,
 	// and a minute after boot, any project whose branch moved since its last sync syncs.

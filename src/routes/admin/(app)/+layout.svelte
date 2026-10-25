@@ -9,11 +9,13 @@
 		GitBranch,
 		LayoutDashboard,
 		LogOut,
+		Newspaper,
 		Plug,
 		Search,
 		Settings,
 	} from "@lucide/svelte";
 	import { onMount } from "svelte";
+	import { dev } from "$app/environment";
 	import { afterNavigate, goto, onNavigate } from "$app/navigation";
 	import { asset, resolve } from "$app/paths";
 	import { page } from "$app/state";
@@ -30,6 +32,7 @@
 		[resolve("/admin/analytics"), "Analytics", ChartLine],
 		[resolve("/admin/posts"), "Posts", FileText],
 		[resolve("/admin/projects"), "Projects", Boxes],
+		[resolve("/admin/reports"), "Reports", Newspaper],
 		[resolve("/admin/github"), "GitHub", GitBranch],
 		[resolve("/admin/connections"), "Connections", Plug],
 		[resolve("/admin/settings"), "Settings", Settings],
@@ -59,6 +62,10 @@
 		const viewport = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
 		const before = viewport?.content;
 		viewport?.setAttribute("content", "width=device-width, initial-scale=1, viewport-fit=cover");
+		// the admin's own service worker, for notifications: scoped here, never the public site
+		navigator.serviceWorker
+			?.register("/service-worker.js", { scope: "/admin", type: dev ? "module" : "classic" })
+			.catch((cause) => console.warn("service worker:", cause));
 		return () => {
 			if (viewport && before) {
 				viewport.content = before;
