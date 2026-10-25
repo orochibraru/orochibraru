@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+	<title>orochibraru admin</title>
+	<rect width="512" height="512" fill="#9c1d45"/>
+	<mask id="eye">
+		<rect width="32" height="32" fill="#fff"/>
+		<circle cx="26.46" cy="11.83" r="0.9" fill="#000"/>
+	</mask>
+	<g transform="translate(102.4 102.4) scale(9.6)" fill="none" stroke="#fff3f6" stroke-linecap="round">
+		<path d="M22.16 8.12A10 10 0 0 0 13.41 6.34" stroke-width="2.2"/>
+		<path d="M13.41 6.34A10 10 0 1 0 25.78 13.92" stroke-width="4.5"/>
+		<circle cx="25.57" cy="12.94" r="3.4" fill="#fff3f6" stroke="none" mask="url(#eye)"/>
+	</g>
+</svg>

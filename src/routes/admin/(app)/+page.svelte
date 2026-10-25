@@ -174,7 +174,7 @@
 							<a class="row-link" href={resolve("/admin/(app)/projects/[repo]", { repo: item.repo })}>{item.name}</a>
 						</td>
 						<td><span class={statusClass(item.published ? "published" : "draft")}>{item.published ? "live" : "draft"}</span></td>
-						<td class="font-mono text-xs text-dim">{item.docsSyncedSha?.slice(0, 7) ?? "no docs"}</td>
+						<td class="wide font-mono text-xs text-dim">{item.docsSyncedSha?.slice(0, 7) ?? "no docs"}</td>
 					</tr>
 				{:else}
 					<tr>
@@ -196,9 +196,9 @@
 			<tbody>
 				{#each data.runs as run (run.id)}
 					<tr>
-						<td class="w-28"><span class={statusClass(run.status)}>{run.status}</span></td>
+						<td class="md:w-28"><span class={statusClass(run.status)}>{run.status}</span></td>
 						<td class="font-medium whitespace-nowrap">{run.repo}</td>
-						<td class="font-mono text-xs text-dim">{run.sha?.slice(0, 7) ?? ""}</td>
+						<td class="wide font-mono text-xs text-dim">{run.sha?.slice(0, 7) ?? ""}</td>
 						<td class="w-full text-dim">
 							{#if run.error}
 								<span class="text-hot">{run.error}</span>

@@ -27,8 +27,8 @@
 			<tr>
 				<th>App</th>
 				<th>Status</th>
-				<th>Grants</th>
-				<th>Last authorized</th>
+				<th class="wide">Grants</th>
+				<th class="wide">Last authorized</th>
 				<th><span class="sr-only">Actions</span></th>
 			</tr>
 		</thead>
@@ -39,8 +39,8 @@
 					<td>
 						<span class={statusClass(connection.disabled ? "revoked" : "ok")}>{connection.disabled ? "revoked" : "active"}</span>
 					</td>
-					<td class="text-dim">{connection.disabled ? "" : connection.activeGrants}</td>
-					<td class="text-xs whitespace-nowrap text-dim" title={connection.lastAuthorized?.toLocaleString()}>
+					<td class="wide text-dim">{connection.disabled ? "" : connection.activeGrants}</td>
+					<td class="wide text-xs whitespace-nowrap text-dim" title={connection.lastAuthorized?.toLocaleString()}>
 						{connection.lastAuthorized ? ago(connection.lastAuthorized) : "never"}
 					</td>
 					<td class="py-1.5">

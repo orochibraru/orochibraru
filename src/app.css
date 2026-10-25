@@ -175,8 +175,10 @@
 		@apply animate-aurora motion-reduce:animate-none;
 	}
 	/* the admin is a tool, used on a big screen: larger type, no backdrop */
-	html:has([data-admin]) {
-		font-size: 112.5%;
+	@media (width >= 48rem) {
+		html:has([data-admin]) {
+			font-size: 112.5%;
+		}
 	}
 	html:has([data-admin]) body::before,
 	html:has([data-admin]) body::after {
@@ -965,5 +967,151 @@
 @media (prefers-reduced-motion: reduce) {
 	.stereo {
 		animation: none;
+	}
+}
+
+/* ---------------------------------------------------------------
+   The admin on a phone: an app, not a page
+   --------------------------------------------------------------- */
+@media (width < 48rem) {
+	/* the desktop's larger type is for a big screen at arm's length */
+	html:has([data-admin]) {
+		font-size: 100%;
+		overscroll-behavior-y: none;
+	}
+	/* under 16px, iOS zooms the page into whatever field gets focus */
+	[data-admin] :is(input:not([type="checkbox"]), textarea, select) {
+		font-size: 16px;
+	}
+	/* a table keeps its first columns on a phone; the rest is desktop detail */
+	[data-admin] .atable :is(th, td).wide {
+		display: none;
+	}
+	[data-admin] .apanel:has(.atable) {
+		overflow-x: auto;
+	}
+}
+@media (pointer: coarse) {
+	[data-admin] {
+		-webkit-tap-highlight-color: transparent;
+		touch-action: manipulation;
+	}
+	/* no keyboard to press, and fingers need bigger targets than a cursor */
+	[data-admin] .kbd {
+		display: none;
+	}
+	[data-admin] .abtn {
+		height: 2.5rem;
+		padding-inline: 1rem;
+	}
+	[data-admin] .abtn:active {
+		opacity: 0.6;
+	}
+	[data-admin] :where(.atable tbody) tr:active {
+		background: color-mix(in oklab, var(--color-fg) 6%, transparent);
+	}
+}
+.admin-chrome {
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+/* "More": a bottom sheet that slides up over a dimmed page */
+.admin-sheet {
+	margin: auto 0 0;
+	width: 100%;
+	max-width: 100%;
+	max-height: 85dvh;
+	border: 0;
+	background: transparent;
+	color: var(--color-fg);
+	padding: 0 0.75rem calc(0.75rem + env(safe-area-inset-bottom));
+	transition:
+		translate 0.35s var(--ease-out-expo),
+		display 0.35s allow-discrete,
+		overlay 0.35s allow-discrete;
+	translate: 0 100%;
+}
+.admin-sheet[open] {
+	translate: 0 0;
+}
+@starting-style {
+	.admin-sheet[open] {
+		translate: 0 100%;
+	}
+}
+.admin-sheet::backdrop {
+	background: rgb(0 0 0 / 0);
+	transition:
+		background 0.35s,
+		display 0.35s allow-discrete,
+		overlay 0.35s allow-discrete;
+}
+.admin-sheet[open]::backdrop {
+	background: rgb(0 0 0 / 0.45);
+}
+@starting-style {
+	.admin-sheet[open]::backdrop {
+		background: rgb(0 0 0 / 0);
+	}
+}
+
+/* the admin's pages move like a navigation stack; its bars hold still */
+::view-transition-group(admin-page) {
+	animation-duration: 0.38s;
+	animation-timing-function: var(--ease-out-expo);
+}
+::view-transition-old(admin-page),
+::view-transition-new(admin-page) {
+	animation-duration: 0.38s;
+	animation-timing-function: var(--ease-out-expo);
+}
+html[data-nav="forward"]::view-transition-old(admin-page) {
+	animation-name: admin-out-left;
+}
+html[data-nav="forward"]::view-transition-new(admin-page) {
+	animation-name: admin-in-right;
+}
+html[data-nav="back"]::view-transition-old(admin-page) {
+	animation-name: admin-out-right;
+}
+html[data-nav="back"]::view-transition-new(admin-page) {
+	animation-name: admin-in-left;
+}
+html[data-nav="same"]::view-transition-old(admin-page),
+html[data-nav="same"]::view-transition-new(admin-page) {
+	animation: none;
+}
+@keyframes admin-in-right {
+	from {
+		transform: translateX(100%);
+	}
+}
+@keyframes admin-out-left {
+	to {
+		transform: translateX(-30%);
+		opacity: 0.6;
+	}
+}
+@keyframes admin-in-left {
+	from {
+		transform: translateX(-30%);
+		opacity: 0.6;
+	}
+}
+@keyframes admin-out-right {
+	to {
+		transform: translateX(100%);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(admin-page),
+	::view-transition-old(admin-page),
+	::view-transition-new(admin-page) {
+		animation: none;
+	}
+	.admin-sheet,
+	.admin-sheet::backdrop {
+		transition: none;
 	}
 }

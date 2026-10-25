@@ -33,7 +33,7 @@
 	}}
 >
 	<div
-		class="sticky top-11 z-10 md:top-0 -mx-4 mb-8 flex h-12 items-center gap-2 border-b border-line bg-bg/85 px-4 backdrop-blur sm:-mx-8 sm:px-8"
+		class="sticky top-[calc(3rem+env(safe-area-inset-top))] z-10 md:top-0 -mx-4 mb-8 flex h-12 items-center gap-2 border-b border-line bg-bg/85 px-4 backdrop-blur sm:-mx-8 sm:px-8"
 	>
 		<a
 			class="flex items-center gap-1.5 text-[.8125rem] text-dim hover:text-fg"

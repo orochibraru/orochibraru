@@ -47,13 +47,13 @@
 	<table class="atable">
 		<thead>
 			<tr>
-				<th class="w-16"><span class="sr-only">Order</span></th>
+				<th class="w-10 md:w-16"><span class="sr-only">Order</span></th>
 				<th>Project</th>
 				<th>Status</th>
-				<th>Docs</th>
-				<th>Last sync</th>
-				{#if data.views}<th class="text-right" title="Pageviews over the last 30 days, docs included">Views</th>{/if}
-				<th class="text-right">Edited</th>
+				<th class="wide">Docs</th>
+				<th class="wide">Last sync</th>
+				{#if data.views}<th class="wide text-right" title="Pageviews over the last 30 days, docs included">Views</th>{/if}
+				<th class="wide text-right">Edited</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -63,14 +63,14 @@
 						<form class="relative z-10 flex flex-col" method="POST" action="?/move" use:enhance>
 							<input type="hidden" name="repo" value={project.repo}>
 							<button
-								class="grid size-6 place-items-center text-dim hover:text-fg disabled:opacity-25"
+								class="grid size-9 place-items-center text-dim hover:text-fg disabled:opacity-25 md:size-6"
 								name="direction"
 								value="up"
 								disabled={index === 0}
 								aria-label="Move {project.name} up"><ChevronUp class="size-4" aria-hidden="true" /></button
 							>
 							<button
-								class="grid size-6 place-items-center text-dim hover:text-fg disabled:opacity-25"
+								class="grid size-9 place-items-center text-dim hover:text-fg disabled:opacity-25 md:size-6"
 								name="direction"
 								value="down"
 								disabled={index === data.projects.length - 1}
@@ -78,9 +78,9 @@
 							>
 						</form>
 					</td>
-					<td class="w-full max-w-0 min-w-80">
+					<td class="w-full max-w-0 md:min-w-80">
 						<div class="flex items-center gap-3">
-							<div class="grid aspect-video w-24 shrink-0 place-items-center overflow-hidden rounded-md border border-line bg-bg">
+							<div class="grid aspect-video w-16 shrink-0 md:w-24 place-items-center overflow-hidden rounded-md border border-line bg-bg">
 								{#if project.shot}
 									<img class="on-light size-full object-cover object-top" src={project.shot.light} alt="" loading="lazy">
 									<img class="on-dark size-full object-cover object-top" src={project.shot.dark} alt="" loading="lazy">
@@ -116,7 +116,7 @@
 					<td>
 						<span class={statusClass(project.published ? "published" : "draft")}>{project.published ? "live" : "draft"}</span>
 					</td>
-					<td class="whitespace-nowrap">
+					<td class="wide whitespace-nowrap">
 						<span class="{DOCS[project.docs][0]} normal-case">{DOCS[project.docs][1]}</span>
 						{#if project.channels.length}
 							<div class="mt-0.5 text-xs text-dim">
@@ -127,7 +127,7 @@
 							</div>
 						{/if}
 					</td>
-					<td class="whitespace-nowrap">
+					<td class="wide whitespace-nowrap">
 						{#if project.sync}
 							<span class={statusClass(project.sync.status)} title={project.sync.error ?? undefined}>{project.sync.status}</span>
 							<div class="mt-0.5 text-xs text-dim" title={project.sync.at.toLocaleString()}>{ago(project.sync.at)}</div>
@@ -136,7 +136,7 @@
 						{/if}
 					</td>
 					{#if data.views}
-						<td class="text-right font-mono text-xs whitespace-nowrap">
+						<td class="wide text-right font-mono text-xs whitespace-nowrap">
 							{#await data.views}
 								<span class="text-dim">&hellip;</span>
 							{:then views}
@@ -148,7 +148,7 @@
 							{/await}
 						</td>
 					{/if}
-					<td class="text-right text-xs whitespace-nowrap text-dim" title={project.updatedAt.toLocaleString()}>{ago(project.updatedAt)}</td>
+					<td class="wide text-right text-xs whitespace-nowrap text-dim" title={project.updatedAt.toLocaleString()}>{ago(project.updatedAt)}</td>
 				</tr>
 			{:else}
 				<tr><td class="py-10 text-center text-dim" colspan="7">No projects yet. Add a repo above.</td></tr>

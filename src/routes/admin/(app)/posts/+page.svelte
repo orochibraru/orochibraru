@@ -61,9 +61,9 @@
 			<tr>
 				<th>Post</th>
 				<th>Status</th>
-				<th class="text-right">Words</th>
-				{#if data.views}<th class="text-right" title="Pageviews over the last 30 days">Views</th>{/if}
-				<th class="text-right">Date</th>
+				<th class="wide text-right">Words</th>
+				{#if data.views}<th class="wide text-right" title="Pageviews over the last 30 days">Views</th>{/if}
+				<th class="wide text-right">Date</th>
 				<th><span class="sr-only">Actions</span></th>
 			</tr>
 		</thead>
@@ -75,7 +75,7 @@
 						open(post, event.clientX, event.clientY);
 					}}
 				>
-					<td class="w-full max-w-0 min-w-64">
+					<td class="w-full max-w-0 md:min-w-64">
 						<a class="row-link" href={resolve("/admin/(app)/posts/[id]", { id: String(post.id) })}>{post.title}</a>
 						<p class="mt-0.5 flex gap-3 text-[13px] text-dim">
 							<span class="min-w-0 flex-1 truncate">
@@ -85,13 +85,13 @@
 									<span class="text-hot/80">No description</span>
 								{/if}
 							</span>
-							<span class="max-w-56 shrink-0 truncate font-mono text-xs leading-5">/blog/{post.slug}</span>
+							<span class="max-w-56 shrink-0 truncate font-mono text-xs leading-5 max-md:hidden">/blog/{post.slug}</span>
 						</p>
 					</td>
 					<td><span class={statusClass(post.status)}>{post.status}</span></td>
-					<td class="text-right font-mono text-xs whitespace-nowrap text-dim">{number.format(post.words)}</td>
+					<td class="wide text-right font-mono text-xs whitespace-nowrap text-dim">{number.format(post.words)}</td>
 					{#if data.views}
-						<td class="text-right font-mono text-xs whitespace-nowrap">
+						<td class="wide text-right font-mono text-xs whitespace-nowrap">
 							{#await data.views}
 								<span class="text-dim">&hellip;</span>
 							{:then views}
@@ -103,14 +103,14 @@
 							{/await}
 						</td>
 					{/if}
-					<td class="text-right whitespace-nowrap">
+					<td class="wide text-right whitespace-nowrap">
 						<div class="font-mono text-xs">{post.date}</div>
 						<div class="text-xs text-dim" title={post.updatedAt.toLocaleString()}>edited {ago(post.updatedAt)}</div>
 					</td>
 					<td class="py-0 pl-0">
 						<!-- above the row link's overlay -->
 						<button
-							class="relative z-1 grid size-7 place-items-center rounded-md text-dim transition-colors hover:bg-fg/8 hover:text-fg"
+							class="relative z-1 grid size-10 place-items-center rounded-md md:size-7 text-dim transition-colors hover:bg-fg/8 hover:text-fg"
 							type="button"
 							aria-label="Actions for {post.title}"
 							aria-haspopup="menu"

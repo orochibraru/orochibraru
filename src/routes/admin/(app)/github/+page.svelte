@@ -157,9 +157,9 @@
 						<tr>
 							<th>Project</th>
 							<th>Last sync</th>
-							<th>Channel</th>
-							<th>Commit</th>
-							<th class="text-right">Files</th>
+							<th class="wide">Channel</th>
+							<th class="wide">Commit</th>
+							<th class="wide text-right">Files</th>
 							<th class="text-right">When</th>
 						</tr>
 					</thead>
@@ -187,9 +187,9 @@
 										<span class="status">never</span>
 									{/if}
 								</td>
-								<td class="text-xs text-dim">{row.run?.channel ?? ""}</td>
-								<td class="font-mono text-xs text-dim">{row.run?.sha?.slice(0, 7) ?? ""}</td>
-								<td class="text-right font-mono text-xs text-dim">{row.run?.status === "ok" ? row.run.changed : ""}</td>
+								<td class="wide text-xs text-dim">{row.run?.channel ?? ""}</td>
+								<td class="wide font-mono text-xs text-dim">{row.run?.sha?.slice(0, 7) ?? ""}</td>
+								<td class="wide text-right font-mono text-xs text-dim">{row.run?.status === "ok" ? row.run.changed : ""}</td>
 								<td class="text-right text-xs whitespace-nowrap text-dim" title={row.run?.startedAt.toLocaleString()}
 									>{row.run ? ago(row.run.startedAt) : ""}</td
 								>
