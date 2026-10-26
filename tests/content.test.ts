@@ -7,6 +7,7 @@ import {
 	listProjectCards,
 	PROJECTS_PAGE,
 	projectMarkdown,
+	renamedPostTarget,
 	wasPostDeleted,
 } from "../src/lib/server/content";
 import { guide, post, project } from "../src/lib/server/db/schema";
@@ -14,6 +15,7 @@ import {
 	createPost,
 	deletePost,
 	setPostStatus,
+	updatePost,
 	updateProjectsPage,
 } from "../src/lib/server/editor";
 import { loadGuides } from "../src/lib/server/guides";
@@ -204,6 +206,22 @@ describe("posts", () => {
 		const slugs = (await loadPosts()).map((item) => item.slug);
 		expect(slugs).toContain("hello");
 		expect(slugs).not.toContain("secret");
+	});
+
+	test("renaming a published post sends its old URLs to the new one", () => {
+		const live = setPostStatus(createPost({ title: "First name" }).id, "published");
+		updatePost(live.id, { slug: "second-name" });
+		updatePost(live.id, { slug: "third-name" });
+		expect(renamedPostTarget("first-name")).toBe("third-name");
+		expect(renamedPostTarget("second-name")).toBe("third-name");
+		// back to an old name: that name is the post again, and nothing loops
+		updatePost(live.id, { slug: "first-name" });
+		expect(renamedPostTarget("first-name")).toBeUndefined();
+		expect(renamedPostTarget("third-name")).toBe("first-name");
+		// a draft never had a public URL to keep
+		const draft = createPost({ title: "Draft name" });
+		updatePost(draft.id, { slug: "draft-renamed" });
+		expect(renamedPostTarget("draft-name")).toBeUndefined();
 	});
 
 	test("a deleted post leaves the list but its slug is remembered", async () => {

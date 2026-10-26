@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ArrowLeft, Eye, PenLine } from "@lucide/svelte";
+	import { ArrowLeft, ExternalLink, Eye, PenLine } from "@lucide/svelte";
 	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
 	import { syncScroll } from "$lib/admin";
@@ -39,7 +39,7 @@
 			class="flex items-center gap-1.5 text-[.8125rem] text-dim hover:text-fg"
 			href={resolve("/admin/posts")}
 		>
-			<ArrowLeft class="size-3.5" aria-hidden="true" /> Posts
+			<ArrowLeft class="size-3.5" aria-hidden="true" /><span class="max-md:sr-only">Posts</span>
 		</a>
 		<div class="ml-auto flex border border-line bg-surface p-0.5 text-[.8125rem]" role="radiogroup" aria-label="Status">
 			{#each ["draft", "published"] as const as option (option)}
@@ -54,11 +54,22 @@
 				</label>
 			{/each}
 		</div>
+		<!-- what's saved, not what's toggled: an unsaved draft has no page to open yet -->
+		{#if data.post.status === "published"}
+			<a
+				class="abtn"
+				href={resolve("/blog/[slug]", { slug: data.post.slug })}
+				target="_blank"
+				rel="noreferrer"
+				title="View on the site"
+				><ExternalLink class="size-3.5" aria-hidden="true" /><span class="max-md:sr-only">View</span></a
+			>
+		{/if}
 		<button class="abtn 2xl:hidden" type="button" onclick={() => (previewing = !previewing)}>
 			{#if previewing}
-				<PenLine class="size-3.5" aria-hidden="true" /> Edit
+				<PenLine class="size-3.5" aria-hidden="true" /><span class="max-md:sr-only">Edit</span>
 			{:else}
-				<Eye class="size-3.5" aria-hidden="true" /> Preview
+				<Eye class="size-3.5" aria-hidden="true" /><span class="max-md:sr-only">Preview</span>
 			{/if}
 		</button>
 		<button class="abtn abtn-primary" type="submit" disabled={saving}>

@@ -4,7 +4,14 @@
 import { and, asc, count, eq } from "drizzle-orm";
 import { SITE } from "$lib/seo";
 import { getDb } from "./db";
-import { deletedPost, deletedProject, guide, project, projectsPage } from "./db/schema";
+import {
+	deletedPost,
+	deletedProject,
+	guide,
+	project,
+	projectsPage,
+	renamedPost,
+} from "./db/schema";
 import { invalidateGuides } from "./guides";
 import { imageByName } from "./images";
 import { invalidatePosts } from "./posts";
@@ -158,6 +165,10 @@ export const getPublishedProjectRow = (repo: string) =>
 /** Whether a project used to live at this repo, so its URLs can redirect instead of 404ing. */
 export const wasProjectDeleted = (repo: string) =>
 	getDb().select().from(deletedProject).where(eq(deletedProject.repo, repo)).get() !== undefined;
+
+/** The slug a renamed post lives at now, if one used to live at this one. */
+export const renamedPostTarget = (slug: string) =>
+	getDb().select().from(renamedPost).where(eq(renamedPost.slug, slug)).get()?.to;
 
 /** Whether a post used to live at this slug, so its URL can redirect instead of 404ing. */
 export const wasPostDeleted = (slug: string) =>

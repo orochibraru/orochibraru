@@ -14,6 +14,7 @@ import {
 	post,
 	project,
 	projectsPage,
+	renamedPost,
 	syncChange,
 	syncJob,
 	syncRun,
@@ -110,12 +111,26 @@ export function updatePost(id: number, patch: Partial<PostInput>): PostRow {
 	if (data.slug && data.slug !== current.slug && getPostBySlug(data.slug)) {
 		throw new EditorError(`the slug ${data.slug} is taken`);
 	}
-	const [row] = getDb()
-		.update(post)
-		.set({ ...data, updatedAt: new Date() })
-		.where(eq(post.id, id))
-		.returning()
-		.all();
+	const renamed = !!data.slug && data.slug !== current.slug && current.status === "published";
+	const row = getDb().transaction((tx) => {
+		const [row] = tx
+			.update(post)
+			.set({ ...data, updatedAt: new Date() })
+			.where(eq(post.id, id))
+			.returning()
+			.all();
+		if (renamed && data.slug) {
+			// a published post's URL was out there: the old one follows it, as do any
+			// older names already pointing at it, and the new one is the post's own again
+			tx.insert(renamedPost)
+				.values({ slug: current.slug, to: data.slug })
+				.onConflictDoUpdate({ target: renamedPost.slug, set: { to: data.slug } })
+				.run();
+			tx.update(renamedPost).set({ to: data.slug }).where(eq(renamedPost.to, current.slug)).run();
+			tx.delete(renamedPost).where(eq(renamedPost.slug, data.slug)).run();
+		}
+		return row;
+	});
 	invalidate();
 	return row as PostRow;
 }

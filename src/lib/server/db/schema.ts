@@ -61,6 +61,12 @@ export const deletedProject = sqliteTable("deleted_project", {
 	deletedAt: timestamp("deleted_at"),
 });
 
+/** A published post's old slugs: each redirects to the slug the post has now. */
+export const renamedPost = sqliteTable("renamed_post", {
+	slug: text("slug").primaryKey(),
+	to: text("to").notNull(),
+});
+
 /** The slugs of deleted posts: their URLs redirect to the blog instead of 404ing. */
 export const deletedPost = sqliteTable("deleted_post", {
 	slug: text("slug").primaryKey(),

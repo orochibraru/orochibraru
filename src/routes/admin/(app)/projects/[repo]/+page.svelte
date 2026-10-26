@@ -3,6 +3,7 @@
 		ArrowLeft,
 		ChevronDown,
 		ChevronUp,
+		ExternalLink,
 		Eye,
 		PenLine,
 		Plus,
@@ -125,6 +126,16 @@
 			></span>
 			Live
 		</label>
+		{#if data.project.published}
+			<a
+				class="abtn"
+				href={resolve("/[repo]", { repo: data.project.repo })}
+				target="_blank"
+				rel="noreferrer"
+				title="View on the site"
+				><ExternalLink class="size-3.5" aria-hidden="true" /><span class="max-md:sr-only">View</span></a
+			>
+		{/if}
 		<button class="abtn abtn-primary" type="submit" disabled={saving}>
 			{saving ? "Saving…" : "Save"}<span class="kbd border-onspark/30 text-onspark/70">⌘S</span>
 		</button>
