@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.22.0](https://github.com/orochibraru/orochibraru/compare/v1.21.0...v1.22.0) (2026-10-26)
+
+### Features
+
+- **admin:** view posts and projects on the site, and keep renamed posts' URLs
+  ([5942b67](https://github.com/orochibraru/orochibraru/commit/5942b67578f50b0d61c277277d28a539e6e3fd7f))
+
 ## [1.21.0](https://github.com/orochibraru/orochibraru/compare/v1.20.0...v1.21.0) (2026-10-26)
 
 ### Features
