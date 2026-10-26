@@ -12,6 +12,7 @@
 	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
 	import { ago, statusClass, syncScroll } from "$lib/admin";
+	import Confirm from "$lib/components/admin/Confirm.svelte";
 	import Editor from "$lib/components/admin/Editor.svelte";
 	import Preview from "$lib/components/admin/Preview.svelte";
 
@@ -21,6 +22,7 @@
 	let tab = $state<(typeof TABS)[number]>("Page");
 	let previewing = $state(false);
 	let saving = $state(false);
+	let confirmer = $state<Confirm>();
 
 	// writable deriveds: edited here, reset whenever another project loads
 	let body = $derived(data.project.body);
@@ -314,3 +316,28 @@
 		</section>
 	</div>
 </form>
+
+<section class="apanel mt-12 border-hot/40" aria-labelledby="danger">
+	<header id="danger" class="text-hot">Danger zone</header>
+	<form class="flex flex-wrap items-center gap-x-6 gap-y-3 p-4" method="POST" action="?/delete" use:enhance>
+		<div class="min-w-0 flex-1 text-[.8125rem] text-dim">
+			<p class="font-medium text-fg">Delete this project</p>
+			<p>
+				Its page, docs, screenshots and sync history go, and /{data.project.repo} redirects to /projects.
+				{#if data.project.githubRepo}The repo on GitHub is untouched, and can be added again.{/if}
+			</p>
+		</div>
+		<button
+			class="abtn abtn-danger border-hot/50 text-hot"
+			type="submit"
+			onclick={(event) =>
+				confirmer?.guard(event, {
+					title: `Delete ${data.project.name}?`,
+					body: "This can't be undone. Its URLs will redirect to /projects.",
+					action: "Delete project",
+				})}>Delete project</button
+		>
+	</form>
+</section>
+
+<Confirm bind:this={confirmer} />

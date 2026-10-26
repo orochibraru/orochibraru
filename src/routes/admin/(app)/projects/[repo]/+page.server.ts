@@ -1,5 +1,6 @@
-import { error, fail } from "@sveltejs/kit";
+import { error, fail, redirect } from "@sveltejs/kit";
 import {
+	deleteProject,
 	docsVersions,
 	EditorError,
 	getProject,
@@ -69,5 +70,9 @@ export const actions = {
 			throw cause;
 		}
 		return { saved: true };
+	},
+	delete: ({ params }) => {
+		deleteProject(projectOr404(params.repo).repo);
+		throw redirect(303, "/admin/projects");
 	},
 };

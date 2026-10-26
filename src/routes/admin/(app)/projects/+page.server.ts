@@ -2,6 +2,7 @@ import { fail, redirect } from "@sveltejs/kit";
 import { getProjectsPage, guideCounts } from "$lib/server/content";
 import {
 	createProject,
+	deleteProject,
 	docsStatuses,
 	docsVersions,
 	EditorError,
@@ -9,8 +10,10 @@ import {
 	listAddableRepos,
 	listAllProjects,
 	reorderProjects,
+	updateProject,
 	updateProjectsPage,
 } from "$lib/server/editor";
+import { queueSync } from "$lib/server/github/worker";
 import { imageByName } from "$lib/server/images";
 import { getUmami, pathViews } from "$lib/server/umami";
 
@@ -63,7 +66,43 @@ export const load = async () => {
 
 const COPY = ["title", "description", "tag", "heading", "accent", "intro", "others"] as const;
 
+/** The repo a row's menu acted on: a project that exists, or a 400. */
+const target = async (request: Request) => {
+	const repo = String((await request.formData()).get("repo") ?? "");
+	return listAllProjects().some((row) => row.repo === repo) ? repo : undefined;
+};
+
 export const actions = {
+	publish: async ({ request }) => {
+		const repo = await target(request);
+		if (!repo) {
+			return fail(400, { message: "No such project" });
+		}
+		updateProject(repo, { published: true });
+	},
+	unpublish: async ({ request }) => {
+		const repo = await target(request);
+		if (!repo) {
+			return fail(400, { message: "No such project" });
+		}
+		updateProject(repo, { published: false });
+	},
+	resync: async ({ request }) => {
+		const repo = await target(request);
+		if (!repo) {
+			return fail(400, { message: "No such project" });
+		}
+		queueSync(repo, { reason: "manual" });
+		return { queued: repo };
+	},
+	delete: async ({ request }) => {
+		const repo = await target(request);
+		if (!repo) {
+			return fail(400, { message: "No such project" });
+		}
+		deleteProject(repo);
+		return { deleted: repo };
+	},
 	move: async ({ request }) => {
 		const form = await request.formData();
 		const repo = String(form.get("repo"));

@@ -10,23 +10,43 @@
 	let at = $state({ x: 0, y: 0 });
 	let drawer = $state(false);
 
+	// A manual popover, dismissed here rather than by the browser: a right-click fires
+	// contextmenu with the button still down, and the browser's own light dismiss then
+	// took the release for a click outside and closed the menu the moment it opened.
+	function outside(event: PointerEvent) {
+		if (!menu?.contains(event.target as Node)) {
+			close();
+		}
+	}
+	function onKey(event: KeyboardEvent) {
+		if (event.key === "Escape") {
+			close();
+		}
+	}
+
 	/** Open at a pointer position; a phone ignores it and slides the drawer up. */
 	export function open(x: number, y: number) {
 		drawer = matchMedia("(width < 48rem)").matches;
 		// keep it on screen: the popover is 12rem wide and about 7.5rem tall
 		at = { x: Math.min(x, innerWidth - 200), y: Math.min(y, innerHeight - 130) };
 		menu?.showPopover();
+		addEventListener("pointerdown", outside, true);
+		addEventListener("keydown", onKey);
 	}
 
 	/** Close it, whichever shape it took. */
 	export function close() {
-		menu?.hidePopover();
+		removeEventListener("pointerdown", outside, true);
+		removeEventListener("keydown", onKey);
+		if (menu?.matches(":popover-open")) {
+			menu.hidePopover();
+		}
 	}
 </script>
 
 <div
 	bind:this={menu}
-	popover
+	popover="manual"
 	role="menu"
 	aria-label={title}
 	class={drawer

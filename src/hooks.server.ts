@@ -3,6 +3,7 @@ import type { Handle, HandleServerError, ServerInit } from "@sveltejs/kit";
 import { building } from "$app/environment";
 import { unavailableAs503 } from "$lib/server/admin";
 import { getAuth } from "$lib/server/auth";
+import { wasProjectDeleted } from "$lib/server/content";
 import { getDataDir, getDb, migrateDatabase } from "$lib/server/db";
 import { reconcile, startSyncWorker } from "$lib/server/github/worker";
 import { canonical, isCrossSiteForm, withHeaders } from "$lib/server/http";
@@ -38,7 +39,15 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 		return withHeaders(await auth.handler(event.request));
 	}
-	return withHeaders(await resolve(event));
+	const response = await resolve(event);
+	// a deleted project's page, docs and .md twins all send their visitors to /projects
+	if (response.status === 404) {
+		const repo = event.url.pathname.split("/")[1]?.replace(/\.md$/, "");
+		if (repo && wasProjectDeleted(repo)) {
+			return new Response(null, { status: 301, headers: { location: "/projects" } });
+		}
+	}
+	return withHeaders(response);
 };
 
 // Unexpected errors reach the log with their stack; the visitor sees only the status.

@@ -1,10 +1,24 @@
 <script lang="ts">
-	import { ChevronDown, ChevronUp, ExternalLink } from "@lucide/svelte";
+	import { ChevronDown, ChevronUp, Ellipsis, ExternalLink } from "@lucide/svelte";
 	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
 	import { ago, statusClass } from "$lib/admin";
+	import Confirm from "$lib/components/admin/Confirm.svelte";
+	import ContextMenu from "$lib/components/admin/ContextMenu.svelte";
 
 	let { data, form } = $props();
+
+	type Row = (typeof data.projects)[number];
+
+	// one menu for the whole list, opened by a row's ⋯ button or a right-click on the row
+	let menu = $state<ContextMenu>();
+	let target = $state<Row>();
+	let confirmer = $state<Confirm>();
+
+	function open(project: Row, x: number, y: number) {
+		target = project;
+		menu?.open(x, y);
+	}
 
 	const DOCS = {
 		valid: ["status status-on", "docs/ · config.json"],
@@ -41,6 +55,14 @@
 </div>
 {#if form?.message}
 	<p class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">{form.message}</p>
+{:else if form && "deleted" in form}
+	<p class="mb-4 border border-line bg-surface px-3 py-2 text-sm" role="status">
+		Deleted <strong>{form.deleted}</strong>. Its URLs now redirect to /projects.
+	</p>
+{:else if form && "queued" in form}
+	<p class="mb-4 border border-line bg-surface px-3 py-2 text-sm" role="status">
+		<span class="status status-busy">queued</span> A docs sync of <strong>{form.queued}</strong> runs in the background.
+	</p>
 {/if}
 
 <div class="apanel overflow-x-auto">
@@ -54,11 +76,17 @@
 				<th class="wide">Last sync</th>
 				{#if data.views}<th class="wide text-right" title="Pageviews over the last 30 days, docs included">Views</th>{/if}
 				<th class="wide text-right">Edited</th>
+				<th><span class="sr-only">Actions</span></th>
 			</tr>
 		</thead>
 		<tbody>
 			{#each data.projects as project, index (project.repo)}
-				<tr>
+				<tr
+					oncontextmenu={(event) => {
+						event.preventDefault();
+						open(project, event.clientX, event.clientY);
+					}}
+				>
 					<td class="py-1">
 						<form class="relative z-10 flex flex-col" method="POST" action="?/move" use:enhance>
 							<input type="hidden" name="repo" value={project.repo}>
@@ -149,13 +177,65 @@
 						</td>
 					{/if}
 					<td class="wide text-right text-xs whitespace-nowrap text-dim" title={project.updatedAt.toLocaleString()}>{ago(project.updatedAt)}</td>
+					<td class="py-0 pl-0">
+						<!-- above the row link's overlay -->
+						<button
+							class="relative z-1 grid size-10 place-items-center rounded-md text-dim transition-colors hover:bg-fg/8 hover:text-fg md:size-7"
+							type="button"
+							aria-label="Actions for {project.name}"
+							aria-haspopup="menu"
+							onclick={(event) => {
+								const box = event.currentTarget.getBoundingClientRect();
+								open(project, box.right - 192, box.bottom + 4);
+							}}><Ellipsis size={16} /></button
+						>
+					</td>
 				</tr>
 			{:else}
-				<tr><td class="py-10 text-center text-dim" colspan="7">No projects yet. Add a repo above.</td></tr>
+				<tr><td class="py-10 text-center text-dim" colspan="8">No projects yet. Add a repo above.</td></tr>
 			{/each}
 		</tbody>
 	</table>
 </div>
+
+<ContextMenu bind:this={menu} title={target?.name}>
+	{#if target}
+		{@const project = target}
+		<form
+			method="POST"
+			use:enhance={() => {
+				menu?.close();
+			}}
+		>
+			<input type="hidden" name="repo" value={project.repo}>
+			<a class="menu-item" role="menuitem" href={resolve("/admin/(app)/projects/[repo]", { repo: project.repo })}>Edit</a>
+			{#if project.published}
+				<a class="menu-item" role="menuitem" href={resolve("/[repo]", { repo: project.repo })} target="_blank" rel="noreferrer">View on site</a>
+				<button class="menu-item" role="menuitem" formaction="?/unpublish">Unpublish</button>
+			{:else}
+				<button class="menu-item" role="menuitem" formaction="?/publish">Publish</button>
+			{/if}
+			{#if project.githubRepo}
+				<button class="menu-item" role="menuitem" formaction="?/resync">Resync docs</button>
+			{/if}
+			<button
+				class="menu-item text-hot"
+				role="menuitem"
+				formaction="?/delete"
+				onclick={(event) => {
+					menu?.close();
+					confirmer?.guard(event, {
+						title: `Delete ${project.name}?`,
+						body: "Its page, docs, screenshots and sync history go, and its URLs redirect to /projects. The GitHub repo is untouched, and can be added again.",
+						action: "Delete project",
+					});
+				}}>Delete</button
+			>
+		</form>
+	{/if}
+</ContextMenu>
+
+<Confirm bind:this={confirmer} />
 
 <form
 	data-save

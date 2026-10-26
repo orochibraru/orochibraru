@@ -6,6 +6,7 @@ import { invalidate } from "./content";
 import { getDb } from "./db";
 import {
 	deletedPost,
+	deletedProject,
 	docsVersion,
 	guide,
 	image,
@@ -14,6 +15,7 @@ import {
 	project,
 	projectsPage,
 	syncChange,
+	syncJob,
 	syncRun,
 } from "./db/schema";
 import { imageUrl } from "./images";
@@ -145,6 +147,30 @@ export function deletePost(id: number) {
 
 // ---- projects
 
+/**
+ * Delete a project: its page, its docs, screenshots and versions (they cascade),
+ * its sync history and anything still queued to sync. Its URLs redirect to
+ * /projects from then on. The repo on GitHub is untouched, and can be added again.
+ */
+export function deleteProject(repo: string) {
+	const deleted = getDb().transaction((tx) => {
+		const [row] = tx.delete(project).where(eq(project.repo, repo)).returning().all();
+		if (!row) {
+			return undefined;
+		}
+		// sync_change rows go with their runs
+		tx.delete(syncRun).where(eq(syncRun.repo, repo)).run();
+		tx.delete(syncJob).where(eq(syncJob.repo, repo)).run();
+		tx.insert(deletedProject).values({ repo }).onConflictDoNothing().run();
+		return row;
+	});
+	if (!deleted) {
+		throw new EditorError(`there is no project at /${repo}`);
+	}
+	invalidate();
+	return deleted;
+}
+
 export type ProjectRow = typeof project.$inferSelect;
 
 export const ProjectPatch = ProjectFields.partial()
@@ -237,6 +263,8 @@ export function createProject(fullName: string): ProjectRow {
 		throw new EditorError(`there is already a project at /${repo}`);
 	}
 	const last = listAllProjects().at(-1);
+	// a project back at an old address is that address's page again, not a redirect
+	getDb().delete(deletedProject).where(eq(deletedProject.repo, repo)).run();
 	const [row] = getDb()
 		.insert(project)
 		.values({

@@ -55,6 +55,12 @@ export const post = sqliteTable("post", {
 	updatedAt: timestamp("updated_at"),
 });
 
+/** The repos of deleted projects: their URLs redirect to /projects instead of 404ing. */
+export const deletedProject = sqliteTable("deleted_project", {
+	repo: text("repo").primaryKey(),
+	deletedAt: timestamp("deleted_at"),
+});
+
 /** The slugs of deleted posts: their URLs redirect to the blog instead of 404ing. */
 export const deletedPost = sqliteTable("deleted_post", {
 	slug: text("slug").primaryKey(),
