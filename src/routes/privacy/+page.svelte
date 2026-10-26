@@ -132,7 +132,8 @@
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">The apps</h2>
 			<p>
 				This page covers this site only. The self-hosted apps have their own:
-				<a class="text-accent" href={resolve("/privacy/homerun")}>Homerun</a> and
+				<a class="text-accent" href={resolve("/privacy/homerun")}>Homerun</a>,
+				<a class="text-accent" href={resolve("/privacy/opencount")}>OpenCount</a> and
 				<a class="text-accent" href={resolve("/privacy/penombre")}>Penombre</a>.
 			</p>
 		</section>
