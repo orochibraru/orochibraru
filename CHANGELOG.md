@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.0](https://github.com/orochibraru/orochibraru/compare/v1.20.0...v1.21.0) (2026-10-26)
+
+### Features
+
+- **admin:** delete projects, and act on them from the list
+  ([94b2203](https://github.com/orochibraru/orochibraru/commit/94b22030a01e94963d3ac010c89ea4b151e767bf))
+
 ## [1.20.0](https://github.com/orochibraru/orochibraru/compare/v1.19.0...v1.20.0) (2026-10-25)
 
 ### Features
