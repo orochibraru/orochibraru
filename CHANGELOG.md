@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.23.0](https://github.com/orochibraru/orochibraru/compare/v1.22.0...v1.23.0) (2026-10-26)
+
+### Features
+
+- **privacy:** add the OpenCount privacy notice, covering app.opencount.eu (#5)
+  ([3e67faa](https://github.com/orochibraru/orochibraru/commit/3e67faa080331556db1da40349b70ee336bc3012))
+
 ## [1.22.0](https://github.com/orochibraru/orochibraru/compare/v1.21.0...v1.22.0) (2026-10-26)
 
 ### Features
