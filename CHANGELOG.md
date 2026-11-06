@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.23.1](https://github.com/orochibraru/orochibraru/compare/v1.23.0...v1.23.1) (2026-11-06)
+
+### Bug Fixes
+
+- **hooks:** only report 5xx errors to Sentry, not bot 405s
+  ([e361c63](https://github.com/orochibraru/orochibraru/commit/e361c635b151f53422c19bf124397f563075200a))
+
 ## [1.23.0](https://github.com/orochibraru/orochibraru/compare/v1.22.0...v1.23.0) (2026-10-26)
 
 ### Features
