@@ -52,7 +52,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 // Unexpected errors reach the log with their stack; the visitor sees only the status.
 export const handleError: HandleServerError = ({ error, event, status }) => {
-	if (status !== 404) {
+	if (status >= 500) {
 		console.error(`${event.request.method} ${event.url.pathname}`, error);
 		Sentry.captureException(error, {
 			extra: { method: event.request.method, path: event.url.pathname, status },
