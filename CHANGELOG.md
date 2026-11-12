@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.25.0](https://github.com/zedensix/zedensix/compare/v1.24.0...v1.25.0) (2026-11-12)
+
+### Features
+
+- **admin:** relink projects to moved repos, unlink the GitHub App from the top,
+  and surface sync failures
+  ([e50e88c](https://github.com/zedensix/zedensix/commit/e50e88cef9b269035a2d0819ea9c25471aabafa5))
+
 ## [1.24.0](https://github.com/zedensix/zedensix/compare/v1.23.1...v1.24.0) (2026-11-12)
 
 ### Features
