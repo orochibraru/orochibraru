@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.24.0](https://github.com/zedensix/zedensix/compare/v1.23.1...v1.24.0) (2026-11-12)
+
+### Features
+
+- rebrand to zedensix, scope search to a project with @, fade admin pages, and
+  fix sync worker boot crashes
+  ([968c930](https://github.com/zedensix/zedensix/commit/968c930d1ca7da2989e5865f4ddab0cbbdce64bc))
+
 ## [1.23.1](https://github.com/orochibraru/orochibraru/compare/v1.23.0...v1.23.1) (2026-11-06)
 
 ### Bug Fixes
