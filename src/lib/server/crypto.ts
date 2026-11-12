@@ -14,7 +14,7 @@ async function keyFor(secret: string) {
 			name: "HKDF",
 			hash: "SHA-256",
 			// the old handle, kept: a new salt can no longer unseal stored secrets
-			salt: encoder.encode("orochibraru"),
+			salt: encoder.encode("zedensix"),
 			info: encoder.encode("sealed-secrets"),
 		},
 		material,

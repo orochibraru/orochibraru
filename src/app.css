@@ -408,7 +408,6 @@
 	.prose pre {
 		@apply overflow-x-auto rounded-2xl border border-line bg-surface px-5.5 py-5 text-[.875rem]/[1.7];
 	}
-	/* the hand-drawn blocks (svelte-smol's tree) dim comments this way */
 	.prose pre .c {
 		@apply text-dim;
 	}

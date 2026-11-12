@@ -1,4 +1,4 @@
-import adapter from "@orochibraru/svelte-smol";
+import adapter from "@sveltejs/adapter-bun";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {

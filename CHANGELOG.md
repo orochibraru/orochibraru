@@ -16,373 +16,373 @@
   fix sync worker boot crashes
   ([968c930](https://github.com/zedensix/zedensix/commit/968c930d1ca7da2989e5865f4ddab0cbbdce64bc))
 
-## [1.23.1](https://github.com/orochibraru/orochibraru/compare/v1.23.0...v1.23.1) (2026-11-06)
+## [1.23.1](https://github.com/zedensix/zedensix/compare/v1.23.0...v1.23.1) (2026-11-06)
 
 ### Bug Fixes
 
 - **hooks:** only report 5xx errors to Sentry, not bot 405s
-  ([e361c63](https://github.com/orochibraru/orochibraru/commit/e361c635b151f53422c19bf124397f563075200a))
+  ([e361c63](https://github.com/zedensix/zedensix/commit/e361c635b151f53422c19bf124397f563075200a))
 
-## [1.23.0](https://github.com/orochibraru/orochibraru/compare/v1.22.0...v1.23.0) (2026-10-26)
+## [1.23.0](https://github.com/zedensix/zedensix/compare/v1.22.0...v1.23.0) (2026-10-26)
 
 ### Features
 
 - **privacy:** add the OpenCount privacy notice, covering app.opencount.eu (#5)
-  ([3e67faa](https://github.com/orochibraru/orochibraru/commit/3e67faa080331556db1da40349b70ee336bc3012))
+  ([3e67faa](https://github.com/zedensix/zedensix/commit/3e67faa080331556db1da40349b70ee336bc3012))
 
-## [1.22.0](https://github.com/orochibraru/orochibraru/compare/v1.21.0...v1.22.0) (2026-10-26)
+## [1.22.0](https://github.com/zedensix/zedensix/compare/v1.21.0...v1.22.0) (2026-10-26)
 
 ### Features
 
 - **admin:** view posts and projects on the site, and keep renamed posts' URLs
-  ([5942b67](https://github.com/orochibraru/orochibraru/commit/5942b67578f50b0d61c277277d28a539e6e3fd7f))
+  ([5942b67](https://github.com/zedensix/zedensix/commit/5942b67578f50b0d61c277277d28a539e6e3fd7f))
 
-## [1.21.0](https://github.com/orochibraru/orochibraru/compare/v1.20.0...v1.21.0) (2026-10-26)
+## [1.21.0](https://github.com/zedensix/zedensix/compare/v1.20.0...v1.21.0) (2026-10-26)
 
 ### Features
 
 - **admin:** delete projects, and act on them from the list
-  ([94b2203](https://github.com/orochibraru/orochibraru/commit/94b22030a01e94963d3ac010c89ea4b151e767bf))
+  ([94b2203](https://github.com/zedensix/zedensix/commit/94b22030a01e94963d3ac010c89ea4b151e767bf))
 
-## [1.20.0](https://github.com/orochibraru/orochibraru/compare/v1.19.0...v1.20.0) (2026-10-25)
+## [1.20.0](https://github.com/zedensix/zedensix/compare/v1.19.0...v1.20.0) (2026-10-25)
 
 ### Features
 
 - **admin:** weekly report, pushed to the admin's browsers
-  ([539405e](https://github.com/orochibraru/orochibraru/commit/539405e21c3fde251e10da532422e00f7bf8bd61))
+  ([539405e](https://github.com/zedensix/zedensix/commit/539405e21c3fde251e10da532422e00f7bf8bd61))
 - **admin:** floating tab bar and drawers for menus on phones
-  ([cf9c7b4](https://github.com/orochibraru/orochibraru/commit/cf9c7b47fc425b555673f0c0850391731b5fa7e0))
+  ([cf9c7b4](https://github.com/zedensix/zedensix/commit/cf9c7b47fc425b555673f0c0850391731b5fa7e0))
 
-## [1.19.0](https://github.com/orochibraru/orochibraru/compare/v1.18.1...v1.19.0) (2026-10-25)
+## [1.19.0](https://github.com/zedensix/zedensix/compare/v1.18.1...v1.19.0) (2026-10-25)
 
 ### Features
 
 - **admin:** make the admin feel like a phone app
-  ([a73eeff](https://github.com/orochibraru/orochibraru/commit/a73eeff8e6817236092926a548a0d7f2041dc417))
+  ([a73eeff](https://github.com/zedensix/zedensix/commit/a73eeff8e6817236092926a548a0d7f2041dc417))
 - **sync:** run docs syncs on a background worker with a durable queue
-  ([7cad869](https://github.com/orochibraru/orochibraru/commit/7cad869bc5a50b30480a9b5e9cc73e80dba11a78))
+  ([7cad869](https://github.com/zedensix/zedensix/commit/7cad869bc5a50b30480a9b5e9cc73e80dba11a78))
 
-## [1.18.1](https://github.com/orochibraru/orochibraru/compare/v1.18.0...v1.18.1) (2026-10-25)
+## [1.18.1](https://github.com/zedensix/zedensix/compare/v1.18.0...v1.18.1) (2026-10-25)
 
 ### Bug Fixes
 
 - **docs:** keep doc descriptions that open with inline code
-  ([9cd4353](https://github.com/orochibraru/orochibraru/commit/9cd4353829e02f12270db11267d5823354b8dec0))
+  ([9cd4353](https://github.com/zedensix/zedensix/commit/9cd4353829e02f12270db11267d5823354b8dec0))
 - **docs:** describe a guide with no lede by its section headings
-  ([a7f1fe9](https://github.com/orochibraru/orochibraru/commit/a7f1fe9d6140132ba2bf5b440cc2af8d7d6d8e82))
+  ([a7f1fe9](https://github.com/zedensix/zedensix/commit/a7f1fe9d6140132ba2bf5b440cc2af8d7d6d8e82))
 
-## [1.18.0](https://github.com/orochibraru/orochibraru/compare/v1.17.2...v1.18.0) (2026-10-15)
+## [1.18.0](https://github.com/zedensix/zedensix/compare/v1.17.2...v1.18.0) (2026-10-15)
 
 ### Features
 
 - privacy pages for Homerun and Penombre
-  ([7128990](https://github.com/orochibraru/orochibraru/commit/71289904fb285a5f768e76f9c86f9dd6bb4c1245))
+  ([7128990](https://github.com/zedensix/zedensix/commit/71289904fb285a5f768e76f9c86f9dd6bb4c1245))
 
-## [1.17.2](https://github.com/orochibraru/orochibraru/compare/v1.17.1...v1.17.2) (2026-10-14)
+## [1.17.2](https://github.com/zedensix/zedensix/compare/v1.17.1...v1.17.2) (2026-10-14)
 
 ### Bug Fixes
 
 - **projects:** stop a code-block label from swallowing the next tile (#4)
-  ([4e422e6](https://github.com/orochibraru/orochibraru/commit/4e422e63846bc9b68f26d5658e07b60f10461bf4))
+  ([4e422e6](https://github.com/zedensix/zedensix/commit/4e422e63846bc9b68f26d5658e07b60f10461bf4))
 
-## [1.17.1](https://github.com/orochibraru/orochibraru/compare/v1.17.0...v1.17.1) (2026-10-09)
+## [1.17.1](https://github.com/zedensix/zedensix/compare/v1.17.0...v1.17.1) (2026-10-09)
 
 ### Bug Fixes
 
 - cap lone project screenshots and embedded videos at 4xl (#3)
-  ([d57cec6](https://github.com/orochibraru/orochibraru/commit/d57cec6d1298931aa2e7161974ebbf36b981ebd1))
+  ([d57cec6](https://github.com/zedensix/zedensix/commit/d57cec6d1298931aa2e7161974ebbf36b981ebd1))
 
-## [1.17.0](https://github.com/orochibraru/orochibraru/compare/v1.16.1...v1.17.0) (2026-10-05)
+## [1.17.0](https://github.com/zedensix/zedensix/compare/v1.16.1...v1.17.0) (2026-10-05)
 
 ### Features
 
 - serve images same-origin as cached WebP
-  ([c7e7c3f](https://github.com/orochibraru/orochibraru/commit/c7e7c3f9c69936fe73c7b886fb4ad498ed41c797))
+  ([c7e7c3f](https://github.com/zedensix/zedensix/commit/c7e7c3f9c69936fe73c7b886fb4ad498ed41c797))
 
-## [1.16.1](https://github.com/orochibraru/orochibraru/compare/v1.16.0...v1.16.1) (2026-10-01)
+## [1.16.1](https://github.com/zedensix/zedensix/compare/v1.16.0...v1.16.1) (2026-10-01)
 
 ### Bug Fixes
 
 - image fallback
-  ([e2f4de0](https://github.com/orochibraru/orochibraru/commit/e2f4de0fc69bd94027df7530623eaa209ccdd3b2))
+  ([e2f4de0](https://github.com/zedensix/zedensix/commit/e2f4de0fc69bd94027df7530623eaa209ccdd3b2))
 
-## [1.16.0](https://github.com/orochibraru/orochibraru/compare/v1.15.2...v1.16.0) (2026-10-01)
+## [1.16.0](https://github.com/zedensix/zedensix/compare/v1.15.2...v1.16.0) (2026-10-01)
 
 ### Features
 
 - more mcp tooling
-  ([3cdc14e](https://github.com/orochibraru/orochibraru/commit/3cdc14e450cc8fc71cbb3cddc8d266a89e123abc))
+  ([3cdc14e](https://github.com/zedensix/zedensix/commit/3cdc14e450cc8fc71cbb3cddc8d266a89e123abc))
 
-## [1.15.2](https://github.com/orochibraru/orochibraru/compare/v1.15.1...v1.15.2) (2026-10-01)
+## [1.15.2](https://github.com/zedensix/zedensix/compare/v1.15.1...v1.15.2) (2026-10-01)
 
 ### Bug Fixes
 
 - simplify image handling & design
-  ([6289b01](https://github.com/orochibraru/orochibraru/commit/6289b01818e23f5c9de0a4f06305e6004272df95))
+  ([6289b01](https://github.com/zedensix/zedensix/commit/6289b01818e23f5c9de0a4f06305e6004272df95))
 
-## [1.15.1](https://github.com/orochibraru/orochibraru/compare/v1.15.0...v1.15.1) (2026-09-29)
+## [1.15.1](https://github.com/zedensix/zedensix/compare/v1.15.0...v1.15.1) (2026-09-29)
 
 ### Bug Fixes
 
 - stats display
-  ([b799cdc](https://github.com/orochibraru/orochibraru/commit/b799cdc7215e94c60f409ee7c1b9b60fbc9177e7))
+  ([b799cdc](https://github.com/zedensix/zedensix/commit/b799cdc7215e94c60f409ee7c1b9b60fbc9177e7))
 
-## [1.15.0](https://github.com/orochibraru/orochibraru/compare/v1.14.0...v1.15.0) (2026-09-29)
+## [1.15.0](https://github.com/zedensix/zedensix/compare/v1.14.0...v1.15.0) (2026-09-29)
 
 ### Features
 
 - better analytics
-  ([f1b8d8b](https://github.com/orochibraru/orochibraru/commit/f1b8d8bce9e893eb3f9c60181180040798df2fc0))
+  ([f1b8d8b](https://github.com/zedensix/zedensix/commit/f1b8d8bce9e893eb3f9c60181180040798df2fc0))
 
-## [1.14.0](https://github.com/orochibraru/orochibraru/compare/v1.13.1...v1.14.0) (2026-09-28)
+## [1.14.0](https://github.com/zedensix/zedensix/compare/v1.13.1...v1.14.0) (2026-09-28)
 
 ### Features
 
 - analytics digest
-  ([fc71e78](https://github.com/orochibraru/orochibraru/commit/fc71e78f82d3a92df7ac16c8e93bb6d8ce59e4c7))
+  ([fc71e78](https://github.com/zedensix/zedensix/commit/fc71e78f82d3a92df7ac16c8e93bb6d8ce59e4c7))
 
-## [1.13.1](https://github.com/orochibraru/orochibraru/compare/v1.13.0...v1.13.1) (2026-09-28)
+## [1.13.1](https://github.com/zedensix/zedensix/compare/v1.13.0...v1.13.1) (2026-09-28)
 
 ### Bug Fixes
 
 - search console integration
-  ([92dc16a](https://github.com/orochibraru/orochibraru/commit/92dc16a93030e8873549f4229c7af3d0f8f837db))
+  ([92dc16a](https://github.com/zedensix/zedensix/commit/92dc16a93030e8873549f4229c7af3d0f8f837db))
 
-## [1.13.0](https://github.com/orochibraru/orochibraru/compare/v1.12.0...v1.13.0) (2026-09-28)
+## [1.13.0](https://github.com/zedensix/zedensix/compare/v1.12.0...v1.13.0) (2026-09-28)
 
 ### Features
 
 - search console integration
-  ([fdc6122](https://github.com/orochibraru/orochibraru/commit/fdc6122f49ea77ebcbfa1ac45b864dc36ab59c2a))
+  ([fdc6122](https://github.com/zedensix/zedensix/commit/fdc6122f49ea77ebcbfa1ac45b864dc36ab59c2a))
 
-## [1.12.0](https://github.com/orochibraru/orochibraru/compare/v1.11.0...v1.12.0) (2026-09-28)
+## [1.12.0](https://github.com/zedensix/zedensix/compare/v1.11.0...v1.12.0) (2026-09-28)
 
 ### Features
 
 - **admin:** sync history with diffs, confirm dialog, live sync spinners
-  ([2834778](https://github.com/orochibraru/orochibraru/commit/2834778212ee73cad6e92f8bad4c3bea30f2daea))
+  ([2834778](https://github.com/zedensix/zedensix/commit/2834778212ee73cad6e92f8bad4c3bea30f2daea))
 
-## [1.11.0](https://github.com/orochibraru/orochibraru/compare/v1.10.0...v1.11.0) (2026-09-28)
+## [1.11.0](https://github.com/zedensix/zedensix/compare/v1.10.0...v1.11.0) (2026-09-28)
 
 ### Features
 
 - **admin:** sidebar nav, Sentry, branded sign-in errors, dev bypass
-  ([199e2e3](https://github.com/orochibraru/orochibraru/commit/199e2e3c897b1471e1ca3df2e2c363933e421cf6))
+  ([199e2e3](https://github.com/zedensix/zedensix/commit/199e2e3c897b1471e1ca3df2e2c363933e421cf6))
 
-## [1.10.0](https://github.com/orochibraru/orochibraru/compare/v1.9.0...v1.10.0) (2026-09-28)
+## [1.10.0](https://github.com/zedensix/zedensix/compare/v1.9.0...v1.10.0) (2026-09-28)
 
 ### Features
 
 - better admin options
-  ([a45b77a](https://github.com/orochibraru/orochibraru/commit/a45b77adec6cb977ebcdedef1c6b9482143592dd))
+  ([a45b77a](https://github.com/zedensix/zedensix/commit/a45b77adec6cb977ebcdedef1c6b9482143592dd))
 
-## [1.9.0](https://github.com/orochibraru/orochibraru/compare/v1.8.0...v1.9.0) (2026-09-25)
+## [1.9.0](https://github.com/zedensix/zedensix/compare/v1.8.0...v1.9.0) (2026-09-25)
 
 ### Features
 
 - **docs:** publish the Latest release's docs, main as canary
-  ([ce8f6b9](https://github.com/orochibraru/orochibraru/commit/ce8f6b983ec45198c77ec7aaca3d44cc68490cdf))
+  ([ce8f6b9](https://github.com/zedensix/zedensix/commit/ce8f6b983ec45198c77ec7aaca3d44cc68490cdf))
 
-## [1.8.0](https://github.com/orochibraru/orochibraru/compare/v1.7.0...v1.8.0) (2026-09-25)
+## [1.8.0](https://github.com/zedensix/zedensix/compare/v1.7.0...v1.8.0) (2026-09-25)
 
 ### Features
 
 - smarter content
-  ([97380d2](https://github.com/orochibraru/orochibraru/commit/97380d2aaa54bb5699035f81ffa9d39ccbf57b40))
+  ([97380d2](https://github.com/zedensix/zedensix/commit/97380d2aaa54bb5699035f81ffa9d39ccbf57b40))
 
-## [1.7.0](https://github.com/orochibraru/orochibraru/compare/v1.6.2...v1.7.0) (2026-09-24)
+## [1.7.0](https://github.com/zedensix/zedensix/compare/v1.6.2...v1.7.0) (2026-09-24)
 
 ### Features
 
 - analytics dashboard & lightbox
-  ([daddb7d](https://github.com/orochibraru/orochibraru/commit/daddb7d11c55a1c5e0da42767a22dd09fe9855dc))
+  ([daddb7d](https://github.com/zedensix/zedensix/commit/daddb7d11c55a1c5e0da42767a22dd09fe9855dc))
 
-## [1.6.2](https://github.com/orochibraru/orochibraru/compare/v1.6.1...v1.6.2) (2026-09-24)
+## [1.6.2](https://github.com/zedensix/zedensix/compare/v1.6.1...v1.6.2) (2026-09-24)
 
 ### Bug Fixes
 
 - handle themed screenshots
-  ([c90abb4](https://github.com/orochibraru/orochibraru/commit/c90abb419c3a814c84c4b4c198eae06d3747a545))
+  ([c90abb4](https://github.com/zedensix/zedensix/commit/c90abb419c3a814c84c4b4c198eae06d3747a545))
 
-## [1.6.1](https://github.com/orochibraru/orochibraru/compare/v1.6.0...v1.6.1) (2026-09-24)
+## [1.6.1](https://github.com/zedensix/zedensix/compare/v1.6.0...v1.6.1) (2026-09-24)
 
 ### Bug Fixes
 
 - parallax
-  ([17e0fd6](https://github.com/orochibraru/orochibraru/commit/17e0fd6d860d078fb58c4397c26fcca2e9292b31))
+  ([17e0fd6](https://github.com/zedensix/zedensix/commit/17e0fd6d860d078fb58c4397c26fcca2e9292b31))
 
-## [1.6.0](https://github.com/orochibraru/orochibraru/compare/v1.5.0...v1.6.0) (2026-09-24)
+## [1.6.0](https://github.com/zedensix/zedensix/compare/v1.5.0...v1.6.0) (2026-09-24)
 
 ### Features
 
 - testcase for webp
-  ([32bbeda](https://github.com/orochibraru/orochibraru/commit/32bbeda309220833131478e00c7147a39650b0b6))
+  ([32bbeda](https://github.com/zedensix/zedensix/commit/32bbeda309220833131478e00c7147a39650b0b6))
 
-## [1.5.0](https://github.com/orochibraru/orochibraru/compare/v1.4.0...v1.5.0) (2026-09-24)
+## [1.5.0](https://github.com/zedensix/zedensix/compare/v1.4.0...v1.5.0) (2026-09-24)
 
 ### Features
 
 - sexier ui
-  ([4025fac](https://github.com/orochibraru/orochibraru/commit/4025fac010a8dc77ef475be7c8f11538d5f5c34f))
+  ([4025fac](https://github.com/zedensix/zedensix/commit/4025fac010a8dc77ef475be7c8f11538d5f5c34f))
 
-## [1.4.0](https://github.com/orochibraru/orochibraru/compare/v1.3.1...v1.4.0) (2026-09-23)
+## [1.4.0](https://github.com/zedensix/zedensix/compare/v1.3.1...v1.4.0) (2026-09-23)
 
 ### Features
 
 - reorg buttoons
-  ([7bc4eee](https://github.com/orochibraru/orochibraru/commit/7bc4eee82d6a20fe04a5c271d79aaccd6ed611c7))
+  ([7bc4eee](https://github.com/zedensix/zedensix/commit/7bc4eee82d6a20fe04a5c271d79aaccd6ed611c7))
 
-## [1.3.1](https://github.com/orochibraru/orochibraru/compare/v1.3.0...v1.3.1) (2026-09-23)
+## [1.3.1](https://github.com/zedensix/zedensix/compare/v1.3.0...v1.3.1) (2026-09-23)
 
 ### Bug Fixes
 
 - admin ui
-  ([1c2fa20](https://github.com/orochibraru/orochibraru/commit/1c2fa20bf498d37b3bac85db3cfe89531a636c29))
+  ([1c2fa20](https://github.com/zedensix/zedensix/commit/1c2fa20bf498d37b3bac85db3cfe89531a636c29))
 
-## [1.3.0](https://github.com/orochibraru/orochibraru/compare/v1.2.1...v1.3.0) (2026-09-23)
+## [1.3.0](https://github.com/zedensix/zedensix/compare/v1.2.1...v1.3.0) (2026-09-23)
 
 ### Features
 
 - prettier admin
-  ([59a1984](https://github.com/orochibraru/orochibraru/commit/59a1984abadd62cfc11d700190a7a667b1d99587))
+  ([59a1984](https://github.com/zedensix/zedensix/commit/59a1984abadd62cfc11d700190a7a667b1d99587))
 
-## [1.2.1](https://github.com/orochibraru/orochibraru/compare/v1.2.0...v1.2.1) (2026-09-21)
+## [1.2.1](https://github.com/zedensix/zedensix/compare/v1.2.0...v1.2.1) (2026-09-21)
 
 ### Bug Fixes
 
 - blog code blocks
-  ([640e9b1](https://github.com/orochibraru/orochibraru/commit/640e9b151b198bb04a9de9209a14c0a04dc5f72f))
+  ([640e9b1](https://github.com/zedensix/zedensix/commit/640e9b151b198bb04a9de9209a14c0a04dc5f72f))
 
-## [1.2.0](https://github.com/orochibraru/orochibraru/compare/v1.1.0...v1.2.0) (2026-09-21)
+## [1.2.0](https://github.com/zedensix/zedensix/compare/v1.1.0...v1.2.0) (2026-09-21)
 
 ### Features
 
 - support mermaid diagrams
-  ([903cc0b](https://github.com/orochibraru/orochibraru/commit/903cc0b463f3e0ec6fcf15c867837514885c2129))
+  ([903cc0b](https://github.com/zedensix/zedensix/commit/903cc0b463f3e0ec6fcf15c867837514885c2129))
 
-## [1.1.0](https://github.com/orochibraru/orochibraru/compare/v1.0.1...v1.1.0) (2026-09-21)
+## [1.1.0](https://github.com/zedensix/zedensix/compare/v1.0.1...v1.1.0) (2026-09-21)
 
 ### Features
 
 - prek in un
-  ([87ec9a8](https://github.com/orochibraru/orochibraru/commit/87ec9a828d395e359b03e41b88fff03da1011600))
+  ([87ec9a8](https://github.com/zedensix/zedensix/commit/87ec9a828d395e359b03e41b88fff03da1011600))
 - pinact
-  ([3c57414](https://github.com/orochibraru/orochibraru/commit/3c57414fbda8a2ef63813044a94afd2f9227b62d))
+  ([3c57414](https://github.com/zedensix/zedensix/commit/3c57414fbda8a2ef63813044a94afd2f9227b62d))
 
 ### Bug Fixes
 
 - remove defaults to prevent overriding content
-  ([a60153d](https://github.com/orochibraru/orochibraru/commit/a60153d4885c95c91931199a01df9e26a1d1fa3f))
+  ([a60153d](https://github.com/zedensix/zedensix/commit/a60153d4885c95c91931199a01df9e26a1d1fa3f))
 
-## [1.0.1](https://github.com/orochibraru/orochibraru/compare/v1.0.0...v1.0.1) (2026-09-19)
+## [1.0.1](https://github.com/zedensix/zedensix/compare/v1.0.0...v1.0.1) (2026-09-19)
 
 ### Bug Fixes
 
 - formatting
-  ([0c05258](https://github.com/orochibraru/orochibraru/commit/0c052580974570aff07d8ad1be98d0a277c18491))
+  ([0c05258](https://github.com/zedensix/zedensix/commit/0c052580974570aff07d8ad1be98d0a277c18491))
 - blog page desc
-  ([4bf0021](https://github.com/orochibraru/orochibraru/commit/4bf0021775dcb8e6aa66d94bef5c3885ebd1593d))
+  ([4bf0021](https://github.com/zedensix/zedensix/commit/4bf0021775dcb8e6aa66d94bef5c3885ebd1593d))
 
 ## 1.0.0 (2026-09-19)
 
 ### Features
 
 - release conf && unbloat
-  ([a648d32](https://github.com/orochibraru/orochibraru/commit/a648d32136830273356ad9fd1ab870190d73b1ce))
+  ([a648d32](https://github.com/zedensix/zedensix/commit/a648d32136830273356ad9fd1ab870190d73b1ce))
 - admin ui (#2)
-  ([1b34b15](https://github.com/orochibraru/orochibraru/commit/1b34b1531a22a95b87c42e167c0c5e6ac78fa2a8))
+  ([1b34b15](https://github.com/zedensix/zedensix/commit/1b34b1531a22a95b87c42e167c0c5e6ac78fa2a8))
 - admin ui
-  ([7984938](https://github.com/orochibraru/orochibraru/commit/798493809cd301915e04eff8ecf4821d284a63a9))
+  ([7984938](https://github.com/zedensix/zedensix/commit/798493809cd301915e04eff8ecf4821d284a63a9))
 - releaser
-  ([b641b70](https://github.com/orochibraru/orochibraru/commit/b641b709470674bba863e50b15335d64edda4d48))
+  ([b641b70](https://github.com/zedensix/zedensix/commit/b641b709470674bba863e50b15335d64edda4d48))
 - adapter docs
-  ([50a7e9a](https://github.com/orochibraru/orochibraru/commit/50a7e9a7d87dd96c47b28098d64e22f525f410f9))
+  ([50a7e9a](https://github.com/zedensix/zedensix/commit/50a7e9a7d87dd96c47b28098d64e22f525f410f9))
 - bercail showcase
-  ([438da51](https://github.com/orochibraru/orochibraru/commit/438da5172e5e26e88ebf9dd88322a6acec435855))
+  ([438da51](https://github.com/zedensix/zedensix/commit/438da5172e5e26e88ebf9dd88322a6acec435855))
 - bercail
-  ([159a1a4](https://github.com/orochibraru/orochibraru/commit/159a1a411971cfbacf176d88d1f45ba4965f70ae))
+  ([159a1a4](https://github.com/zedensix/zedensix/commit/159a1a411971cfbacf176d88d1f45ba4965f70ae))
 - syntax highlighting & icons
-  ([5b6c554](https://github.com/orochibraru/orochibraru/commit/5b6c5541eda483de4c163b19f75b7af37a4e8953))
+  ([5b6c554](https://github.com/zedensix/zedensix/commit/5b6c5541eda483de4c163b19f75b7af37a4e8953))
 - nuvio doocs
-  ([d5cce96](https://github.com/orochibraru/orochibraru/commit/d5cce96343620c2f1a60cffa79f2419cb0367999))
+  ([d5cce96](https://github.com/zedensix/zedensix/commit/d5cce96343620c2f1a60cffa79f2419cb0367999))
 - privacy policy & analytics
-  ([f2192c2](https://github.com/orochibraru/orochibraru/commit/f2192c24c0eb8e6485b8da4a40b2e0c2da711679))
+  ([f2192c2](https://github.com/zedensix/zedensix/commit/f2192c24c0eb8e6485b8da4a40b2e0c2da711679))
 - parse contributing
-  ([a82b33c](https://github.com/orochibraru/orochibraru/commit/a82b33cf302a7ce7628bc5f63acd5c959c2210d8))
+  ([a82b33c](https://github.com/zedensix/zedensix/commit/a82b33cf302a7ce7628bc5f63acd5c959c2210d8))
 - config schema
-  ([1cdc686](https://github.com/orochibraru/orochibraru/commit/1cdc686f9f8b59f4474d67524d63377264430e77))
+  ([1cdc686](https://github.com/zedensix/zedensix/commit/1cdc686f9f8b59f4474d67524d63377264430e77))
 - homerun features
-  ([577f46b](https://github.com/orochibraru/orochibraru/commit/577f46b75569baef836599810daab5ebe343307e))
+  ([577f46b](https://github.com/zedensix/zedensix/commit/577f46b75569baef836599810daab5ebe343307e))
 - sexier ui
-  ([929fb88](https://github.com/orochibraru/orochibraru/commit/929fb885fa09dc1206f695964bf637d1f029076b))
+  ([929fb88](https://github.com/zedensix/zedensix/commit/929fb885fa09dc1206f695964bf637d1f029076b))
 - showcase
-  ([d344900](https://github.com/orochibraru/orochibraru/commit/d344900c1072fd5186cf3c9c13d3897614ae8502))
+  ([d344900](https://github.com/zedensix/zedensix/commit/d344900c1072fd5186cf3c9c13d3897614ae8502))
 - embedded docs w/ cron
-  ([de9b3cc](https://github.com/orochibraru/orochibraru/commit/de9b3ccab00b6f42a70439c3808ba85a1700624c))
+  ([de9b3cc](https://github.com/zedensix/zedensix/commit/de9b3ccab00b6f42a70439c3808ba85a1700624c))
 - prek hooks
-  ([fba83a9](https://github.com/orochibraru/orochibraru/commit/fba83a97afe75c187927e5284d892670a6939bfc))
+  ([fba83a9](https://github.com/zedensix/zedensix/commit/fba83a97afe75c187927e5284d892670a6939bfc))
 - html templates
-  ([30694f8](https://github.com/orochibraru/orochibraru/commit/30694f8ac1df38b5dbaee293dcb47ec846a59c9a))
+  ([30694f8](https://github.com/zedensix/zedensix/commit/30694f8ac1df38b5dbaee293dcb47ec846a59c9a))
 - run examples
-  ([ea55120](https://github.com/orochibraru/orochibraru/commit/ea55120fdd9cb435de6245d48d4815640e1f4dd1))
+  ([ea55120](https://github.com/zedensix/zedensix/commit/ea55120fdd9cb435de6245d48d4815640e1f4dd1))
 - rant blog
-  ([1e114a8](https://github.com/orochibraru/orochibraru/commit/1e114a81627f26c6720b34376f6aae5556b9db46))
+  ([1e114a8](https://github.com/zedensix/zedensix/commit/1e114a81627f26c6720b34376f6aae5556b9db46))
 - more rant
-  ([100cac0](https://github.com/orochibraru/orochibraru/commit/100cac0b941161d50f6172aa7f40e3b01defccbf))
+  ([100cac0](https://github.com/zedensix/zedensix/commit/100cac0b941161d50f6172aa7f40e3b01defccbf))
 - more ranting
-  ([2174f6b](https://github.com/orochibraru/orochibraru/commit/2174f6b86da7a49c52f46d518f982573e3c2a55b))
+  ([2174f6b](https://github.com/zedensix/zedensix/commit/2174f6b86da7a49c52f46d518f982573e3c2a55b))
 - a bit more content
-  ([45461d1](https://github.com/orochibraru/orochibraru/commit/45461d1fc61a112c309da40a3ad2eaa83c718de2))
+  ([45461d1](https://github.com/zedensix/zedensix/commit/45461d1fc61a112c309da40a3ad2eaa83c718de2))
 - website
-  ([a49d285](https://github.com/orochibraru/orochibraru/commit/a49d285d39c604fee3a1f77bd6fa6a0606ce6448))
+  ([a49d285](https://github.com/zedensix/zedensix/commit/a49d285d39c604fee3a1f77bd6fa6a0606ce6448))
 
 ### Bug Fixes
 
 - db migration
-  ([2c02fc5](https://github.com/orochibraru/orochibraru/commit/2c02fc519b05319afdec358bef16952cd94e0d62))
+  ([2c02fc5](https://github.com/zedensix/zedensix/commit/2c02fc519b05319afdec358bef16952cd94e0d62))
 - syntax highlighting
-  ([a892b4d](https://github.com/orochibraru/orochibraru/commit/a892b4d9012e510facae3fe42aa56aba007e540e))
+  ([a892b4d](https://github.com/zedensix/zedensix/commit/a892b4d9012e510facae3fe42aa56aba007e540e))
 - contributing
-  ([351aa49](https://github.com/orochibraru/orochibraru/commit/351aa49809b6f0367c724c88ab006eb2de404f39))
+  ([351aa49](https://github.com/zedensix/zedensix/commit/351aa49809b6f0367c724c88ab006eb2de404f39))
 - detect and build docs categories
-  ([c65222a](https://github.com/orochibraru/orochibraru/commit/c65222a00c9d0776c348076e0c62804a557f6946))
+  ([c65222a](https://github.com/zedensix/zedensix/commit/c65222a00c9d0776c348076e0c62804a557f6946))
 - svelte sync before build
-  ([8916724](https://github.com/orochibraru/orochibraru/commit/8916724cd82b425d1f3bcef0a33d0494fed4d8f4))
+  ([8916724](https://github.com/zedensix/zedensix/commit/8916724cd82b425d1f3bcef0a33d0494fed4d8f4))
 - broken import
-  ([1f0c114](https://github.com/orochibraru/orochibraru/commit/1f0c1147a0db6e488c9dc72268534164e2ee35d9))
+  ([1f0c114](https://github.com/zedensix/zedensix/commit/1f0c1147a0db6e488c9dc72268534164e2ee35d9))
 - content
-  ([5e59d80](https://github.com/orochibraru/orochibraru/commit/5e59d802bce4e3e1146ca42ce5b754d61efba4cc))
+  ([5e59d80](https://github.com/zedensix/zedensix/commit/5e59d802bce4e3e1146ca42ce5b754d61efba4cc))
 - build
-  ([c9469ff](https://github.com/orochibraru/orochibraru/commit/c9469ffabbada85a6da3f3e343deb7dadd50c7d0))
+  ([c9469ff](https://github.com/zedensix/zedensix/commit/c9469ffabbada85a6da3f3e343deb7dadd50c7d0))
 - docs layout & menus
-  ([fec0b8e](https://github.com/orochibraru/orochibraru/commit/fec0b8ebf8346720fdc6725193c72850268ee0d4))
+  ([fec0b8e](https://github.com/zedensix/zedensix/commit/fec0b8ebf8346720fdc6725193c72850268ee0d4))
 - deploy key
-  ([ce683ca](https://github.com/orochibraru/orochibraru/commit/ce683ca4024e0476c8f01af7165ad74dd04edc7e))
+  ([ce683ca](https://github.com/zedensix/zedensix/commit/ce683ca4024e0476c8f01af7165ad74dd04edc7e))
 - trigger custom flow from other repos (docs)
-  ([2b30584](https://github.com/orochibraru/orochibraru/commit/2b30584fe8eaa5b6bcb19ab735a44b659711b92b))
+  ([2b30584](https://github.com/zedensix/zedensix/commit/2b30584fe8eaa5b6bcb19ab735a44b659711b92b))
 - seo
-  ([73a7fc5](https://github.com/orochibraru/orochibraru/commit/73a7fc57bffcd163f4270a777499d19efa01b059))
+  ([73a7fc5](https://github.com/zedensix/zedensix/commit/73a7fc57bffcd163f4270a777499d19efa01b059))
 - no readme
-  ([52e807f](https://github.com/orochibraru/orochibraru/commit/52e807f6329360296cdadbabd626a9be67db643e))
+  ([52e807f](https://github.com/zedensix/zedensix/commit/52e807f6329360296cdadbabd626a9be67db643e))
 - struct
-  ([2a3b2bb](https://github.com/orochibraru/orochibraru/commit/2a3b2bb8ce58004213bc56f23e9101fb15b22092))
+  ([2a3b2bb](https://github.com/zedensix/zedensix/commit/2a3b2bb8ce58004213bc56f23e9101fb15b22092))
 - fresh docker builds
-  ([3c22c96](https://github.com/orochibraru/orochibraru/commit/3c22c96165c4690b26356205dcc4f53200a9c732))
+  ([3c22c96](https://github.com/zedensix/zedensix/commit/3c22c96165c4690b26356205dcc4f53200a9c732))
 - faster loading
-  ([4d62dfd](https://github.com/orochibraru/orochibraru/commit/4d62dfde902962ba0e675fc5e0a7cdab9572968d))
+  ([4d62dfd](https://github.com/zedensix/zedensix/commit/4d62dfde902962ba0e675fc5e0a7cdab9572968d))
 - content
-  ([7c989ae](https://github.com/orochibraru/orochibraru/commit/7c989aecfb6db512b43fa3eea603e981546fc4d3))
+  ([7c989ae](https://github.com/zedensix/zedensix/commit/7c989aecfb6db512b43fa3eea603e981546fc4d3))
 - lint
-  ([a0fb3c4](https://github.com/orochibraru/orochibraru/commit/a0fb3c4ef073acf5f1c6a963d9563f9f02a438ca))
+  ([a0fb3c4](https://github.com/zedensix/zedensix/commit/a0fb3c4ef073acf5f1c6a963d9563f9f02a438ca))
 - tailwint
-  ([81efe3a](https://github.com/orochibraru/orochibraru/commit/81efe3a1e5ee88adca593ed68155148441213caa))
+  ([81efe3a](https://github.com/zedensix/zedensix/commit/81efe3a1e5ee88adca593ed68155148441213caa))
 - nuvio hosted instance link
-  ([5dac3f2](https://github.com/orochibraru/orochibraru/commit/5dac3f28621b3eae48a4590dfd648869065eb28b))
+  ([5dac3f2](https://github.com/zedensix/zedensix/commit/5dac3f28621b3eae48a4590dfd648869065eb28b))
 - penombre docs
-  ([7e9b1f0](https://github.com/orochibraru/orochibraru/commit/7e9b1f0123e761660ae5bdc2f15eeb822137b343))
+  ([7e9b1f0](https://github.com/zedensix/zedensix/commit/7e9b1f0123e761660ae5bdc2f15eeb822137b343))
 - links
-  ([f197e71](https://github.com/orochibraru/orochibraru/commit/f197e71510fc5e63239cae086894d5f60503ade7))
+  ([f197e71](https://github.com/zedensix/zedensix/commit/f197e71510fc5e63239cae086894d5f60503ade7))
 - links
-  ([f9a8d19](https://github.com/orochibraru/orochibraru/commit/f9a8d1997e1d0e317bf6881eee91d9bd49f393c0))
+  ([f9a8d19](https://github.com/zedensix/zedensix/commit/f9a8d1997e1d0e317bf6881eee91d9bd49f393c0))
 - build
-  ([2faad1c](https://github.com/orochibraru/orochibraru/commit/2faad1c024347eac4283475fe381ba47b2a9fa0b))
+  ([2faad1c](https://github.com/zedensix/zedensix/commit/2faad1c024347eac4283475fe381ba47b2a9fa0b))

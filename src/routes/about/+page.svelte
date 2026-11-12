@@ -15,7 +15,7 @@
 				description:
 					"Self-taught software engineer with ten years of experience, building free self-hosted tools for homelabs.",
 				url: "https://zedensix.com/about",
-				sameAs: ["https://github.com/zedensix", "https://hub.docker.com/u/orochibraru"],
+				sameAs: ["https://github.com/zedensix", "https://hub.docker.com/u/zedensix"],
 				knowsAbout: ["self-hosting", "homelab", "Docker", "SvelteKit", "Bun", "TypeScript"],
 			},
 		},
@@ -223,7 +223,7 @@
 				<a class="btn" href="https://github.com/zedensix?tab=repositories" target="_blank" rel="noopener"
 					>GitHub &rarr;</a
 				>
-				<a class="btn" href="https://hub.docker.com/u/orochibraru" target="_blank" rel="noopener"
+				<a class="btn" href="https://hub.docker.com/u/zedensix" target="_blank" rel="noopener"
 					>Docker Hub &rarr;</a
 				>
 			</div>
