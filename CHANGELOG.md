@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.25.1](https://github.com/zedensix/zedensix/compare/v1.25.0...v1.25.1) (2026-11-12)
+
+### Bug Fixes
+
+- **build:** migrate to SvelteKit 3 so @sveltejs/adapter-bun builds the server
+  binary
+  ([014961e](https://github.com/zedensix/zedensix/commit/014961ed52980ff128de6f34c486f522f5105d9a))
+- remove oro references
+  ([f836d23](https://github.com/zedensix/zedensix/commit/f836d2321f0335dccf1b578259e85fc72a678f7e))
+
 ## [1.25.0](https://github.com/zedensix/zedensix/compare/v1.24.0...v1.25.0) (2026-11-12)
 
 ### Features
