@@ -5,6 +5,7 @@
 		ChevronUp,
 		ExternalLink,
 		Eye,
+		Link,
 		PenLine,
 		Plus,
 		RefreshCw,
@@ -12,6 +13,7 @@
 	} from "@lucide/svelte";
 	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
+	import { page } from "$app/state";
 	import { ago, statusClass, syncScroll } from "$lib/admin";
 	import Confirm from "$lib/components/admin/Confirm.svelte";
 	import Editor from "$lib/components/admin/Editor.svelte";
@@ -20,7 +22,7 @@
 	let { data, form } = $props();
 
 	const TABS = ["Page", "Card", "SEO", "Buttons", "Docs"] as const;
-	let tab = $state<(typeof TABS)[number]>("Page");
+	let tab = $state<(typeof TABS)[number]>(page.url.hash === "#docs" ? "Docs" : "Page");
 	let previewing = $state(false);
 	let saving = $state(false);
 	let confirmer = $state<Confirm>();
@@ -39,27 +41,34 @@
 	let sync = $derived<SyncState>({ job: data.job, runs: data.runs });
 	const busy = $derived(sync.job?.status === "queued" || sync.job?.status === "running");
 	let asking = $state(false);
+	let syncProblem = $state("");
 	const syncUrl = $derived(
 		resolve("/admin/(app)/projects/[repo]/sync", { repo: data.project.repo }),
 	);
 
 	async function refreshSync(method: "GET" | "POST" = "GET") {
-		const response = await fetch(syncUrl, { method });
-		if (response.ok) {
+		try {
+			const response = await fetch(syncUrl, { method });
+			if (!response.ok) {
+				syncProblem = `The sync ${method === "POST" ? "didn't start" : "status didn't load"}: ${response.status} ${response.statusText}`;
+				return;
+			}
+			syncProblem = "";
 			// JSON carries dates as strings; the page reads them as Dates
 			sync = JSON.parse(await response.text(), (key, value) =>
 				(key.endsWith("At") || key === "runAfter") && typeof value === "string"
 					? new Date(value)
 					: value,
 			) as SyncState;
+		} catch (cause) {
+			syncProblem = `The connection dropped: ${cause}`;
 		}
 	}
 
 	async function resync() {
 		asking = true;
-		await refreshSync("POST").finally(() => {
-			asking = false;
-		});
+		await refreshSync("POST");
+		asking = false;
 	}
 
 	$effect(() => {
@@ -267,6 +276,35 @@
 		</section>
 
 		<section hidden={tab !== "Docs"}>
+			<div class="apanel mb-4 flex flex-wrap items-center gap-3 p-3 text-[.8125rem] text-dim">
+				<label class="flex flex-wrap items-center gap-2">
+					GitHub repo
+					<select class="field h-8 w-auto py-0 font-mono" name="githubRepo" value={data.project.githubRepo ?? ""}>
+						<option value="">None</option>
+						{#if data.project.githubRepo}
+							<option>{data.project.githubRepo}</option>
+						{/if}
+						{#each data.linkable as repo (repo)}
+							<option>{repo}</option>
+						{/each}
+					</select>
+				</label>
+				<button class="abtn" type="submit" formaction="?/link">
+					<Link class="size-3.5" aria-hidden="true" /> Link
+				</button>
+				{#if !data.linkable.length}
+					<a class="text-dim hover:text-fg" href={resolve("/admin/github")}
+						>Install the GitHub App on more repos to pick another</a
+					>
+				{/if}
+			</div>
+			{#if data.project.githubRepo && !data.readable}
+				<p class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">
+					The GitHub App can't read <code>{data.project.githubRepo}</code>: the repo moved, was renamed,
+					or isn't in the app's installation. Link the repo it is now, or
+					<a class="underline" href={resolve("/admin/github")}>install the app on it</a>.
+				</p>
+			{/if}
 			{#if data.project.githubRepo}
 				<div class="mb-4 flex flex-wrap items-center gap-3 text-[.8125rem] text-dim">
 					<p>
@@ -284,6 +322,9 @@
 						{busy ? (sync.job?.status === "running" ? "Syncing…" : "Queued…") : "Resync now"}
 					</button>
 				</div>
+				{#if syncProblem}
+					<p class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">{syncProblem}</p>
+				{/if}
 				{#if sync.job && sync.job.status !== "ok"}
 					<p class="mb-4 border border-line bg-surface px-3 py-2 text-sm" role="status">
 						{#if sync.job.status === "queued" && sync.job.runAfter}
@@ -322,7 +363,7 @@
 					</table>
 				</div>
 			{:else}
-				<p class="apanel p-8 text-center text-sm text-dim">This project has no linked repo, so there are no docs to sync.</p>
+				<p class="apanel p-8 text-center text-sm text-dim">No linked repo, so no docs to sync. Pick one above.</p>
 			{/if}
 		</section>
 	</div>

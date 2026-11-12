@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LoaderCircle } from "@lucide/svelte";
+	import { LoaderCircle, Unlink } from "@lucide/svelte";
 	import { SvelteSet } from "svelte/reactivity";
 	import { enhance } from "$app/forms";
 	import { invalidateAll } from "$app/navigation";
@@ -25,6 +25,7 @@
 
 	// while "sync every project" runs, each project spins until the server says it's done
 	let syncing = $state(false);
+	let refreshing = $state(false);
 	const pending = new SvelteSet<string>();
 	let failures = $state<Record<string, string>>({});
 	let problem = $state("");
@@ -39,7 +40,7 @@
 		try {
 			const response = await fetch("/admin/github/sync", { method: "POST" });
 			if (!response.ok || !response.body) {
-				problem = `The sync didn't start: ${response.status} ${response.statusText}`;
+				problem = `The sync didn't start: ${(await response.text()) || `${response.status} ${response.statusText}`}`;
 				return;
 			}
 			let rest = "";
@@ -70,6 +71,21 @@
 	}
 </script>
 
+{#snippet unlink()}
+	<form method="POST" action="?/forget" use:enhance>
+		<button
+			class="abtn abtn-danger"
+			type="submit"
+			onclick={(event) =>
+				confirmer?.guard(event, {
+					title: "Unlink this GitHub App?",
+					body: "Syncs stop until another app is created and installed. Projects keep their pages and repo links. The app stays on GitHub until you delete it there.",
+					action: "Unlink app",
+				})}><Unlink class="size-3.5" aria-hidden="true" /> Unlink app</button
+		>
+	</form>
+{/snippet}
+
 <svelte:head>
 	<title>GitHub | zedensix admin</title>
 </svelte:head>
@@ -81,7 +97,28 @@
 	{/if}
 </div>
 
-{#if !data.app}
+{#if form?.message}
+	<p class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">{form.message}</p>
+{/if}
+{#if data.problem}
+	<p class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">{data.problem}</p>
+{/if}
+{#if problem}
+	<p class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">{problem}</p>
+{/if}
+
+{#if data.broken}
+	<div class="apanel flex flex-wrap items-center gap-3 p-4">
+		<p class="mr-auto text-sm text-hot" role="alert">The GitHub App's credentials can't be read: {data.broken}</p>
+		{@render unlink()}
+	</div>
+{:else if !data.app}
+	{#if form && "forgotten" in form}
+		<p class="mb-4 border border-line bg-surface px-3 py-2 text-sm" role="status">
+			App unlinked. Create the new one below, install it, then relink each project from its Docs tab
+			if its repo moved.
+		</p>
+	{/if}
 	<div class="apanel max-w-xl p-5">
 		<p class="mb-5 text-sm text-dim">
 			Docs sync through a GitHub App this site creates for itself: read-only access to contents,
@@ -106,20 +143,30 @@
 		<a class="abtn abtn-primary" href={data.app.installUrl} target="_blank" rel="noopener"
 			>{data.app.installed ? "Choose repos" : "Install the app"}</a
 		>
-		<form method="POST" action="?/refresh" use:enhance>
-			<button class="abtn" type="submit">Refresh repo list</button>
-		</form>
-		<button class="abtn" type="button" onclick={syncAll} disabled={syncing}>
-			{#if syncing}<LoaderCircle class="size-3.5 animate-spin" aria-hidden="true" />{/if}
-			{syncing ? "Syncing…" : "Sync every project"}
-		</button>
+		{#if data.app.installed}
+			<form
+				method="POST"
+				action="?/refresh"
+				use:enhance={() => {
+					refreshing = true;
+					return async ({ update }) => {
+						await update();
+						refreshing = false;
+					};
+				}}
+			>
+				<button class="abtn" type="submit" disabled={refreshing}>
+					{#if refreshing}<LoaderCircle class="size-3.5 animate-spin" aria-hidden="true" />{/if}
+					Refresh repo list
+				</button>
+			</form>
+			<button class="abtn" type="button" onclick={syncAll} disabled={syncing}>
+				{#if syncing}<LoaderCircle class="size-3.5 animate-spin" aria-hidden="true" />{/if}
+				{syncing ? "Syncing…" : "Sync every project"}
+			</button>
+		{/if}
+		{@render unlink()}
 	</div>
-	{#if form?.message}
-		<p class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">{form.message}</p>
-	{/if}
-	{#if problem}
-		<p class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">{problem}</p>
-	{/if}
 	<section class="apanel">
 		<header>Repos not yet a project</header>
 		{#each data.repos as repo (repo)}
@@ -170,6 +217,13 @@
 								<td class="w-full">
 									<button type="button" class="row-link text-left" onclick={() => (tab = row.repo)}>{row.name}</button>
 									<span class="block font-mono text-xs text-dim">{row.githubRepo}</span>
+									{#if !row.readable}
+										<a
+											class="relative z-1 block w-fit text-xs text-hot underline"
+											href={`${resolve("/admin/(app)/projects/[repo]", { repo: row.repo })}#docs`}
+											>The app can't read this repo: relink it</a
+										>
+									{/if}
 									{#if error}
 										<span class="block max-w-xl truncate text-xs text-hot" title={error}>{error}</span>
 									{/if}
@@ -262,24 +316,6 @@
 			{/if}
 		{/if}
 	</section>
-	<form
-		class="mt-16 flex items-center gap-3 border-t border-line pt-4 text-sm text-dim"
-		method="POST"
-		action="?/forget"
-		use:enhance
-	>
-		<span>Forgetting the app here leaves it on GitHub until you delete it there.</span>
-		<button
-			class="abtn abtn-danger ml-auto"
-			type="submit"
-			onclick={(event) =>
-				confirmer?.guard(event, {
-					title: "Forget this GitHub App?",
-					body: "It stays installed on GitHub until you delete it there.",
-					action: "Forget app",
-				})}>Forget this app</button
-		>
-	</form>
 {/if}
 
 <Confirm bind:this={confirmer} />

@@ -10,6 +10,10 @@ export const load = async ({ url, cookies }) => {
 		throw error(400, "This GitHub callback doesn't match an app creation started here");
 	}
 	cookies.delete("github_manifest_state", { path: "/admin/github" });
-	await exchangeManifestCode(code);
+	try {
+		await exchangeManifestCode(code);
+	} catch (cause) {
+		throw error(502, cause instanceof Error ? cause.message : "GitHub didn't hand the app over");
+	}
 	throw redirect(303, "/admin/github");
 };

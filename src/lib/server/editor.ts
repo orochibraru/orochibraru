@@ -305,6 +305,37 @@ export function createProject(fullName: string): ProjectRow {
 	return row as ProjectRow;
 }
 
+/** Point a project at another installed repo (a transfer, a rename), or at none. */
+export function linkProjectRepo(repo: string, fullName: string | null): ProjectRow {
+	if (!getProject(repo)) {
+		throw new EditorError(`no project ${repo}`);
+	}
+	let defaultBranch: string | null = null;
+	if (fullName) {
+		const installed = getDb()
+			.select()
+			.from(installedRepo)
+			.where(eq(installedRepo.fullName, fullName))
+			.get();
+		if (!installed) {
+			throw new EditorError(`${fullName} isn't a repo the GitHub App can read`);
+		}
+		const owner = listAllProjects().find((row) => row.githubRepo === fullName && row.repo !== repo);
+		if (owner) {
+			throw new EditorError(`${fullName} is already linked to /${owner.repo}`);
+		}
+		defaultBranch = installed.defaultBranch;
+	}
+	const [row] = getDb()
+		.update(project)
+		.set({ githubRepo: fullName, defaultBranch, updatedAt: new Date() })
+		.where(eq(project.repo, repo))
+		.returning()
+		.all();
+	invalidate();
+	return row as ProjectRow;
+}
+
 export const recentSyncRuns = (limit = 8, repo?: string) =>
 	getDb()
 		.select()
@@ -314,9 +345,16 @@ export const recentSyncRuns = (limit = 8, repo?: string) =>
 		.limit(limit)
 		.all();
 
-/** Every project with a linked repo and its most recent sync run, if it has one. */
+/** Every project with a linked repo, whether the app can read it, and its most recent sync run. */
 export function lastSyncs() {
 	const db = getDb();
+	const installed = new Set(
+		db
+			.select({ fullName: installedRepo.fullName })
+			.from(installedRepo)
+			.all()
+			.map((row) => row.fullName),
+	);
 	const latest = db
 		.select({ id: max(syncRun.id) })
 		.from(syncRun)
@@ -334,7 +372,11 @@ export function lastSyncs() {
 		.where(isNotNull(project.githubRepo))
 		.orderBy(asc(project.position), asc(project.name))
 		.all()
-		.map((row) => ({ ...row, run: runs.get(row.repo) ?? null }));
+		.map((row) => ({
+			...row,
+			readable: installed.has(row.githubRepo ?? ""),
+			run: runs.get(row.repo) ?? null,
+		}));
 }
 
 export type SyncChangeRow = typeof syncChange.$inferSelect;

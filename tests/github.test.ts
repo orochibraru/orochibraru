@@ -8,6 +8,7 @@ import {
 	appJwt,
 	exchangeManifestCode,
 	getGithubApp,
+	github,
 	recordInstallation,
 	useGithubFetch,
 } from "../src/lib/server/github/app";
@@ -76,6 +77,9 @@ useGithubFetch(async (input, init) => {
 		return release
 			? Response.json({ tag_name: release.tag })
 			: new Response("no release", { status: 404 });
+	}
+	if (path.startsWith("/repos/moved/tool/")) {
+		return Response.json({ message: "Resource not accessible by integration" }, { status: 403 });
 	}
 	if (outage && path.startsWith("/repos/me/tool/commits/")) {
 		return new Response("bad gateway", { status: 502 });
@@ -148,6 +152,17 @@ describe("the app", () => {
 			exp: 1540,
 			iss: "42",
 		});
+	});
+});
+
+describe("errors", () => {
+	test("carry the reason GitHub gave", async () => {
+		const app = await getGithubApp();
+		await expect(
+			github(app as NonNullable<typeof app>, "/repos/moved/tool/commits/main"),
+		).rejects.toThrow(
+			"GitHub failed on /repos/moved/tool/commits/main (403): Resource not accessible by integration",
+		);
 	});
 });
 

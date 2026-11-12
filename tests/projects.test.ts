@@ -11,7 +11,14 @@ import {
 	syncJob,
 	syncRun,
 } from "../src/lib/server/db/schema";
-import { createProject, deleteProject, EditorError } from "../src/lib/server/editor";
+import {
+	createProject,
+	deleteProject,
+	EditorError,
+	getProject,
+	lastSyncs,
+	linkProjectRepo,
+} from "../src/lib/server/editor";
 import { freshSite } from "./helpers";
 
 const site = freshSite();
@@ -74,5 +81,35 @@ describe("deleting a project", () => {
 	test("adding the repo back makes its address a page again", () => {
 		createProject("me/tool");
 		expect(wasProjectDeleted("tool")).toBe(false);
+	});
+});
+
+describe("linking a project to a repo", () => {
+	test("follows a moved repo, refuses one the app can't read or another project has, and unlinks", () => {
+		const db = site.db;
+		db.insert(installedRepo)
+			.values([
+				{ fullName: "new-owner/tool", installationId: 8, defaultBranch: "trunk" },
+				{ fullName: "me/other", installationId: 7, defaultBranch: "main" },
+			])
+			.run();
+		createProject("me/other");
+		db.delete(installedRepo).where(eq(installedRepo.fullName, "me/tool")).run();
+		expect(lastSyncs().find((row) => row.repo === "tool")?.readable).toBe(false);
+
+		linkProjectRepo("tool", "new-owner/tool");
+		expect(getProject("tool")).toMatchObject({
+			githubRepo: "new-owner/tool",
+			defaultBranch: "trunk",
+		});
+		expect(lastSyncs().find((row) => row.repo === "tool")?.readable).toBe(true);
+
+		expect(() => linkProjectRepo("tool", "gone/tool")).toThrow(
+			"isn't a repo the GitHub App can read",
+		);
+		expect(() => linkProjectRepo("tool", "me/other")).toThrow("already linked to /other");
+
+		linkProjectRepo("tool", null);
+		expect(getProject("tool")).toMatchObject({ githubRepo: null, defaultBranch: null });
 	});
 });

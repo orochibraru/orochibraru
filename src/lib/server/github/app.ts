@@ -24,6 +24,16 @@ export class GithubError extends Error {
 	status?: number;
 }
 
+/** A failed answer as an error, with the reason GitHub gave in its body. */
+async function refused(response: Response, what: string) {
+	const body = (await response.json().catch(() => null)) as { message?: string } | null;
+	const failure = new GithubError(
+		`${what} (${response.status})${body?.message ? `: ${body.message}` : ""}`,
+	);
+	failure.status = response.status;
+	return failure;
+}
+
 /** What GitHub is told the app is: read-only on contents, one webhook, push and release events. */
 export function manifest(origin = env.origin) {
 	return {
@@ -76,7 +86,7 @@ export async function exchangeManifestCode(code: string) {
 		headers: { accept: "application/vnd.github+json" },
 	});
 	if (!response.ok) {
-		throw new GithubError(`GitHub refused the manifest code: ${response.status}`);
+		throw await refused(response, "GitHub refused the manifest code");
 	}
 	const app = (await response.json()) as {
 		id: number;
@@ -147,7 +157,7 @@ export async function installationToken(app: App): Promise<string> {
 		headers: { accept: "application/vnd.github+json", authorization: `Bearer ${appJwt(app)}` },
 	});
 	if (!response.ok) {
-		throw new GithubError(`GitHub refused an installation token: ${response.status}`);
+		throw await refused(response, "GitHub refused an installation token");
 	}
 	const body = (await response.json()) as { token: string; expires_at: string };
 	tokens.set(app.installationId, { token: body.token, expires: Date.parse(body.expires_at) });
@@ -164,9 +174,7 @@ export async function github<T>(app: App, path: string): Promise<T> {
 		},
 	});
 	if (!response.ok) {
-		const failure = new GithubError(`GitHub answered ${response.status} for ${path}`);
-		failure.status = response.status;
-		throw failure;
+		throw await refused(response, `GitHub failed on ${path}`);
 	}
 	return (await response.json()) as T;
 }

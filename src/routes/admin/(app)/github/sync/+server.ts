@@ -1,4 +1,5 @@
 import { requireAdmin } from "$lib/server/admin";
+import { getGithubApp } from "$lib/server/github/app";
 import { reconcile } from "$lib/server/github/worker";
 
 export type SyncEvent = { repo: string; error?: string };
@@ -6,6 +7,10 @@ export type SyncEvent = { repo: string; error?: string };
 /** "Sync every project now": reconcile, one JSON line per project as it finishes. */
 export const POST = async (event) => {
 	await requireAdmin(event);
+	const app = await getGithubApp();
+	if (!app?.installationId) {
+		return new Response("The GitHub App isn't installed: nothing can sync.", { status: 409 });
+	}
 	const encoder = new TextEncoder();
 	const body = new ReadableStream<Uint8Array>({
 		async start(controller) {

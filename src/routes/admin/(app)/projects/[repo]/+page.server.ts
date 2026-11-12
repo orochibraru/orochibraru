@@ -4,11 +4,14 @@ import {
 	docsVersions,
 	EditorError,
 	getProject,
+	lastSyncs,
+	linkProjectRepo,
+	listAddableRepos,
 	projectImages,
 	recentSyncRuns,
 	updateProject,
 } from "$lib/server/editor";
-import { latestJob } from "$lib/server/github/worker";
+import { latestJob, queueSync } from "$lib/server/github/worker";
 
 const projectOr404 = (repo: string) => {
 	const row = getProject(repo);
@@ -24,6 +27,8 @@ export const load = ({ params }) => ({
 	job: latestJob(params.repo) ?? null,
 	versions: docsVersions(params.repo).map(({ channel, ref, sha }) => ({ channel, ref, sha })),
 	images: projectImages(params.repo),
+	linkable: listAddableRepos().map((repo) => repo.fullName),
+	readable: lastSyncs().some((row) => row.repo === params.repo && row.readable),
 });
 
 const text = (form: FormData, name: string) => String(form.get(name) ?? "").trim();
@@ -70,6 +75,22 @@ export const actions = {
 			throw cause;
 		}
 		return { saved: true };
+	},
+	link: async ({ params, request }) => {
+		const row = projectOr404(params.repo);
+		const fullName = text(await request.formData(), "githubRepo") || null;
+		try {
+			linkProjectRepo(row.repo, fullName);
+		} catch (cause) {
+			if (cause instanceof EditorError) {
+				return fail(400, { message: cause.message });
+			}
+			throw cause;
+		}
+		if (fullName) {
+			queueSync(row.repo, { reason: "manual" });
+		}
+		return { linked: fullName };
 	},
 	delete: ({ params }) => {
 		deleteProject(projectOr404(params.repo).repo);

@@ -10,16 +10,29 @@ import {
 	refreshInstalledRepos,
 } from "$lib/server/github/app";
 
+const reason = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
+
 export const load = async ({ url, cookies }) => {
-	const app = await getGithubApp();
-	// GitHub sends you back here after an install, often before its webhook lands
-	const installed = Number(url.searchParams.get("installation_id"));
-	if (app && installed && app.installationId !== installed) {
-		await recordInstallation(installed).catch((cause) => console.error(cause));
+	let problem = "";
+	let broken = "";
+	let current: Awaited<ReturnType<typeof getGithubApp>> = null;
+	try {
+		const app = await getGithubApp();
+		// GitHub sends you back here after an install, often before its webhook lands
+		const installed = Number(url.searchParams.get("installation_id"));
+		if (app && installed && app.installationId !== installed) {
+			await recordInstallation(installed).catch((cause) => {
+				console.error(cause);
+				problem = `The installation didn't record: ${reason(cause)}`;
+			});
+		}
+		current = await getGithubApp();
+	} catch (cause) {
+		// the app's row exists but can't be read: it can only be unlinked
+		broken = reason(cause);
 	}
-	const current = await getGithubApp();
 	let state: string | null = null;
-	if (!current) {
+	if (!current && !broken) {
 		state = crypto.randomUUID();
 		cookies.set("github_manifest_state", state, {
 			path: "/admin/github",
@@ -30,6 +43,8 @@ export const load = async ({ url, cookies }) => {
 		});
 	}
 	return {
+		broken,
+		problem,
 		app: current && {
 			slug: current.slug,
 			installed: !!current.installationId,
@@ -50,10 +65,11 @@ export const actions = {
 		try {
 			await refreshInstalledRepos();
 		} catch (cause) {
-			return fail(502, { message: cause instanceof Error ? cause.message : "GitHub failed" });
+			return fail(502, { message: `The repo list didn't refresh: ${reason(cause)}` });
 		}
 	},
 	forget: () => {
 		forgetGithubApp();
+		return { forgotten: true };
 	},
 };
