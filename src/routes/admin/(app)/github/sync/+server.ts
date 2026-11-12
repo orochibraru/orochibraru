@@ -1,6 +1,6 @@
-import { requireAdmin } from "$lib/server/admin";
-import { getGithubApp } from "$lib/server/github/app";
-import { reconcile } from "$lib/server/github/worker";
+import { requireAdmin } from "#lib/server/admin.ts";
+import { getGithubApp } from "#lib/server/github/app.ts";
+import { reconcile } from "#lib/server/github/worker.ts";
 
 export type SyncEvent = { repo: string; error?: string };
 

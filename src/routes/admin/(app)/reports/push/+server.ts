@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
-import { requireAdmin } from "$lib/server/admin";
-import { type BrowserSubscription, subscribe, unsubscribe } from "$lib/server/push";
+import { requireAdmin } from "#lib/server/admin.ts";
+import { type BrowserSubscription, subscribe, unsubscribe } from "#lib/server/push.ts";
 
 const isSubscription = (value: unknown): value is BrowserSubscription => {
 	const { endpoint, keys } = (value ?? {}) as Partial<BrowserSubscription>;

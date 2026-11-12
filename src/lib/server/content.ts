@@ -2,7 +2,7 @@
 // directly. Rendering (Shiki above all) is cached in memory until a save or a
 // sync calls invalidate().
 import { and, asc, count, eq } from "drizzle-orm";
-import { SITE } from "$lib/seo";
+import { SITE } from "#lib/seo.ts";
 import { getDb } from "./db";
 import {
 	deletedPost,

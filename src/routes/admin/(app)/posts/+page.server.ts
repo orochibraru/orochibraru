@@ -5,8 +5,8 @@ import {
 	getPostById,
 	listAllPosts,
 	setPostStatus,
-} from "$lib/server/editor";
-import { getUmami, pathViews } from "$lib/server/umami";
+} from "#lib/server/editor.ts";
+import { getUmami, pathViews } from "#lib/server/umami.ts";
 
 const postFrom = async (request: Request) => {
 	const post = getPostById(Number((await request.formData()).get("id")));

@@ -10,8 +10,8 @@ import {
 	projectImages,
 	recentSyncRuns,
 	updateProject,
-} from "$lib/server/editor";
-import { latestJob, queueSync } from "$lib/server/github/worker";
+} from "#lib/server/editor.ts";
+import { latestJob, queueSync } from "#lib/server/github/worker.ts";
 
 const projectOr404 = (repo: string) => {
 	const row = getProject(repo);

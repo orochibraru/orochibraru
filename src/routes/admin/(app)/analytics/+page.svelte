@@ -1,8 +1,8 @@
 <script lang="ts">
+	import Delta from "#lib/components/admin/Delta.svelte";
+	import VisitorsChart from "#lib/components/admin/VisitorsChart.svelte";
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
-	import Delta from "$lib/components/admin/Delta.svelte";
-	import VisitorsChart from "$lib/components/admin/VisitorsChart.svelte";
 
 	let { data } = $props();
 
@@ -28,7 +28,7 @@
 			: `${Math.round(seconds)}s`;
 	const ratio = (part: number, whole: number) => (whole ? part / whole : 0);
 	const href = (days: number) => {
-		const url = new URL(page.url);
+		const url = new URL(page.url.href);
 		url.searchParams.set("days", String(days));
 		return `${url.pathname}${url.search}`;
 	};
@@ -65,8 +65,16 @@
 			{#each items as item (item.label)}
 				<tr>
 					<!-- the bar behind the label is the row's share of the top one -->
-					<td class="relative max-w-0 truncate" title={item.title ?? item.label}>
-						<span class="absolute inset-y-1 left-0 rounded-r-sm bg-accent/10" style:width="{(item.value / top) * 100}%"></span>
+
+					<td
+						class="relative max-w-0 truncate"
+						title={item.title ?? item.label}
+					>
+						<span
+							class="absolute inset-y-1 left-0 rounded-r-sm bg-accent/10"
+							style:width="{item.value / top * 100}%"
+						></span>
+
 						<span class="relative">{item.label}</span>
 					</td>
 					<td class="text-right tabular-nums">{item.value}</td>
@@ -81,7 +89,9 @@
 
 {#snippet notConnected(service: string)}
 	<p class="px-3 py-6 text-center text-sm text-dim">
-		{service} isn&rsquo;t connected. <a class="text-cool" href={resolve("/admin/settings")}>Set it up in Settings</a>.
+		{service} isn’t connected.
+		<a class="text-cool" href={resolve('admin/settings')}>Set it up in Settings</a>
+		.
 	</p>
 {/snippet}
 
@@ -111,13 +121,31 @@
 		</header>
 		{#if data.umami}
 			{#await data.umami}
-				<p class="px-3 py-6 text-center text-sm text-dim">Asking Umami&hellip;</p>
+				<p class="px-3 py-6 text-center text-sm text-dim">Asking Umami…</p>
 			{:then report}
 				{@const before = report.previous}
 				{@render tiles([
-					["Visitors", compact.format(report.visitors), `${report.visitors} visitors`, [report.visitors, before.visitors]],
-					["Visits", compact.format(report.visits), `${report.visits} visits`, [report.visits, before.visits]],
-					["Views", compact.format(report.pageviews), `${report.pageviews} views`, [report.pageviews, before.pageviews]],
+					[
+						"Visitors",
+						compact.format(report.visitors),
+						`${report.visitors} visitors`,
+						[report.visitors, before.visitors]
+					],
+
+					[
+						"Visits",
+						compact.format(report.visits),
+						`${report.visits} visits`,
+						[report.visits, before.visits]
+					],
+
+					[
+						"Views",
+						compact.format(report.pageviews),
+						`${report.pageviews} views`,
+						[report.pageviews, before.pageviews]
+					],
+
 					[
 						"Bounce rate",
 						report.visits ? percent.format(report.bounces / report.visits) : "–",
@@ -144,7 +172,9 @@
 				</div>
 			{:catch}
 				<p class="px-3 py-6 text-center text-sm text-hot">
-					Couldn&rsquo;t reach Umami. Saving it again in <a class="text-cool" href={resolve("/admin/settings")}>Settings</a> says why.
+					Couldn’t reach Umami. Saving it again in
+					<a class="text-cool" href={resolve('admin/settings')}>Settings</a>
+					says why.
 				</p>
 			{/await}
 		{:else}
@@ -159,11 +189,17 @@
 		</header>
 		{#if data.search}
 			{#await data.search}
-				<p class="px-3 py-6 text-center text-sm text-dim">Asking Search Console&hellip;</p>
+				<p class="px-3 py-6 text-center text-sm text-dim">Asking Search Console…</p>
 			{:then stats}
 				{@const before = stats.previous}
 				{@render tiles([
-					["Clicks", compact.format(stats.totals.clicks), `${stats.totals.clicks} clicks`, [stats.totals.clicks, before.clicks]],
+					[
+						"Clicks",
+						compact.format(stats.totals.clicks),
+						`${stats.totals.clicks} clicks`,
+						[stats.totals.clicks, before.clicks]
+					],
+
 					[
 						"Impressions",
 						compact.format(stats.totals.impressions),
@@ -203,7 +239,9 @@
 				</p>
 			{:catch}
 				<p class="px-3 py-6 text-center text-sm text-hot">
-					Couldn&rsquo;t reach Search Console. Saving it again in <a class="text-cool" href={resolve("/admin/settings")}>Settings</a> says why.
+					Couldn’t reach Search Console. Saving it again in
+					<a class="text-cool" href={resolve('admin/settings')}>Settings</a>
+					says why.
 				</p>
 			{/await}
 		{:else}

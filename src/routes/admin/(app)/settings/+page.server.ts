@@ -1,13 +1,13 @@
 import { fail } from "@sveltejs/kit";
-import { env } from "$lib/server/env";
+import { env } from "#lib/server/env.ts";
 import {
 	forgetSearchConsole,
 	getSearchConsole,
 	SearchConsoleError,
 	saveSearchConsole,
 	testSearchConsole,
-} from "$lib/server/search-console";
-import { forgetUmami, getUmami, saveUmami, testUmami, UmamiError } from "$lib/server/umami";
+} from "#lib/server/search-console.ts";
+import { forgetUmami, getUmami, saveUmami, testUmami, UmamiError } from "#lib/server/umami.ts";
 
 export const load = async () => {
 	const [umami, search] = await Promise.all([getUmami(), getSearchConsole()]);

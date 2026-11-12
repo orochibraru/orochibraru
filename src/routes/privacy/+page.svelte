@@ -1,6 +1,6 @@
 <script lang="ts">
+	import Meta from "#lib/components/Meta.svelte";
 	import { resolve } from "$app/paths";
-	import Meta from "$lib/components/Meta.svelte";
 
 	const EMAIL = "contact@zedensix.com";
 	const UPDATED = "17 September 2026";
@@ -16,9 +16,11 @@
 <main class="mx-auto max-w-page px-6">
 	<article class="prose">
 		<div class="pt-10 pb-5">
-			<a class="text-sm font-medium text-dim hover:text-accent" href={resolve("/")}
-				>&larr; Home</a
-			>
+			<a
+				class="text-sm font-medium text-dim hover:text-accent"
+				href={resolve("/")}
+			>← Home</a>
+
 			<span class="tag ml-3.5">Updated {UPDATED}</span>
 			<h1 class="mt-4.5 text-[clamp(2.4rem,6.5vw,4rem)]/none animate-rise stereo font-extrabold tracking-[-.045em]">
 				Privacy.
@@ -53,11 +55,9 @@
 				<li>country, region and city, looked up from your IP address</li>
 			</ul>
 			<p class="mt-5">
-				It sets <strong>no cookies</strong> and stores nothing on your device. Your IP address is
-				used at the moment of the visit and never saved. To group page views into a visit, Umami
-				keeps a one-way hash of your IP address and browser details, mixed with a secret that
-				changes every month, so visits can&rsquo;t be linked across months, across other sites, or
-				back to you by name.
+				It sets
+				<strong>no cookies</strong>
+				and stores nothing on your device. Your IP address is used at the moment of the visit and never saved. To group page views into a visit, Umami keeps a one-way hash of your IP address and browser details, mixed with a secret that changes every month, so visits can’t be linked across months, across other sites, or back to you by name.
 			</p>
 			<ul class="mt-5 list-disc pl-6">
 				<li>
@@ -75,8 +75,7 @@
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Server logs</h2>
 			<p>
-				Like any web server, this one logs each request: your IP address, the date and time, the URL
-				requested, the response status, the referrer and your browser&rsquo;s user agent.
+				Like any web server, this one logs each request: your IP address, the date and time, the URL requested, the response status, the referrer and your browser’s user agent.
 			</p>
 			<ul class="mt-5 list-disc pl-6">
 				<li>
@@ -96,8 +95,7 @@
 				used for automated decisions about you.
 			</p>
 			<p class="mt-5">
-				No accounts, no forms, no newsletter, no embeds, no ads. The light or dark theme you pick is
-				saved in your browser&rsquo;s local storage and never sent anywhere.
+				No accounts, no forms, no newsletter, no embeds, no ads. The light or dark theme you pick is saved in your browser’s local storage and never sent anywhere.
 			</p>
 		</section>
 
@@ -111,9 +109,9 @@
 				<li>object to it being processed at all</li>
 			</ul>
 			<p class="mt-5">
-				Email <a class="text-accent" href="mailto:{EMAIL}">{EMAIL}</a> and you&rsquo;ll get an answer within
-				a month. Because nothing here is tied to a name, I may need details such as your IP address and
-				the approximate time of your visit to find your data.
+				Email
+				<a class="text-accent" href="mailto:{EMAIL}">{EMAIL}</a>
+				and you’ll get an answer within a month. Because nothing here is tied to a name, I may need details such as your IP address and the approximate time of your visit to find your data.
 			</p>
 			<p class="mt-5">
 				To object without asking: block <code>anal.zedensix.com</code> with any content blocker.
@@ -132,9 +130,27 @@
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">The apps</h2>
 			<p>
 				This page covers this site only. The self-hosted apps have their own:
-				<a class="text-accent" href={resolve("/privacy/homerun")}>Homerun</a>,
-				<a class="text-accent" href={resolve("/privacy/opencount")}>OpenCount</a> and
-				<a class="text-accent" href={resolve("/privacy/penombre")}>Penombre</a>.
+
+				<a
+					class="text-accent"
+					href={resolve('privacy/homerun')}
+				>Homerun</a>
+
+				,
+
+				<a
+					class="text-accent"
+					href={resolve('privacy/opencount')}
+				>OpenCount</a>
+
+				and
+
+				<a
+					class="text-accent"
+					href={resolve('privacy/penombre')}
+				>Penombre</a>
+
+				.
 			</p>
 		</section>
 

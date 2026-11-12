@@ -1,6 +1,6 @@
-import { docsUrl, type Project } from "$lib/projects";
-import { clip, mdPath, readable, SITE } from "$lib/seo";
-import { PAGES } from "$lib/site";
+import { docsUrl, type Project } from "#lib/projects.ts";
+import { clip, mdPath, readable, SITE } from "#lib/seo.ts";
+import { PAGES } from "#lib/site.ts";
 import { getPublishedProjectRow, listProjectPages, projectMarkdown } from "./content";
 import { type Guide, loadDocProjects, loadGuides } from "./guides";
 import { descriptionOf, markdown, titleOf } from "./markdown";

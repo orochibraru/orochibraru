@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { RefreshCw } from "@lucide/svelte";
-	import { invalidateAll } from "$app/navigation";
+	import { refreshAll } from "$app/navigation";
 
 	// Drag down from the top of a list page to reload it, as a phone app does. Only
 	// on touch screens, and only where `enabled`: on an editor, reloading the page's
@@ -41,7 +41,7 @@
 		refreshing = true;
 		pull = THRESHOLD;
 		navigator.vibrate?.(8);
-		await invalidateAll().finally(() => {
+		await refreshAll().finally(() => {
 			refreshing = false;
 			pull = 0;
 		});

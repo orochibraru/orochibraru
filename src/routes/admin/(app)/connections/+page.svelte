@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { ago, statusClass } from "#lib/admin.ts";
 	import { enhance } from "$app/forms";
-	import { ago, statusClass } from "$lib/admin";
 
 	let { data } = $props();
 </script>

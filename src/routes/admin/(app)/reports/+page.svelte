@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Bell, BellOff, ChevronRight, Send } from "@lucide/svelte";
 	import { onMount } from "svelte";
+	import { ago } from "#lib/admin.ts";
 	import { enhance } from "$app/forms";
-	import { invalidateAll } from "$app/navigation";
+	import { refreshAll } from "$app/navigation";
 	import { resolve } from "$app/paths";
-	import { ago } from "$lib/admin";
 
 	let { data, form } = $props();
 
@@ -80,7 +80,7 @@
 			}
 			mine = subscription.endpoint;
 			status = "on";
-			await invalidateAll();
+			await refreshAll();
 		} catch (cause) {
 			// a private window, or a browser whose push service refused it
 			problem = `Couldn't turn notifications on: ${cause instanceof Error ? cause.message : cause}`;
@@ -104,7 +104,7 @@
 			}
 			mine = undefined;
 			status = "off";
-			await invalidateAll();
+			await refreshAll();
 		} catch (cause) {
 			problem = `Couldn't turn notifications off: ${cause instanceof Error ? cause.message : cause}`;
 		} finally {

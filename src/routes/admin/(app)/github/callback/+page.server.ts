@@ -1,5 +1,5 @@
 import { error, redirect } from "@sveltejs/kit";
-import { exchangeManifestCode } from "$lib/server/github/app";
+import { exchangeManifestCode } from "#lib/server/github/app.ts";
 
 // Step two of the manifest flow. The state cookie proves this browser started it.
 export const load = async ({ url, cookies }) => {

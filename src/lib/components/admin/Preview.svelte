@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { copyButtons } from "$lib/copy";
-	import { mermaidDiagrams } from "$lib/mermaid";
+	import { copyButtons } from "#lib/copy.ts";
+	import { mermaidDiagrams } from "#lib/mermaid.ts";
 
 	let { kind, markdown, repo }: { kind: "post" | "project"; markdown: string; repo?: string } =
 		$props();

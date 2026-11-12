@@ -1,7 +1,7 @@
 import { error, redirect } from "@sveltejs/kit";
-import { unavailableAs503 } from "$lib/server/admin";
-import { getAuth } from "$lib/server/auth";
-import { isAdminEmail } from "$lib/server/env";
+import { unavailableAs503 } from "#lib/server/admin.ts";
+import { getAuth } from "#lib/server/auth.ts";
+import { isAdminEmail } from "#lib/server/env.ts";
 
 export const load = async ({ request, url }) => {
 	const auth = await unavailableAs503(getAuth());

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import "../app.css";
+	import Footer from "#lib/components/Footer.svelte";
+	import Header from "#lib/components/Header.svelte";
+	import Search from "#lib/components/Search.svelte";
+	import TopLoadingBar from "#lib/components/top-loading-bar.svelte";
 	import { browser } from "$app/env";
 	import { onNavigate } from "$app/navigation";
 	import { page } from "$app/state";
-	import Footer from "$lib/components/Footer.svelte";
-	import Header from "$lib/components/Header.svelte";
-	import Search from "$lib/components/Search.svelte";
-	import TopLoadingBar from "$lib/components/top-loading-bar.svelte";
 
 	let { children } = $props();
 
@@ -32,6 +32,10 @@
 	}
 
 	onNavigate((navigation) => {
+		if (navigation.shallow && navigation.type === "goto") {
+			return;
+		}
+
 		if (!browser) {
 			return;
 		}
@@ -49,18 +53,24 @@
 	});
 </script>
 
-<svelte:window onpointermove={spotlight} />
+<svelte:window onpointermove={spotlight}></svelte:window>
 
 <TopLoadingBar />
 {#if admin}
   <!-- the admin brings its own chrome and its own ⌘K -->
   {@render children()}
 {:else}
-  <!-- docs render a fixed lg:w-72 sidebar, so everything else shifts right of it -->
-  <div class={docs ? "lg:pl-72" : undefined}>
-    <Header {width} {source} {docs} onsearch={() => search?.open()} />
-    {@render children()}
-    <Footer {width} />
-  </div>
-  <Search bind:this={search} />
+	<!-- docs render a fixed lg:w-72 sidebar, so everything else shifts right of it -->
+	<div class={docs ? "lg:pl-72" : undefined}>
+		<Header
+			width={width}
+			source={source}
+			docs={docs}
+			onsearch={() => search?.open()}
+		/>
+
+		{@render children()}
+		<Footer width={width} />
+	</div>
+	<Search bind:this={search} />
 {/if}

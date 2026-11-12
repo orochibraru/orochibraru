@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { authClient } from "#lib/auth-client.ts";
+	import Logo from "#lib/components/Logo.svelte";
 	import { page } from "$app/state";
-	import { authClient } from "$lib/auth-client";
-	import Logo from "$lib/components/Logo.svelte";
 
 	let { data } = $props();
 	let busy = $state(false);

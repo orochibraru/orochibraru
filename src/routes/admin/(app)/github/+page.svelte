@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { LoaderCircle, Unlink } from "@lucide/svelte";
 	import { SvelteSet } from "svelte/reactivity";
+	import { ago, statusClass } from "#lib/admin.ts";
+	import Confirm from "#lib/components/admin/Confirm.svelte";
 	import { enhance } from "$app/forms";
-	import { invalidateAll } from "$app/navigation";
+	import { refreshAll } from "$app/navigation";
 	import { resolve } from "$app/paths";
-	import { ago, statusClass } from "$lib/admin";
-	import Confirm from "$lib/components/admin/Confirm.svelte";
 	import type { SyncEvent } from "./sync/+server";
 
 	let { data, form } = $props();
@@ -58,7 +58,7 @@
 						failures[event.repo] = event.error;
 					}
 					// that project's row catches up now, not when the whole run ends
-					await invalidateAll();
+					await refreshAll();
 				}
 			}
 		} catch (cause) {
@@ -66,7 +66,7 @@
 		} finally {
 			pending.clear();
 			syncing = false;
-			await invalidateAll();
+			await refreshAll();
 		}
 	}
 </script>

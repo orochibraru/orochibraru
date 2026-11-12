@@ -1,7 +1,7 @@
-import { digest } from "$lib/server/digest";
-import { docsVersions, overview } from "$lib/server/editor";
-import { getSearchConsole, searchStats } from "$lib/server/search-console";
-import { getUmami, umamiReport, umamiStats } from "$lib/server/umami";
+import { digest } from "#lib/server/digest.ts";
+import { docsVersions, overview } from "#lib/server/editor.ts";
+import { getSearchConsole, searchStats } from "#lib/server/search-console.ts";
+import { getUmami, umamiReport, umamiStats } from "#lib/server/umami.ts";
 
 export const load = async () => {
 	const { posts, projects, runs } = overview();

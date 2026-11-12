@@ -22,10 +22,17 @@
 	<title>{data.label} | zedensix admin</title>
 </svelte:head>
 
-<div class="mb-5 flex min-h-8 flex-wrap items-center gap-x-4 gap-y-1">
-	<a class="inline-flex items-center gap-1.5 text-sm text-dim hover:text-fg" href={resolve("/admin/reports")}
-		><ArrowLeft class="size-4" aria-hidden="true" /> Reports</a
+<div
+	class="mb-5 flex min-h-8 flex-wrap items-center gap-x-4 gap-y-1"
+>
+	<a
+		class="inline-flex items-center gap-1.5 text-sm text-dim hover:text-fg"
+		href={resolve('admin/reports')}
 	>
+		<ArrowLeft class="size-4" aria-hidden="true" />
+		Reports
+	</a>
+
 	<h1 class="text-base font-semibold">{data.label}</h1>
 	<p class="w-full text-sm text-dim">{data.summary}</p>
 </div>
@@ -122,7 +129,11 @@
 			</p>
 			{#if report.syncs.failing.length}
 				<p class="text-hot">Still failing: {report.syncs.failing.join(", ")}.</p>
-				<a class="text-cool hover:underline" href={resolve("/admin/github")}>Open GitHub sync</a>
+
+				<a
+					class="text-cool hover:underline"
+					href={resolve('admin/github')}
+				>Open GitHub sync</a>
 			{:else}
 				<p class="text-dim">Every project ended the week in sync.</p>
 			{/if}

@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit";
-import { markdownResponse, projectPageDoc } from "$lib/server/documents";
+import { markdownResponse, projectPageDoc } from "#lib/server/documents.ts";
 
 export const GET = ({ params }) => {
 	const doc = projectPageDoc(params.repo);

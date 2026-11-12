@@ -5,7 +5,7 @@ import {
 	getPostById,
 	setPostStatus,
 	updatePost,
-} from "$lib/server/editor";
+} from "#lib/server/editor.ts";
 
 const postOr404 = (id: string) => {
 	const post = getPostById(Number(id));

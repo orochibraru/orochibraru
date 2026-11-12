@@ -1,6 +1,6 @@
 <script lang="ts">
+	import Meta from "#lib/components/Meta.svelte";
 	import { resolve } from "$app/paths";
-	import Meta from "$lib/components/Meta.svelte";
 
 	const EMAIL = "contact@zedensix.com";
 	const UPDATED = "15 October 2026";
@@ -17,16 +17,17 @@
 <main class="mx-auto max-w-page px-6">
 	<article class="prose">
 		<div class="pt-10 pb-5">
-			<a class="text-sm font-medium text-dim hover:text-accent" href={resolve("/privacy")}
-				>&larr; Privacy</a
-			>
+			<a
+				class="text-sm font-medium text-dim hover:text-accent"
+				href={resolve('privacy')}
+			>← Privacy</a>
+
 			<span class="tag ml-3.5">Updated {UPDATED}</span>
 			<h1 class="mt-4.5 text-[clamp(2.4rem,6.5vw,4rem)]/none animate-rise stereo font-extrabold tracking-[-.045em]">
 				Homerun privacy.
 			</h1>
 			<p class="mt-6 max-w-[72ch] text-[1.15rem] text-dim">
-				Short version: Homerun runs on your own server. Your account, your services and their logs
-				live there. I don&rsquo;t host it, can&rsquo;t see it, and nothing in it reports back to me.
+				Short version: Homerun runs on your own server. Your account, your services and their logs live there. I don’t host it, can’t see it, and nothing in it reports back to me.
 			</p>
 		</div>
 
@@ -42,9 +43,7 @@
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Who is responsible</h2>
 			<p>
-				Whoever runs a Homerun instance decides what it stores, so under the GDPR they are the data
-				controller for it, including for the visitors of the apps it hosts. If it&rsquo;s your
-				server, that&rsquo;s you. I have no access to it.
+				Whoever runs a Homerun instance decides what it stores, so under the GDPR they are the data controller for it, including for the visitors of the apps it hosts. If it’s your server, that’s you. I have no access to it.
 			</p>
 			<p class="mt-5">
 				I write the software. For questions about what it does with data, email
@@ -86,9 +85,8 @@
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">What leaves your server</h2>
 			<ul class="list-disc pl-6">
 				<li>
-					<strong>Update check:</strong> when an admin opens the dashboard, the server asks GitHub for the
-					latest Homerun release, at most every 10 minutes. GitHub sees the server&rsquo;s IP address,
-					nothing else. The command-line tool only checks when you run its update command.
+					<strong>Update check:</strong>
+					when an admin opens the dashboard, the server asks GitHub for the latest Homerun release, at most every 10 minutes. GitHub sees the server’s IP address, nothing else. The command-line tool only checks when you run its update command.
 				</li>
 				<li>
 					<strong>Features you use:</strong> service icons from jsDelivr, image tags from Docker Hub, the
@@ -111,32 +109,31 @@
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Claude and other AI clients</h2>
 			<p>
-				Connecting an AI client signs it in to your instance with OAuth: you approve it on your own
-				server, which gives it a token for the MCP endpoint only. It can ask for your profile, email
-				and groups, and acts with your account&rsquo;s permissions.
+				Connecting an AI client signs it in to your instance with OAuth: you approve it on your own server, which gives it a token for the MCP endpoint only. It can ask for your profile, email and groups, and acts with your account’s permissions.
 			</p>
 			<p class="mt-5">
-				Through it, the client can read and change what you can: services, configs, deployments,
-				logs, errors, monitoring, DNS records, users and notification channels. Values that look
-				like secrets, such as passwords, tokens and keys, are redacted before it sees them. Revoke access on the
-				identity provider page or under <strong>Profile &rarr; API Keys</strong>.
+				Through it, the client can read and change what you can: services, configs, deployments, logs, errors, monitoring, DNS records, users and notification channels. Values that look like secrets, such as passwords, tokens and keys, are redacted before it sees them. Revoke access on the identity provider page or under
+				<strong>Profile → API Keys</strong>
+				.
 			</p>
 			<p class="mt-5">
-				Whatever it reads goes to the AI provider and is then covered by their privacy policy (for
-				Claude,
-				<a class="text-accent" href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener"
-					>Anthropic&rsquo;s</a
-				>). Nothing goes through me.
+				Whatever it reads goes to the AI provider and is then covered by their privacy policy (for Claude,
+
+				<a
+					class="text-accent"
+					href="https://www.anthropic.com/legal/privacy"
+					target="_blank"
+					rel="noopener"
+				>Anthropic’s</a>
+
+				). Nothing goes through me.
 			</p>
 		</section>
 
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Your browser</h2>
 			<p>
-				The dashboard sets a session cookie to keep you signed in, a cookie for apps behind its login
-				wall, short-lived cookies (10 minutes) while connecting a Git provider or testing single
-				sign-on, and a cookie with your time zone so charts match your clock. It keeps the theme, view
-				modes, navigation state and diagram layouts in your browser&rsquo;s storage.
+				The dashboard sets a session cookie to keep you signed in, a cookie for apps behind its login wall, short-lived cookies (10 minutes) while connecting a Git provider or testing single sign-on, and a cookie with your time zone so charts match your clock. It keeps the theme, view modes, navigation state and diagram layouts in your browser’s storage.
 			</p>
 		</section>
 

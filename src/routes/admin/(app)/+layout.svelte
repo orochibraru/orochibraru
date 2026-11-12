@@ -14,32 +14,32 @@
 		Search,
 		Settings,
 	} from "@lucide/svelte";
-	import { onMount } from "svelte";
-	import { dev } from "$app/environment";
+	import { type ComponentProps, onMount } from "svelte";
+	import { swipeToClose } from "#lib/admin.ts";
+	import { authClient } from "#lib/auth-client.ts";
+	import Palette from "#lib/components/admin/Palette.svelte";
+	import PullToRefresh from "#lib/components/admin/PullToRefresh.svelte";
+	import Logo from "#lib/components/Logo.svelte";
+	import { dev } from "$app/env";
 	import { afterNavigate, goto, onNavigate } from "$app/navigation";
 	import { asset, resolve } from "$app/paths";
 	import { page } from "$app/state";
-	import { swipeToClose } from "$lib/admin";
-	import { authClient } from "$lib/auth-client";
-	import Palette, { type Command } from "$lib/components/admin/Palette.svelte";
-	import PullToRefresh from "$lib/components/admin/PullToRefresh.svelte";
-	import Logo from "$lib/components/Logo.svelte";
 
 	let { data, children } = $props();
 
 	const NAV = [
-		[resolve("/admin"), "Overview", LayoutDashboard],
-		[resolve("/admin/analytics"), "Analytics", ChartLine],
-		[resolve("/admin/posts"), "Posts", FileText],
-		[resolve("/admin/projects"), "Projects", Boxes],
-		[resolve("/admin/reports"), "Reports", Newspaper],
-		[resolve("/admin/github"), "GitHub", GitBranch],
-		[resolve("/admin/connections"), "Connections", Plug],
-		[resolve("/admin/settings"), "Settings", Settings],
+		[resolve("admin"), "Overview", LayoutDashboard],
+		[resolve("admin/analytics"), "Analytics", ChartLine],
+		[resolve("admin/posts"), "Posts", FileText],
+		[resolve("admin/projects"), "Projects", Boxes],
+		[resolve("admin/reports"), "Reports", Newspaper],
+		[resolve("admin/github"), "GitHub", GitBranch],
+		[resolve("admin/connections"), "Connections", Plug],
+		[resolve("admin/settings"), "Settings", Settings],
 	] as const;
 
 	const current = (href: string) =>
-		href === resolve("/admin") ? page.url.pathname === href : page.url.pathname.startsWith(href);
+		href === resolve("admin") ? page.url.pathname === href : page.url.pathname.startsWith(href);
 
 	// on a phone: four tabs at the bottom, the rest behind More, as a native app has it
 	const TABS = NAV.slice(0, 4);
@@ -54,10 +54,15 @@
 	let scrolled = $state(0);
 
 	let sheet = $state<HTMLDialogElement>();
-	afterNavigate(() => sheet?.close());
 
-	// Room for the notch and the home indicator: only while the admin is on screen,
-	// the public site keeps the browser's own margins.
+	afterNavigate(({ shallow, type }) => {
+		if (shallow && type === "goto") {
+			return;
+		}
+
+		return sheet?.close();
+	});
+
 	onMount(() => {
 		const viewport = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
 		const before = viewport?.content;
@@ -76,6 +81,10 @@
 	// Pages crossfade. The root layout starts the transition; this only tells app.css
 	// when the page stays the same (a form post, a query change), which doesn't animate.
 	onNavigate((navigation) => {
+		if (navigation.shallow && navigation.type === "goto") {
+			return;
+		}
+
 		const from = navigation.from?.url.pathname;
 		const to = navigation.to?.url.pathname;
 		if (!from || !to) {
@@ -87,7 +96,7 @@
 	let palette = $state<Palette>();
 	let newPost = $state<HTMLFormElement>();
 
-	const commands = $derived<Command[]>([
+	const commands = $derived<ComponentProps<typeof Palette>["commands"]>([
 		{ label: "New post", kind: "Action", run: () => newPost?.requestSubmit() },
 		...NAV.map(([href, label]) => ({ label, kind: "Page", run: () => goto(href) })),
 		...data.jump.posts.map((post) => ({
@@ -133,16 +142,28 @@
 </script>
 
 <svelte:head>
-	<meta name="robots" content="noindex">
+	<meta name="robots" content="noindex" />
 	<!-- added to a home screen, the admin opens as its own app, without the browser around it -->
-	<link rel="manifest" href={asset("/admin/manifest.webmanifest")}>
-	<meta name="mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-title" content="Admin">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+	<link
+		rel="manifest"
+		href={asset('admin/manifest.webmanifest')}
+	/>
+
+	<meta name="mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-title" content="Admin" />
+
+	<meta
+		name="apple-mobile-web-app-status-bar-style"
+		content="black-translucent"
+	/>
 </svelte:head>
 
-<svelte:window onkeydown={onWindowKeydown} bind:scrollY={scrolled} />
+<svelte:window
+	onkeydown={onWindowKeydown}
+	bind:scrollY={scrolled}
+></svelte:window>
 
 <div data-admin class="flex min-h-dvh flex-col md:pl-56">
 	<!-- phones get an app's chrome: a title bar under the notch, tabs over the home indicator -->
@@ -156,7 +177,7 @@
 		<div class="grid h-12 grid-cols-[2.75rem_1fr_2.75rem] items-center px-1.5">
 			<a
 				class="grid size-11 place-items-center active:opacity-50"
-				href={resolve("/admin")}
+				href={resolve('admin')}
 				aria-label="Overview"
 				><Logo class="size-7 rounded-lg" /></a
 			>
@@ -180,7 +201,10 @@
 	<aside
 		class="fixed inset-y-0 left-0 z-20 hidden w-56 flex-col border-r border-line bg-surface md:flex"
 	>
-		<a class="flex h-14 shrink-0 items-center gap-2.5 px-4" href={resolve("/admin")}>
+		<a
+			class="flex h-14 shrink-0 items-center gap-2.5 px-4"
+			href={resolve('admin')}
+		>
 			<Logo class="size-7 rounded-md" />
 			<span class="text-sm font-semibold">zedensix</span>
 		</a>
@@ -198,7 +222,7 @@
 		<nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3" aria-label="Admin">
 			{#each NAV as [href, label, Icon] (href)}
 				<a
-					{href}
+					href={href}
 					class={[
 						"flex h-8 items-center gap-2.5 rounded-lg px-2 text-[.8125rem] transition-colors",
 						current(href) ? "bg-fg/8 font-medium text-fg" : "text-dim hover:bg-fg/4 hover:text-fg",
@@ -247,7 +271,7 @@
 		<div class="grid h-15 grid-cols-5 gap-1">
 			{#each TABS as [href, label, Icon] (href)}
 				<a
-					{href}
+					href={href}
 					class={[
 						"flex flex-col items-center justify-center gap-1 rounded-[1.375rem] text-[.6875rem] font-medium transition-colors active:scale-95",
 						current(href) ? "bg-spark/15 text-spark" : "text-dim",
@@ -289,8 +313,15 @@
 	<div class="drawer-handle" aria-hidden="true"></div>
 	<div class="drawer-group">
 		{#each MORE as [href, label, Icon] (href)}
-			<a {href} aria-current={current(href) ? "page" : undefined}>
-				<Icon class={["size-5", current(href) ? "text-spark" : "text-dim"]} aria-hidden="true" />
+			<a
+				href={href}
+				aria-current={current(href) ? "page" : undefined}
+			>
+				<Icon
+					class={["size-5", current(href) ? "text-spark" : "text-dim"]}
+					aria-hidden="true"
+				/>
+
 				<span class="flex-1">{label}</span>
 				<ChevronRight class="size-4 text-dim" aria-hidden="true" />
 			</a>
@@ -313,8 +344,15 @@
 
 <PullToRefresh enabled={atTabRoot} />
 
-<form bind:this={newPost} hidden method="POST" action="{resolve('/admin/posts')}?/create"></form>
-<Palette bind:this={palette} {commands} />
+<form
+	bind:this={newPost}
+	hidden
+	method="POST"
+	action="{resolve('admin/posts')}?/create"
+></form>
+
+<Palette bind:this={palette} commands={commands} />
+
 <p
 	class={[
 		"fixed right-4 bottom-[calc(7rem+env(safe-area-inset-bottom))] z-30 rounded-full border border-line bg-surface px-3 py-2 shadow-lg transition duration-200 md:bottom-4 md:rounded-none",

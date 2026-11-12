@@ -1,9 +1,9 @@
-import { docsUrl } from "$lib/projects";
-import { SITE } from "$lib/seo";
-import { listProjectPages } from "$lib/server/content";
-import { loadDocProjects, loadGuides } from "$lib/server/guides";
-import { loadPosts } from "$lib/server/posts";
-import { PAGES } from "$lib/site";
+import { docsUrl } from "#lib/projects.ts";
+import { SITE } from "#lib/seo.ts";
+import { listProjectPages } from "#lib/server/content.ts";
+import { loadDocProjects, loadGuides } from "#lib/server/guides.ts";
+import { loadPosts } from "#lib/server/posts.ts";
+import { PAGES } from "#lib/site.ts";
 
 export const GET = async () => {
 	const [guides, posts, projects] = await Promise.all([

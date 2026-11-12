@@ -1,10 +1,6 @@
-<script lang="ts" module>
-	/** A Lucide icon's SVG children, as `lucideIcon()` reads them on the server. */
-	export type IconNode = [tag: string, attrs: Record<string, string>][];
-</script>
-
 <script lang="ts">
 	import type { SVGAttributes } from "svelte/elements";
+	import type { IconNode } from "#lib/docs-config.ts";
 
 	// Icons picked by name in a repo's docs/config.json can't be static imports, and
 	// importing all of Lucide would ship every icon: the server sends only the ones used.

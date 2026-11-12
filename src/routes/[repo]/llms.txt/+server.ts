@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
-import { docsUrl } from "$lib/projects";
-import { clip, mdPath, SITE } from "$lib/seo";
-import { loadDocProjects, loadGuides } from "$lib/server/guides";
+import { docsUrl } from "#lib/projects.ts";
+import { clip, mdPath, SITE } from "#lib/seo.ts";
+import { loadDocProjects, loadGuides } from "#lib/server/guides.ts";
 
 // One project's slice of /llms.txt: an assistant asked about Penombre needs Penombre, not the whole site.
 export const GET = async ({ params }) => {

@@ -13,7 +13,13 @@
 	}
 
 	// the drawer is all links: once one is followed, the new page is what you want to see
-	afterNavigate(() => dialog?.close());
+	afterNavigate(({ shallow, type }) => {
+		if (shallow && type === "goto") {
+			return;
+		}
+
+		return dialog?.close();
+	});
 </script>
 
 <!-- a modal <dialog> already traps focus, closes on Escape and draws the backdrop -->

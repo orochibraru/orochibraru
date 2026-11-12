@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
-import { guideDoc, markdownResponse } from "$lib/server/documents";
-import { loadGuides } from "$lib/server/guides";
+import { guideDoc, markdownResponse } from "#lib/server/documents.ts";
+import { loadGuides } from "#lib/server/guides.ts";
 
 export const GET = async ({ params }) => {
 	const guide = (await loadGuides(params.channel)).find(

@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
-import { lucideIcon } from "$lib/docs-config";
-import { CHANNELS } from "$lib/projects";
-import { loadCategories, loadDocProjects, loadGuides } from "$lib/server/guides";
+import { lucideIcon } from "#lib/docs-config.ts";
+import { CHANNELS } from "#lib/projects.ts";
+import { loadCategories, loadDocProjects, loadGuides } from "#lib/server/guides.ts";
 
 export const load = async ({ params }) => {
 	const channel = params.channel ?? "latest";

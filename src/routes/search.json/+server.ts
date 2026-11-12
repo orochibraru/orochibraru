@@ -1,9 +1,8 @@
-import { json } from "@sveltejs/kit";
-import { listProjectPages } from "$lib/server/content";
-import { pageDoc } from "$lib/server/documents";
-import { loadGuides } from "$lib/server/guides";
-import { loadPosts } from "$lib/server/posts";
-import { PAGES } from "$lib/site";
+import { listProjectPages } from "#lib/server/content.ts";
+import { pageDoc } from "#lib/server/documents.ts";
+import { loadGuides } from "#lib/server/guides.ts";
+import { loadPosts } from "#lib/server/posts.ts";
+import { PAGES } from "#lib/site.ts";
 
 // A guide contributes a row per heading, so a result lands on the section that answers the question.
 // `r` is the project's repo, which the palette's @project prefix scopes the search to.
@@ -14,7 +13,7 @@ export const GET = async ({ fetch }) => {
 		Promise.all(PAGES.map((page) => pageDoc(fetch, page))),
 	]);
 
-	return json([
+	return Response.json([
 		...guides.flatMap((guide) =>
 			guide.sections.map((section) => ({
 				u: `${guide.url}${section.id ? `#${section.id}` : ""}`,

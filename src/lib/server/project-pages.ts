@@ -9,9 +9,9 @@
 // `## Heading {#id}` pins a section's anchor, and a ### straight above a code
 // block, with no paragraph under it, is the small uppercase label over that block.
 import { z } from "zod";
-import type { IconNode } from "$lib/components/LucideIcon.svelte";
-import { isIconName, lucideIcon } from "$lib/docs-config";
-import { SITE } from "$lib/seo";
+import type { IconNode } from "#lib/docs-config.ts";
+import { isIconName, lucideIcon } from "#lib/docs-config.ts";
+import { SITE } from "#lib/seo.ts";
 import type { project } from "./db/schema";
 import { slugify } from "./guides";
 import { highlight } from "./highlight";

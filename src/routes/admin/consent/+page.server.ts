@@ -1,5 +1,5 @@
-import { requireAdmin } from "$lib/server/admin";
-import { clientName } from "$lib/server/connections";
+import { requireAdmin } from "#lib/server/admin.ts";
+import { clientName } from "#lib/server/connections.ts";
 
 export const load = async (event) => {
 	const admin = await requireAdmin(event);

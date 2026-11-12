@@ -1,5 +1,5 @@
-import { getAuth } from "$lib/server/auth";
-import { isAdminEmail } from "$lib/server/env";
+import { getAuth } from "#lib/server/auth.ts";
+import { isAdminEmail } from "#lib/server/env.ts";
 
 // Whether the header shows an Admin link. Anonymous visitors carry no session
 // cookie, so they never wake better-auth (and its IdP discovery) up.

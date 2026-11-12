@@ -15,6 +15,7 @@
 	const projects = $derived(
 		new Map((index ?? []).filter((entry) => entry.r).map((entry) => [entry.r, entry.p])),
 	);
+
 	const picking = $derived(/^@\S*$/.test(query));
 	const scope = $derived(query.match(/^@(\S+)\s/)?.[1]?.toLowerCase());
 	const terms = $derived(
@@ -103,7 +104,13 @@
 		field?.setSelectionRange(query.length, query.length);
 	}
 
-	afterNavigate(() => dialog?.close());
+	afterNavigate(({ shallow, type }) => {
+		if (shallow && type === "goto") {
+			return;
+		}
+
+		return dialog?.close();
+	});
 
 	function onWindowKeydown(event: KeyboardEvent) {
 		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
@@ -145,7 +152,7 @@
 	});
 </script>
 
-<svelte:window onkeydown={onWindowKeydown} />
+<svelte:window onkeydown={onWindowKeydown}></svelte:window>
 
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 <dialog
@@ -164,8 +171,8 @@
 			stroke-width="2"
 			aria-hidden="true"
 		>
-			<circle cx="11" cy="11" r="7" />
-			<path d="m20 20-3.5-3.5" />
+			<circle cx="11" cy="11" r="7"></circle>
+			<path d="m20 20-3.5-3.5"></path>
 		</svg>
 		<input
 			bind:this={field}
@@ -174,7 +181,7 @@
 			autocomplete="off"
 			placeholder="Search, or @project to search one"
 			class="w-full bg-transparent py-1 text-[.95rem] outline-none placeholder:text-dim"
-		>
+		/>
 		<kbd class="kbd hidden px-1.5 sm:inline-grid">esc</kbd>
 	</div>
 	<ul class="max-h-[52vh] overflow-y-auto p-2">
@@ -211,12 +218,12 @@
 		{/each}
 	</ul>
 	{#if index && scope && !projects.has(scope)}
-		<p class="px-4 py-8 text-center text-[.9rem] text-dim">
-			No project is called &ldquo;{scope}&rdquo;. Type @ to pick one.
-		</p>
+		<p
+			class="px-4 py-8 text-center text-[.9rem] text-dim"
+		>No project is called “{scope}”. Type @ to pick one.</p>
 	{:else if query && index && !results.length && !choices.length}
-		<p class="px-4 py-8 text-center text-[.9rem] text-dim">
-			Nothing matches &ldquo;{terms.join(" ")}&rdquo;{scope ? ` in ${projects.get(scope)}` : ""}.
-		</p>
+		<p
+			class="px-4 py-8 text-center text-[.9rem] text-dim"
+		>Nothing matches “{terms.join(" ")}”{scope ? ` in ${projects.get(scope)}` : ""}.</p>
 	{/if}
 </dialog>

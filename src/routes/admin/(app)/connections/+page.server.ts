@@ -1,5 +1,5 @@
-import { listConnections, revokeConnection } from "$lib/server/connections";
-import { env } from "$lib/server/env";
+import { listConnections, revokeConnection } from "#lib/server/connections.ts";
+import { env } from "#lib/server/env.ts";
 
 export const load = () => ({ connections: listConnections(), endpoint: `${env.origin}/mcp` });
 

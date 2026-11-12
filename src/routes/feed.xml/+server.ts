@@ -1,5 +1,5 @@
-import { SITE } from "$lib/seo";
-import { loadPosts } from "$lib/server/posts";
+import { SITE } from "#lib/seo.ts";
+import { loadPosts } from "#lib/server/posts.ts";
 
 const escapeXml = (text: string) => Bun.escapeHTML(text);
 

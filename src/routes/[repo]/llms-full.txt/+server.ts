@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
-import { SITE } from "$lib/seo";
-import { guideDoc, projectDoc, projectPageDoc, twin } from "$lib/server/documents";
-import { loadDocProjects, loadGuides } from "$lib/server/guides";
+import { SITE } from "#lib/seo.ts";
+import { guideDoc, projectDoc, projectPageDoc, twin } from "#lib/server/documents.ts";
+import { loadDocProjects, loadGuides } from "#lib/server/guides.ts";
 
 export const GET = async ({ params }) => {
 	const project = (await loadDocProjects()).find((project) => project.key === params.repo);

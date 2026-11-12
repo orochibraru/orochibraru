@@ -1,5 +1,5 @@
-import { SITE } from "$lib/seo";
-import { allDocs, twin } from "$lib/server/documents";
+import { SITE } from "#lib/seo.ts";
+import { allDocs, twin } from "#lib/server/documents.ts";
 
 export const GET = async ({ fetch }) => {
 	const docs = await allDocs(fetch);

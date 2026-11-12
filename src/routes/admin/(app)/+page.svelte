@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { ago, statusClass } from "#lib/admin.ts";
+	import Delta from "#lib/components/admin/Delta.svelte";
+	import VisitorsChart from "#lib/components/admin/VisitorsChart.svelte";
 	import { resolve } from "$app/paths";
-	import { ago, statusClass } from "$lib/admin";
-	import Delta from "$lib/components/admin/Delta.svelte";
-	import VisitorsChart from "$lib/components/admin/VisitorsChart.svelte";
 
 	let { data } = $props();
 	const failed = $derived(data.runs.filter((run) => run.status === "failed").length);
@@ -24,9 +24,12 @@
 				>{failed} failed sync{failed === 1 ? "" : "s"}</span
 			>{/if}
 	</p>
-	<form class="ml-auto" method="POST" action="{resolve('/admin/posts')}?/create">
-		<button class="abtn abtn-primary" type="submit">New post</button>
-	</form>
+
+	<form
+		class="ml-auto"
+		method="POST"
+		action="{resolve('admin/posts')}?/create"
+	><button class="abtn abtn-primary" type="submit">New post</button></form>
 </div>
 
 <div class="grid gap-4 lg:grid-cols-2">
@@ -35,7 +38,7 @@
 			<header>Today</header>
 			<div class="grid gap-2 p-3 text-sm leading-relaxed">
 				{#await data.digest}
-					<p class="text-dim">Reading the numbers&hellip;</p>
+					<p class="text-dim">Reading the numbers…</p>
 				{:then paragraphs}
 					{#each paragraphs as paragraph, index (index)}
 						<p>{paragraph}</p>
@@ -51,12 +54,19 @@
 		{#if data.analytics}
 			{#await data.analytics}
 				<header>Visitors</header>
-				<p class="px-3 py-6 text-center text-sm text-dim">Asking Umami&hellip;</p>
+				<p class="px-3 py-6 text-center text-sm text-dim">Asking Umami…</p>
 			{:then stats}
 				<header>
 					Visitors
-					{#if stats.active}<span class="text-xs font-normal text-cool">&bull; {stats.active} online</span>{/if}
-					<a class="ml-auto text-xs font-normal text-dim hover:text-fg" href={resolve("/admin/analytics")}>Details</a>
+
+					{#if stats.active}
+						<span class="text-xs font-normal text-cool">• {stats.active} online</span>
+					{/if}
+
+					<a
+						class="ml-auto text-xs font-normal text-dim hover:text-fg"
+						href={resolve('admin/analytics')}
+					>Details</a>
 				</header>
 				<div class="grid grid-cols-2 gap-2 p-3 sm:grid-cols-5">
 					{#each stats.ranges as range, index (range.label)}
@@ -67,7 +77,7 @@
 								index === selected ? "border-accent bg-accent/6" : "border-transparent bg-fg/3 hover:border-edge",
 							]}
 							aria-pressed={index === selected}
-							onclick={() => (selected = index)}
+							onclick={() => selected = index}
 						>
 							<div class="text-[11px] font-medium tracking-wide text-dim uppercase">{range.label}</div>
 							<div class="mt-1.5 text-xl font-bold" title="{range.visitors} visitors">
@@ -89,13 +99,16 @@
 			{:catch}
 				<header>Visitors</header>
 				<p class="px-3 py-6 text-center text-sm text-hot">
-					Couldn&rsquo;t reach Umami. <a class="text-cool" href={resolve("/admin/settings")}>Check the settings</a>.
+					Couldn’t reach Umami.
+					<a class="text-cool" href={resolve('admin/settings')}>Check the settings</a>
+					.
 				</p>
 			{/await}
 		{:else}
 			<header>Visitors</header>
 			<p class="px-3 py-6 text-center text-sm text-dim">
-				<a class="text-cool" href={resolve("/admin/settings")}>Connect a self-hosted Umami</a> to see visitor stats here.
+				<a class="text-cool" href={resolve('admin/settings')}>Connect a self-hosted Umami</a>
+				to see visitor stats here.
 			</p>
 		{/if}
 	</section>
@@ -104,11 +117,15 @@
 		<header>
 			Search
 			<span class="text-xs font-normal text-dim">last 28 days</span>
-			<a class="ml-auto text-xs font-normal text-dim hover:text-fg" href={resolve("/admin/analytics")}>Details</a>
+
+			<a
+				class="ml-auto text-xs font-normal text-dim hover:text-fg"
+				href={resolve('admin/analytics')}
+			>Details</a>
 		</header>
 		{#if data.search}
 			{#await data.search}
-				<p class="px-3 py-6 text-center text-sm text-dim">Asking Search Console&hellip;</p>
+				<p class="px-3 py-6 text-center text-sm text-dim">Asking Search Console…</p>
 			{:then stats}
 				{@const { totals, previous } = stats}
 				{@const tiles: [string, string, number, number, boolean?][] = [
@@ -116,25 +133,41 @@
 					["Impressions", compact.format(totals.impressions), totals.impressions, previous.impressions],
 					["CTR", percent.format(totals.ctr), totals.ctr, previous.ctr],
 					// position 1 is the top: lower is better
-					["Avg position", totals.position.toFixed(1), totals.position, previous.position, true],
+					// position 1 is the top: lower is better
+					[
+						"Avg position",
+						totals.position.toFixed(1),
+						totals.position,
+						previous.position,
+						true
+					]
 				]}
 				<div class="grid grid-cols-2 gap-2 p-3 sm:grid-cols-4">
 					{#each tiles as [label, value, now, before, lower] (label)}
 						<div class="rounded-lg bg-fg/3 px-3 py-2.5 leading-tight">
 							<div class="text-[11px] font-medium tracking-wide text-dim uppercase">{label}</div>
 							<div class="mt-1.5 text-xl font-bold">{value}</div>
-							<Delta {now} {before} {lower} against="the 28 days before" />
+
+							<Delta
+								now={now}
+								before={before}
+								lower={lower}
+								against="the 28 days before"
+							/>
 						</div>
 					{/each}
 				</div>
 			{:catch}
 				<p class="px-3 py-6 text-center text-sm text-hot">
-					Couldn&rsquo;t reach Search Console. <a class="text-cool" href={resolve("/admin/settings")}>Check the settings</a>.
+					Couldn’t reach Search Console.
+					<a class="text-cool" href={resolve('admin/settings')}>Check the settings</a>
+					.
 				</p>
 			{/await}
 		{:else}
 			<p class="px-3 py-6 text-center text-sm text-dim">
-				<a class="text-cool" href={resolve("/admin/settings")}>Connect Google Search Console</a> to see search stats here.
+				<a class="text-cool" href={resolve('admin/settings')}>Connect Google Search Console</a>
+				to see search stats here.
 			</p>
 		{/if}
 	</section>
@@ -142,7 +175,11 @@
 	<section class="apanel">
 		<header>
 			Recent posts
-			<a class="ml-auto text-xs font-normal text-dim hover:text-fg" href={resolve("/admin/posts")}>All posts</a>
+
+			<a
+				class="ml-auto text-xs font-normal text-dim hover:text-fg"
+				href={resolve('admin/posts')}
+			>All posts</a>
 		</header>
 		<table class="atable">
 			<tbody>
@@ -164,7 +201,11 @@
 	<section class="apanel">
 		<header>
 			Projects
-			<a class="ml-auto text-xs font-normal text-dim hover:text-fg" href={resolve("/admin/projects")}>Reorder</a>
+
+			<a
+				class="ml-auto text-xs font-normal text-dim hover:text-fg"
+				href={resolve('admin/projects')}
+			>Reorder</a>
 		</header>
 		<table class="atable">
 			<tbody>
@@ -179,7 +220,9 @@
 				{:else}
 					<tr>
 						<td class="py-6 text-center text-dim">
-							No projects yet. <a class="text-cool" href={resolve("/admin/projects")}>Add one from GitHub</a>.
+							No projects yet.
+							<a class="text-cool" href={resolve('admin/projects')}>Add one from GitHub</a>
+							.
 						</td>
 					</tr>
 				{/each}
@@ -190,7 +233,11 @@
 	<section class="apanel lg:col-span-2">
 		<header>
 			Docs sync
-			<a class="ml-auto text-xs font-normal text-dim hover:text-fg" href={resolve("/admin/github")}>GitHub</a>
+
+			<a
+				class="ml-auto text-xs font-normal text-dim hover:text-fg"
+				href={resolve('admin/github')}
+			>GitHub</a>
 		</header>
 		<table class="atable">
 			<tbody>

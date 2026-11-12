@@ -5,10 +5,11 @@ RUN bun install --frozen-lockfile --ignore-scripts
 COPY . .
 RUN bun run build
 
-# The binary needs only libc, and CA certificates to reach GitHub and the IdP.
+# The binary needs only libc, and CA certificates to reach GitHub and the IdP;
+# curl is for the healthcheck.
 FROM debian:bookworm-slim
 RUN apt-get update \
-	&& apt-get install -y --no-install-recommends ca-certificates \
+	&& apt-get install -y --no-install-recommends ca-certificates curl \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& useradd --system --create-home --uid 10001 app \
 	&& mkdir -p /data && chown app:app /data
@@ -20,5 +21,5 @@ ENV HOST=0.0.0.0 PORT=3000 DATA_DIR=/data
 VOLUME /data
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-	CMD ["./build/healthcheck"]
+	CMD ["sh", "-c", "curl -fsS \"http://127.0.0.1:${PORT}/_health\" > /dev/null || exit 1"]
 CMD ["./build/server"]

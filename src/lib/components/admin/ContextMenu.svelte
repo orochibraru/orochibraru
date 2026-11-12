@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from "svelte";
-	import { swipeToClose } from "$lib/admin";
+	import { swipeToClose } from "#lib/admin.ts";
 
 	// A context menu: a small popover at the pointer on a desktop, a bottom drawer on a
 	// phone, where a menu pinned to a fingertip is too small to hit and runs off screen.

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import avatar from "$lib/assets/avatar.jpg";
-	import { breadcrumbs, jsonld, mdPath, SITE } from "$lib/seo";
+	import avatar from "#lib/assets/avatar.jpg";
+	import { breadcrumbs, jsonld, mdPath, SITE } from "#lib/seo.ts";
 
 	type Image = { url: string; width: number; height: number; alt: string };
 

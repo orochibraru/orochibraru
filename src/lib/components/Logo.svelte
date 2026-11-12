@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { HTMLImgAttributes } from "svelte/elements";
-	import mark from "$lib/assets/mark.webp";
+	import mark from "#lib/assets/mark.webp";
 
 	let { class: className, ...rest }: HTMLImgAttributes = $props();
 </script>

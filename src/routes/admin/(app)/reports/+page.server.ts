@@ -1,6 +1,12 @@
 import { fail } from "@sveltejs/kit";
-import { notify, publicKey, subscriptions, unsubscribe } from "$lib/server/push";
-import { listReports, runWeeklyReport, sendReport, summary, weekLabel } from "$lib/server/report";
+import { notify, publicKey, subscriptions, unsubscribe } from "#lib/server/push.ts";
+import {
+	listReports,
+	runWeeklyReport,
+	sendReport,
+	summary,
+	weekLabel,
+} from "#lib/server/report.ts";
 
 export const load = async () => ({
 	reports: listReports().map((report) => ({

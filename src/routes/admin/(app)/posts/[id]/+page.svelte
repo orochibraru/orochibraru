@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { ArrowLeft, ExternalLink, Eye, PenLine } from "@lucide/svelte";
+	import { syncScroll } from "#lib/admin.ts";
+	import Confirm from "#lib/components/admin/Confirm.svelte";
+	import Editor from "#lib/components/admin/Editor.svelte";
+	import Preview from "#lib/components/admin/Preview.svelte";
 	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
-	import { syncScroll } from "$lib/admin";
-	import Confirm from "$lib/components/admin/Confirm.svelte";
-	import Editor from "$lib/components/admin/Editor.svelte";
-	import Preview from "$lib/components/admin/Preview.svelte";
 
 	let { data, form } = $props();
 	// writable deriveds: edited locally, reset when another post loads
@@ -37,7 +37,7 @@
 	>
 		<a
 			class="flex items-center gap-1.5 text-[.8125rem] text-dim hover:text-fg"
-			href={resolve("/admin/posts")}
+			href={resolve('admin/posts')}
 		>
 			<ArrowLeft class="size-3.5" aria-hidden="true" /><span class="max-md:sr-only">Posts</span>
 		</a>
@@ -49,7 +49,14 @@
 						status === option ? "bg-fg/8 text-fg" : "text-dim hover:text-fg",
 					]}
 				>
-					<input class="sr-only" type="radio" name="status" value={option} bind:group={status}>
+					<input
+						class="sr-only"
+						type="radio"
+						name="status"
+						value={option}
+						bind:group={status}
+					/>
+
 					{option}
 				</label>
 			{/each}
@@ -62,10 +69,17 @@
 				target="_blank"
 				rel="noreferrer"
 				title="View on the site"
-				><ExternalLink class="size-3.5" aria-hidden="true" /><span class="max-md:sr-only">View</span></a
 			>
+				<ExternalLink class="size-3.5" aria-hidden="true" />
+				<span class="max-md:sr-only">View</span>
+			</a>
 		{/if}
-		<button class="abtn 2xl:hidden" type="button" onclick={() => (previewing = !previewing)}>
+
+		<button
+			class="abtn 2xl:hidden"
+			type="button"
+			onclick={() => previewing = !previewing}
+		>
 			{#if previewing}
 				<PenLine class="size-3.5" aria-hidden="true" /><span class="max-md:sr-only">Edit</span>
 			{:else}
@@ -89,12 +103,19 @@
 			placeholder="Title"
 			aria-label="Title"
 			required
-		>
+		/>
 
 		<dl class="mt-5 mb-8 grid max-w-5xl grid-cols-[7rem_1fr] items-center gap-x-3 gap-y-1 border-y border-line py-3 text-sm">
 			<dt class="text-dim"><label for="slug">Slug</label></dt>
 			<dd class="flex items-center gap-2">
-				<input id="slug" class="field border-transparent bg-transparent hover:border-line focus:border-accent font-mono text-[.8125rem]" name="slug" value={data.post.slug} pattern={"[a-z0-9]+(-[a-z0-9]+)*"}>
+				<input
+					id="slug"
+					class="field border-transparent bg-transparent hover:border-line focus:border-accent font-mono text-[.8125rem]"
+					name="slug"
+					value={data.post.slug}
+					pattern={"[a-z0-9]+(-[a-z0-9]+)*"}
+				/>
+
 				{#if data.post.status === "published"}
 					<a
 						class="shrink-0 text-xs text-cool hover:underline"
@@ -104,7 +125,17 @@
 				{/if}
 			</dd>
 			<dt class="text-dim"><label for="date">Date</label></dt>
-			<dd><input id="date" class="field w-auto border-transparent bg-transparent hover:border-line focus:border-accent" name="date" type="date" value={data.post.date}></dd>
+
+			<dd>
+				<input
+					id="date"
+					class="field w-auto border-transparent bg-transparent hover:border-line focus:border-accent"
+					name="date"
+					type="date"
+					value={data.post.date}
+				/>
+			</dd>
+
 			<dt class="self-start pt-1.5 text-dim"><label for="description">Description</label></dt>
 			<dd>
 				<textarea

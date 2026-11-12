@@ -1,8 +1,8 @@
 <script lang="ts">
+	import Meta from "#lib/components/Meta.svelte";
+	import Particles from "#lib/components/Particles.svelte";
+	import { readable } from "#lib/seo.ts";
 	import { resolve } from "$app/paths";
-	import Meta from "$lib/components/Meta.svelte";
-	import Particles from "$lib/components/Particles.svelte";
-	import { readable } from "$lib/seo";
 
 	let { data } = $props();
 
@@ -43,9 +43,21 @@
 	];
 
 	const principles = [
-		{ title: "No subscription", text: "Nothing to renew, nothing to cancel, no card on file." },
-		{ title: "No seats", text: "Invite the whole household. The count never matters." },
-		{ title: "No telemetry", text: "Nothing phones home. What happens on your box stays there." },
+		{
+			title: "No subscription",
+			text: "Nothing to renew, nothing to cancel, no card on file.",
+		},
+
+		{
+			title: "No seats",
+			text: "Invite the whole household. The count never matters.",
+		},
+
+		{
+			title: "No telemetry",
+			text: "Nothing phones home. What happens on your box stays there.",
+		},
+
 		{
 			title: "One container",
 			text: "Most of it is one image and one volume. Back up a folder, done.",
@@ -71,10 +83,12 @@
 	<Particles />
 	<!-- the hero sits right under the header with the numbers straight after it, so the
 	     first screen is all content; it sinks and blurs away as the page scrolls over it -->
-	<div class="hero-exit flex flex-col pt-10 pb-14 lg:pt-14">
-		<span class="tag animate-rise self-start"
-			>{data.projects.length} projects &middot; self-hosted &middot; MIT &amp; AGPL</span
-		>
+
+	<div
+		class="hero-exit flex flex-col pt-10 pb-14 lg:pt-14"
+	>
+		<span class="tag animate-rise self-start">{data.projects.length} projects · self-hosted · MIT & AGPL</span>
+
 		<h1
 			class="mt-6.5 text-[clamp(2.8rem,9.5vw,7.5rem)]/[.9] stereo font-extrabold tracking-tighter text-balance *:block *:animate-rise"
 		>
@@ -82,16 +96,19 @@
 			<span class="[animation-delay:.08s]">never grew</span>
 			<span class="grad pb-[.08em] [animation-delay:.16s]">a pricing page.</span>
 		</h1>
-		<p class="mt-8 max-w-[62ch] animate-rise text-[1.1rem] text-dim [animation-delay:.28s]">
-			Storage, deploys, monitoring, streaming, routing: the software a homelab runs on, built to
-			live on hardware you own.
-			<strong class="font-semibold text-fg"
-				>All of it free. All of it open. No seats, no tiers, no &ldquo;contact sales&rdquo;.</strong
-			>
+
+		<p
+			class="mt-8 max-w-[62ch] animate-rise text-[1.1rem] text-dim [animation-delay:.28s]"
+		>
+			Storage, deploys, monitoring, streaming, routing: the software a homelab runs on, built to live on hardware you own.
+			<strong class="font-semibold text-fg">All of it free. All of it open. No seats, no tiers, no “contact sales”.</strong>
 		</p>
-		<div class="mt-9 flex animate-rise flex-wrap gap-3 [animation-delay:.36s]">
-			<a class="btn btn-primary" href={resolve("/projects")}>See the projects</a>
-			<a class="btn" href="#problem">Why this exists &darr;</a>
+
+		<div
+			class="mt-9 flex animate-rise flex-wrap gap-3 [animation-delay:.36s]"
+		>
+			<a class="btn btn-primary" href={resolve('projects')}>See the projects</a>
+			<a class="btn" href="#problem">Why this exists ↓</a>
 		</div>
 	</div>
 
@@ -99,41 +116,43 @@
 	<div class="relative z-10">
 		<div class="zone zone-scan">
 		<section id="numbers" class="mb-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-			{#each stats as stat (stat.label)}
-				<div class="feat">
-					<p
-						class="bg-linear-to-br from-fg to-dim bg-clip-text text-[clamp(2rem,4vw,3rem)]/none font-extrabold tracking-[-.04em] text-transparent"
+				{#each stats as stat (stat.label)}
+					<div class="feat">
+						<p
+							class="bg-linear-to-br from-fg to-dim bg-clip-text text-[clamp(2rem,4vw,3rem)]/none font-extrabold tracking-[-.04em] text-transparent"
 					>
 						{stat.value}
 					</p>
-					<p class="mt-2 text-sm text-dim">{stat.label}</p>
-				</div>
-			{/each}
-		</section>
+						<p class="mt-2 text-sm text-dim">{stat.label}</p>
+					</div>
+				{/each}
+			</section>
 
-		<div
-			class="glass mb-28 overflow-hidden rounded-full py-3.5 text-xs font-semibold tracking-[.2em] whitespace-nowrap text-dim mask-[linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]"
-		>
-		<div class="inline-block animate-marquee motion-reduce:animate-none">
-			FREE FOREVER &nbsp;&middot;&nbsp;
-			<b class="font-normal text-accent">NO SUBSCRIPTION</b>
-			&nbsp;&middot;&nbsp; SELF-HOSTED &nbsp;&middot;&nbsp;
-			<b class="font-normal text-hot">NO TELEMETRY</b>
-			&nbsp;&middot;&nbsp; YOUR HARDWARE &nbsp;&middot;&nbsp;
-			<b class="font-normal text-accent">YOUR DATA</b>
-			&nbsp;&middot;&nbsp; OPEN SOURCE &nbsp;&middot;&nbsp;
-			<b class="font-normal text-hot">NO PAYWALL</b>
-			&nbsp;&middot;&nbsp; FREE FOREVER &nbsp;&middot;&nbsp;
-			<b class="font-normal text-accent">NO SUBSCRIPTION</b>
-			&nbsp;&middot;&nbsp; SELF-HOSTED &nbsp;&middot;&nbsp;
-			<b class="font-normal text-hot">NO TELEMETRY</b>
-			&nbsp;&middot;&nbsp; YOUR HARDWARE &nbsp;&middot;&nbsp;
-			<b class="font-normal text-accent">YOUR DATA</b>
-			&nbsp;&middot;&nbsp; OPEN SOURCE &nbsp;&middot;&nbsp;
-			<b class="font-normal text-hot">NO PAYWALL</b>
-			&nbsp;&middot;&nbsp;
-		</div>
-		</div>
+			<div
+				class="glass mb-28 overflow-hidden rounded-full py-3.5 text-xs font-semibold tracking-[.2em] whitespace-nowrap text-dim mask-[linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]"
+			>
+				<div
+					class="inline-block animate-marquee motion-reduce:animate-none"
+				>
+					FREE FOREVER ·
+					<b class="font-normal text-accent">NO SUBSCRIPTION</b>
+					· SELF-HOSTED ·
+					<b class="font-normal text-hot">NO TELEMETRY</b>
+					· YOUR HARDWARE ·
+					<b class="font-normal text-accent">YOUR DATA</b>
+					· OPEN SOURCE ·
+					<b class="font-normal text-hot">NO PAYWALL</b>
+					· FREE FOREVER ·
+					<b class="font-normal text-accent">NO SUBSCRIPTION</b>
+					· SELF-HOSTED ·
+					<b class="font-normal text-hot">NO TELEMETRY</b>
+					· YOUR HARDWARE ·
+					<b class="font-normal text-accent">YOUR DATA</b>
+					· OPEN SOURCE ·
+					<b class="font-normal text-hot">NO PAYWALL</b>
+					·
+				</div>
+			</div>
 		</div>
 
 		<section id="problem" class="mb-28">
@@ -235,7 +254,7 @@
 						Each one replaces a subscription. Each one runs in a container on a box you own.
 					</p>
 				</div>
-				<a class="btn" href={resolve("/projects")}>All projects &rarr;</a>
+				<a class="btn" href={resolve('projects')}>All projects →</a>
 			</div>
 			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				{#each data.projects as project (project.repo)}
@@ -254,7 +273,7 @@
 			<section class="zone zone-grid mb-28">
 				<div class="mb-8 flex flex-wrap items-end justify-between gap-4">
 					<h2 class="text-[clamp(2rem,5vw,3.2rem)]/none">From the blog</h2>
-					<a class="btn" href={resolve("/blog")}>All posts</a>
+					<a class="btn" href={resolve('blog')}>All posts</a>
 				</div>
 				<div class="grid gap-4 md:grid-cols-3">
 					{#each data.posts as post (post.slug)}
@@ -288,13 +307,11 @@
 				</p>
 				<p class="mt-5 max-w-[78ch] text-dim">
 					Broken? Open an issue. Fixed it? Open a PR.
-					<b class="font-normal text-accent"
-						>Never get in touch and just run it for years? That&rsquo;s the point.</b
-					>
+					<b class="font-normal text-accent">Never get in touch and just run it for years? That’s the point.</b>
 				</p>
 				<div class="mt-8 flex flex-wrap gap-3">
-					<a class="btn btn-primary" href={resolve("/projects")}>Pick a project</a>
-					<a class="btn" href={resolve("/about")}>The long version &rarr;</a>
+					<a class="btn btn-primary" href={resolve('projects')}>Pick a project</a>
+					<a class="btn" href={resolve('about')}>The long version →</a>
 				</div>
 			</div>
 		</section>

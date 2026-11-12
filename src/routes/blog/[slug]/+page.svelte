@@ -1,10 +1,10 @@
 <script lang="ts">
+	import Meta from "#lib/components/Meta.svelte";
+	import { copyButtons } from "#lib/copy.ts";
+	import { lightbox } from "#lib/lightbox.ts";
+	import { mermaidDiagrams } from "#lib/mermaid.ts";
+	import { PERSON, readable, SITE } from "#lib/seo.ts";
 	import { resolve } from "$app/paths";
-	import Meta from "$lib/components/Meta.svelte";
-	import { copyButtons } from "$lib/copy";
-	import { lightbox } from "$lib/lightbox";
-	import { mermaidDiagrams } from "$lib/mermaid";
-	import { PERSON, readable, SITE } from "$lib/seo";
 
 	let { data } = $props();
 	const post = $derived(data.post);
@@ -12,13 +12,16 @@
 </script>
 
 <svelte:head>
-	<meta property="article:published_time" content={post.date}>
+	<meta
+		property="article:published_time"
+		content={post.date}
+	/>
 </svelte:head>
 
 <Meta
 	title="{post.title} | zedensix"
 	description={post.description}
-	{path}
+	path={path}
 	ogType="article"
 	trail={[
 	["Blog", "/blog"],
@@ -45,9 +48,11 @@
 <main class="mx-auto max-w-page px-6">
 	<article>
 		<div class="pt-10 pb-8">
-			<a class="text-sm font-medium text-dim hover:text-accent" href={resolve("/blog")}
-				>&larr; All posts</a
-			>
+			<a
+				class="text-sm font-medium text-dim hover:text-accent"
+				href={resolve('blog')}
+			>← All posts</a>
+
 			<h1
 				class="mt-4.5 max-w-[24ch] text-[clamp(2.2rem,5vw,3.2rem)]/[1.05] animate-rise stereo font-extrabold tracking-[-.035em]"
 			>

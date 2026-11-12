@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
-import { markdownResponse, pageDoc } from "$lib/server/documents";
-import { PAGES } from "$lib/site";
+import { markdownResponse, pageDoc } from "#lib/server/documents.ts";
+import { PAGES } from "#lib/site.ts";
 
 export const GET = async ({ params, fetch }) => {
 	const page = PAGES.find(

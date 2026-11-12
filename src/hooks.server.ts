@@ -1,13 +1,13 @@
 import * as Sentry from "@sentry/bun";
-import type { Handle, HandleServerError, ServerInit } from "@sveltejs/kit";
-import { building } from "$app/environment";
-import { unavailableAs503 } from "$lib/server/admin";
-import { getAuth } from "$lib/server/auth";
-import { wasProjectDeleted } from "$lib/server/content";
-import { getDataDir, getDb, migrateDatabase } from "$lib/server/db";
-import { reconcile, startSyncWorker } from "$lib/server/github/worker";
-import { canonical, isCrossSiteForm, withHeaders } from "$lib/server/http";
-import { startReportSchedule } from "$lib/server/report";
+import type { Handle, HandleServerError, ServerInit } from "@sveltejs/kit/hooks";
+import { unavailableAs503 } from "#lib/server/admin.ts";
+import { getAuth } from "#lib/server/auth.ts";
+import { wasProjectDeleted } from "#lib/server/content.ts";
+import { getDataDir, getDb, migrateDatabase } from "#lib/server/db/index.ts";
+import { reconcile, startSyncWorker } from "#lib/server/github/worker.ts";
+import { canonical, isCrossSiteForm, withHeaders } from "#lib/server/http.ts";
+import { startReportSchedule } from "#lib/server/report.ts";
+import { building } from "$app/env";
 
 // better-auth answers /api/auth/*, and the OAuth discovery documents MCP clients
 // look for at the root: /.well-known/oauth-{authorization-server,protected-resource}/…
@@ -51,11 +51,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 };
 
 // Unexpected errors reach the log with their stack; the visitor sees only the status.
-export const handleError: HandleServerError = ({ error, event, status }) => {
-	if (status >= 500) {
+// Kit 3 sends error() calls and its own 404/405s here too: those aren't bugs.
+export const handleError: HandleServerError = ({ kind, error, event }) => {
+	if (kind === "unknown") {
 		console.error(`${event.request.method} ${event.url.pathname}`, error);
 		Sentry.captureException(error, {
-			extra: { method: event.request.method, path: event.url.pathname, status },
+			extra: { method: event.request.method, path: event.url.pathname },
 		});
 	}
 };

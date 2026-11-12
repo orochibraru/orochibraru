@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { RefreshCw } from "@lucide/svelte";
-	import type { SubmitFunction } from "@sveltejs/kit";
-	import { enhance } from "$app/forms";
+	import { enhance, type SubmitFunction } from "$app/forms";
 
 	let { data, form } = $props();
 
@@ -64,11 +63,24 @@
 			<p class="text-xs text-dim">A self-hosted Umami v3: its visitor stats show on the overview and the analytics page.</p>
 			<label>
 				Umami URL
-				<input name="url" type="url" required placeholder="https://umami.example.com" value={data.umami?.url ?? ""}>
+
+				<input
+					name="url"
+					type="url"
+					required
+					placeholder="https://umami.example.com"
+					value={data.umami?.url ?? ""}
+				/>
 			</label>
 			<label>
 				Website ID
-				<input name="websiteId" required placeholder="From the tracking script" value={data.umami?.websiteId ?? ""}>
+
+				<input
+					name="websiteId"
+					required
+					placeholder="From the tracking script"
+					value={data.umami?.websiteId ?? ""}
+				/>
 			</label>
 			<label>
 				API key
@@ -77,8 +89,10 @@
 					type="password"
 					autocomplete="off"
 					required={!data.umami}
-					placeholder={data.umami ? "Saved: leave blank to keep it" : "Your Umami API key"}
-				>
+					placeholder={data.umami
+						? "Saved: leave blank to keep it"
+						: "Your Umami API key"}
+				/>
 			</label>
 			{#if form?.umamiError}
 				<p class="text-sm text-hot" role="alert">{form.umamiError}</p>
@@ -109,7 +123,13 @@
 			{/if}
 			<label>
 				Property
-				<input name="site" required placeholder={data.searchPlaceholder} value={data.search?.site ?? ""}>
+
+				<input
+					name="site"
+					required
+					placeholder={data.searchPlaceholder}
+					value={data.search?.site ?? ""}
+				/>
 			</label>
 			<label>
 				Service account key

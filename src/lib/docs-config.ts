@@ -4,9 +4,11 @@
 // validation and autocomplete from a `$schema` line.
 import { icons } from "lucide";
 import { z } from "zod";
-import type { IconNode } from "$lib/components/LucideIcon.svelte";
-import { ROOT_GUIDES } from "$lib/projects";
-import { SITE } from "$lib/seo";
+import { ROOT_GUIDES } from "#lib/projects.ts";
+import { SITE } from "#lib/seo.ts";
+
+/** A Lucide icon's SVG children, as `lucideIcon()` reads them on the server. */
+export type IconNode = [tag: string, attrs: Record<string, string>][];
 
 export const SCHEMA_URL = `${SITE}/docs-config.schema.json`;
 

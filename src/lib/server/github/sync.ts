@@ -6,8 +6,8 @@ import { basename } from "node:path";
 import { structuredPatch } from "diff";
 import { and, eq, notInArray } from "drizzle-orm";
 import { z } from "zod";
-import { DocsConfig } from "$lib/docs-config";
-import { ROOT_GUIDES } from "$lib/projects";
+import { DocsConfig } from "#lib/docs-config.ts";
+import { ROOT_GUIDES } from "#lib/projects.ts";
 import { invalidate } from "../content";
 import { getDb } from "../db";
 import {

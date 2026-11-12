@@ -1,10 +1,10 @@
 import { requireMcpAuth } from "@better-auth/mcp";
 import { error } from "@sveltejs/kit";
-import { unavailableAs503 } from "$lib/server/admin";
-import { getAuth } from "$lib/server/auth";
-import { env } from "$lib/server/env";
-import { handleMcp } from "$lib/server/mcp";
-import { isTokenOnAllowlist } from "$lib/server/mcp-auth";
+import { unavailableAs503 } from "#lib/server/admin.ts";
+import { getAuth } from "#lib/server/auth.ts";
+import { env } from "#lib/server/env.ts";
+import { handleMcp } from "#lib/server/mcp.ts";
+import { isTokenOnAllowlist } from "#lib/server/mcp-auth.ts";
 
 const RESOURCE = `${env.origin}/mcp`;
 

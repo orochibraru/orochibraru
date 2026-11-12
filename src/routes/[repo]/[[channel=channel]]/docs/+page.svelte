@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { ArrowRight, ArrowUpRight } from "@lucide/svelte";
+	import LucideIcon from "#lib/components/LucideIcon.svelte";
+	import Meta from "#lib/components/Meta.svelte";
+	import { docsUrl } from "#lib/projects.ts";
+	import { clip, PERSON, SITE, WEBSITE } from "#lib/seo.ts";
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
-	import LucideIcon from "$lib/components/LucideIcon.svelte";
-	import Meta from "$lib/components/Meta.svelte";
-	import { docsUrl } from "$lib/projects";
-	import { clip, PERSON, SITE, WEBSITE } from "$lib/seo";
 
 	let { data } = $props();
 	const project = $derived(data.project);

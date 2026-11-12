@@ -1,6 +1,6 @@
 <script lang="ts">
 	import "@milkdown/crepe/theme/common/style.css";
-	import { dark } from "$lib/mermaid";
+	import { dark } from "#lib/mermaid.ts";
 	import "@milkdown/crepe/theme/frame.css";
 
 	let {

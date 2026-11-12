@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit";
-import { getProjectPage } from "$lib/server/content";
+import { getProjectPage } from "#lib/server/content.ts";
 
 export const load = async ({ params }) => {
 	const page = getProjectPage(params.repo);

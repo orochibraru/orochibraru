@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit";
-import { getReport, summary, weekLabel } from "$lib/server/report";
+import { getReport, summary, weekLabel } from "#lib/server/report.ts";
 
 export const load = ({ params }) => {
 	const report = getReport(Number(params.id));

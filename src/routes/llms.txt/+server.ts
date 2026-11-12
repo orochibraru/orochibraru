@@ -1,6 +1,6 @@
-import { mdPath, SITE } from "$lib/seo";
-import { allDocs } from "$lib/server/documents";
-import { loadDocProjects } from "$lib/server/guides";
+import { mdPath, SITE } from "#lib/seo.ts";
+import { allDocs } from "#lib/server/documents.ts";
+import { loadDocProjects } from "#lib/server/guides.ts";
 
 export const GET = async ({ fetch }) => {
 	const [docs, projects] = await Promise.all([allDocs(fetch), loadDocProjects()]);

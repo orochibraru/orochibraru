@@ -8,10 +8,10 @@
 import { posix } from "node:path";
 import { and, asc, eq, isNotNull } from "drizzle-orm";
 import { z } from "zod";
-import type { IconNode } from "$lib/components/LucideIcon.svelte";
-import { DocsConfig, lucideIcon } from "$lib/docs-config";
-import { type Channel, docsUrl, type Project, ROOT_GUIDES } from "$lib/projects";
-import { SITE } from "$lib/seo";
+import type { IconNode } from "#lib/docs-config.ts";
+import { DocsConfig, lucideIcon } from "#lib/docs-config.ts";
+import { type Channel, docsUrl, type Project, ROOT_GUIDES } from "#lib/projects.ts";
+import { SITE } from "#lib/seo.ts";
 import { getDb } from "./db";
 import { docsVersion, guide as guideTable, project as projectTable } from "./db/schema";
 import { highlight } from "./highlight";

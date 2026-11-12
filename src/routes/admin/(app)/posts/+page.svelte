@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Ellipsis } from "@lucide/svelte";
+	import { ago, statusClass } from "#lib/admin.ts";
+	import Confirm from "#lib/components/admin/Confirm.svelte";
+	import ContextMenu from "#lib/components/admin/ContextMenu.svelte";
 	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
-	import { ago, statusClass } from "$lib/admin";
-	import Confirm from "$lib/components/admin/Confirm.svelte";
-	import ContextMenu from "$lib/components/admin/ContextMenu.svelte";
 
 	let { data } = $props();
 
@@ -43,9 +43,13 @@
 					data.status === status ? "bg-fg/8 text-fg" : "text-dim hover:text-fg",
 				]}
 				aria-current={data.status === status ? "page" : undefined}
-				href={status ? `${resolve("/admin/posts")}?status=${status}` : resolve("/admin/posts")}
-				>{label} <span class="text-dim">{data.counts[key]}</span></a
+				href={status
+					? `${resolve('admin/posts')}?status=${status}`
+					: resolve('admin/posts')}
 			>
+				{label}
+				<span class="text-dim">{data.counts[key]}</span>
+			</a>
 		{/each}
 	</div>
 	<form class="ml-auto" method="POST" action="?/create">
@@ -91,12 +95,12 @@
 					{#if data.views}
 						<td class="wide text-right font-mono text-xs whitespace-nowrap">
 							{#await data.views}
-								<span class="text-dim">&hellip;</span>
+								<span class="text-dim">…</span>
 							{:then views}
 								{#if views && post.status === "published"}
 									{number.format(views[`/blog/${post.slug}`] ?? 0)}
 								{:else}
-									<span class="text-dim">&ndash;</span>
+									<span class="text-dim">–</span>
 								{/if}
 							{/await}
 						</td>

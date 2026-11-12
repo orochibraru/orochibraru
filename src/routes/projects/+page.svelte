@@ -1,8 +1,8 @@
 <script lang="ts">
+	import BrandIcon from "#lib/components/BrandIcon.svelte";
+	import Meta from "#lib/components/Meta.svelte";
+	import { SITE, WEBSITE } from "#lib/seo.ts";
 	import { resolve } from "$app/paths";
-	import BrandIcon from "$lib/components/BrandIcon.svelte";
-	import Meta from "$lib/components/Meta.svelte";
-	import { SITE, WEBSITE } from "$lib/seo";
 
 	let { data } = $props();
 

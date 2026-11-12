@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { getProjectsPage, guideCounts } from "$lib/server/content";
+import { getProjectsPage, guideCounts } from "#lib/server/content.ts";
 import {
 	createProject,
 	deleteProject,
@@ -12,10 +12,10 @@ import {
 	reorderProjects,
 	updateProject,
 	updateProjectsPage,
-} from "$lib/server/editor";
-import { queueSync } from "$lib/server/github/worker";
-import { imageByName } from "$lib/server/images";
-import { getUmami, pathViews } from "$lib/server/umami";
+} from "#lib/server/editor.ts";
+import { queueSync } from "#lib/server/github/worker.ts";
+import { imageByName } from "#lib/server/images.ts";
+import { getUmami, pathViews } from "#lib/server/umami.ts";
 
 export const load = async () => {
 	const docs = docsStatuses();

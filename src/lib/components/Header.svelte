@@ -47,14 +47,19 @@
 </script>
 
 {#snippet links(style: string)}
-	<a class={style} href={resolve("/projects")}>Projects</a>
-	<a class={style} href={resolve("/blog")}>Blog</a>
-	<a class={style} href={resolve("/about")}>About</a>
-	<a class={style} href={source ?? "https://github.com/zedensix?tab=repositories"} target="_blank" rel="noopener"
-		>{source ? "Source" : "GitHub"}</a
-	>
+	<a class={style} href={resolve('projects')}>Projects</a>
+	<a class={style} href={resolve('blog')}>Blog</a>
+	<a class={style} href={resolve('about')}>About</a>
+
+	<a
+		class={style}
+		href={source ?? "https://github.com/zedensix?tab=repositories"}
+		target="_blank"
+		rel="noopener"
+	>{source ? "Source" : "GitHub"}</a>
+
 	{#if page.data.signedIn}
-		<a class={style} href={resolve("/admin")}>Admin</a>
+		<a class={style} href={resolve('admin')}>Admin</a>
 	{/if}
 {/snippet}
 
@@ -76,11 +81,14 @@
 		<a
 			class="group flex items-center gap-2.5 font-display text-[17px] font-semibold tracking-[-.02em] {docs ? "lg:hidden" : ""}"
 			href={resolve("/")}
-			><Logo class="size-7 rounded-md" /><span
-				>zeden<span class="text-accent">six</span></span
-			></a
 		>
-		<div class="ml-auto flex items-center gap-3 text-[15px] font-medium whitespace-nowrap text-fg/80 md:gap-6">
+			<Logo class="size-7 rounded-md" />
+			<span>zeden<span class="text-accent">six</span></span>
+		</a>
+
+		<div
+			class="ml-auto flex items-center gap-3 text-[15px] font-medium whitespace-nowrap text-fg/80 md:gap-6"
+		>
 			<!-- below md the links move into the menu drawer -->
 			<div class="hidden items-center gap-6 md:flex">
 				{@render links("relative transition-colors hover:text-accent after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:after:scale-x-100")}
@@ -99,11 +107,11 @@
 					stroke-width="2"
 					aria-hidden="true"
 				>
-					<circle cx="11" cy="11" r="7" />
-					<path d="m20 20-3.5-3.5" />
+					<circle cx="11" cy="11" r="7"></circle>
+					<path d="m20 20-3.5-3.5"></path>
 				</svg>
 				<span class="hidden md:inline">Search</span>
-				<kbd class="kbd hidden md:inline-grid">&#8984;K</kbd>
+				<kbd class="kbd hidden md:inline-grid">⌘K</kbd>
 			</button>
 			<button
 				type="button"
@@ -121,8 +129,8 @@
 					stroke-width="1.8"
 					stroke-linecap="round"
 				>
-					<rect x="3" y="4" width="18" height="12.5" rx="1.5" />
-					<path d="M9.5 20.5h5M12 16.5v4" />
+					<rect x="3" y="4" width="18" height="12.5" rx="1.5"></rect>
+					<path d="M9.5 20.5h5M12 16.5v4"></path>
 				</svg>
 				<svg
 					viewBox="0 0 24 24"
@@ -133,10 +141,10 @@
 					stroke-width="1.8"
 					stroke-linecap="round"
 				>
-					<circle cx="12" cy="12" r="4.2" />
+					<circle cx="12" cy="12" r="4.2"></circle>
 					<path
 						d="M12 2.7v2.1M12 19.2v2.1M21.3 12h-2.1M4.8 12H2.7M18.6 5.4 17.1 6.9M6.9 17.1 5.4 18.6M18.6 18.6 17.1 17.1M6.9 6.9 5.4 5.4"
-					/>
+					></path>
 				</svg>
 				<svg
 					viewBox="0 0 24 24"
@@ -147,7 +155,9 @@
 					stroke-width="1.8"
 					stroke-linejoin="round"
 				>
-					<path d="M20.2 14.8A8.6 8.6 0 0 1 9.2 3.8a8.6 8.6 0 1 0 11 11Z" />
+					<path
+						d="M20.2 14.8A8.6 8.6 0 0 1 9.2 3.8a8.6 8.6 0 1 0 11 11Z"
+					></path>
 				</svg>
 			</button>
 			<button

@@ -11,13 +11,13 @@
 		RefreshCw,
 		X,
 	} from "@lucide/svelte";
+	import { ago, statusClass, syncScroll } from "#lib/admin.ts";
+	import Confirm from "#lib/components/admin/Confirm.svelte";
+	import Editor from "#lib/components/admin/Editor.svelte";
+	import Preview from "#lib/components/admin/Preview.svelte";
 	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
-	import { ago, statusClass, syncScroll } from "$lib/admin";
-	import Confirm from "$lib/components/admin/Confirm.svelte";
-	import Editor from "$lib/components/admin/Editor.svelte";
-	import Preview from "$lib/components/admin/Preview.svelte";
 
 	let { data, form } = $props();
 
@@ -108,7 +108,7 @@
 	>
 		<a
 			class="flex items-center gap-1.5 text-[.8125rem] text-dim hover:text-fg"
-			href={resolve("/admin/projects")}
+			href={resolve('admin/projects')}
 		>
 			<ArrowLeft class="size-3.5" aria-hidden="true" /> Projects
 		</a>
@@ -123,12 +123,21 @@
 						"px-2.5 py-0.5 transition-colors",
 						tab === name ? "bg-fg/8 text-fg" : "text-dim hover:text-fg",
 					]}
-					onclick={() => (tab = name)}>{name}</button
-				>
+					onclick={() => tab = name}
+				>{name}</button>
 			{/each}
 		</div>
-		<label class="ml-auto flex cursor-pointer items-center gap-2 text-[.8125rem]">
-			<input class="peer sr-only" type="checkbox" name="published" checked={data.project.published}>
+
+		<label
+			class="ml-auto flex cursor-pointer items-center gap-2 text-[.8125rem]"
+		>
+			<input
+				class="peer sr-only"
+				type="checkbox"
+				name="published"
+				checked={data.project.published}
+			/>
+
 			<span
 				class="relative h-4 w-7 border border-edge bg-surface transition-colors peer-checked:border-spark peer-checked:bg-spark peer-focus-visible:outline-2 peer-focus-visible:outline-accent after:absolute after:top-0.5 after:left-0.5 after:size-2.5 after:bg-dim after:transition-transform after:content-[''] peer-checked:after:translate-x-3 peer-checked:after:bg-onspark"
 				aria-hidden="true"
@@ -142,8 +151,10 @@
 				target="_blank"
 				rel="noreferrer"
 				title="View on the site"
-				><ExternalLink class="size-3.5" aria-hidden="true" /><span class="max-md:sr-only">View</span></a
 			>
+				<ExternalLink class="size-3.5" aria-hidden="true" />
+				<span class="max-md:sr-only">View</span>
+			</a>
 		{/if}
 		<button class="abtn abtn-primary" type="submit" disabled={saving}>
 			{saving ? "Saving…" : "Save"}<span class="kbd border-onspark/30 text-onspark/70">⌘S</span>
@@ -162,7 +173,12 @@
 					a feature tile; an image named after a synced screenshot, then a <strong class="text-fg">bold</strong>
 					title, is a captioned screenshot. Type <code class="text-fg">/</code> for both.
 				</p>
-				<button class="abtn shrink-0 2xl:hidden" type="button" onclick={() => (previewing = !previewing)}>
+
+				<button
+					class="abtn shrink-0 2xl:hidden"
+					type="button"
+					onclick={() => previewing = !previewing}
+				>
 					{#if previewing}
 						<PenLine class="size-3.5" aria-hidden="true" /> Edit
 					{:else}
@@ -186,8 +202,15 @@
 		<section class="admin-form grid max-w-4xl gap-5" hidden={tab !== "Card"}>
 			<p class="text-[.8125rem] text-dim">What the project's card on the home page shows.</p>
 			<div class="grid gap-5 sm:grid-cols-2">
-				<label>Name <input name="name" value={data.project.name} required></label>
-				<label>Category <input name="category" value={data.project.category}></label>
+				<label>
+					Name
+					<input name="name" value={data.project.name} required />
+				</label>
+
+				<label>
+					Category
+					<input name="category" value={data.project.category} />
+				</label>
 			</div>
 			<label>
 				Blurb
@@ -195,15 +218,22 @@
 			</label>
 			<label>
 				Chips, comma separated
-				<input name="chips" value={data.project.chips.join(", ")}>
+				<input name="chips" value={data.project.chips.join(", ")} />
 			</label>
 		</section>
 
 		<section class="admin-form grid max-w-4xl gap-5" hidden={tab !== "SEO"}>
 			<p class="text-[.8125rem] text-dim">What search engines and link previews see.</p>
 			<div class="grid gap-5 sm:grid-cols-2">
-				<label>Page title <input name="title" value={data.project.title}></label>
-				<label>Tag beside “All projects” <input name="tag" value={data.project.tag}></label>
+				<label>
+					Page title
+					<input name="title" value={data.project.title} />
+				</label>
+
+				<label>
+					Tag beside “All projects”
+					<input name="tag" value={data.project.tag} />
+				</label>
 			</div>
 			<label>
 				Description
@@ -212,9 +242,23 @@
 			<div class="grid gap-5 sm:grid-cols-2">
 				<label>
 					Social image, by screenshot name
-					<input class="font-mono" name="imageSrc" value={data.project.image?.src ?? ""} placeholder="hero">
+
+					<input
+						class="font-mono"
+						name="imageSrc"
+						value={data.project.image?.src ?? ""}
+						placeholder="hero"
+					/>
 				</label>
-				<label>Its alt text <input name="imageAlt" value={data.project.image?.alt ?? ""}></label>
+
+				<label>
+					Its alt text
+
+					<input
+						name="imageAlt"
+						value={data.project.image?.alt ?? ""}
+					/>
+				</label>
 			</div>
 			<label>
 				Extra SoftwareApplication fields, as JSON
@@ -224,8 +268,16 @@
 			</label>
 		</section>
 
-		<section class="admin-form grid max-w-6xl gap-3" hidden={tab !== "Buttons"}>
-			<input type="hidden" name="buttons" value={JSON.stringify(buttons)}>
+		<section
+			class="admin-form grid max-w-6xl gap-3"
+			hidden={tab !== "Buttons"}
+		>
+			<input
+				type="hidden"
+				name="buttons"
+				value={JSON.stringify(buttons)}
+			/>
+
 			<p class="text-[.8125rem] text-dim">
 				The links under the project's title. Icon is <code class="text-fg">github</code>,
 				<code class="text-fg">docker</code>, or any
@@ -250,11 +302,27 @@
 								onclick={() => move(index, index + 1)}><ChevronDown class="size-4" aria-hidden="true" /></button
 							>
 						</div>
-						<label>Label <input bind:value={button.label}></label>
-						<label>Link <input class="font-mono" bind:value={button.href}></label>
-						<label>Icon <input class="font-mono" bind:value={button.icon}></label>
+
+						<label>Label <input bind:value={button.label} /></label>
+
+						<label>
+							Link
+							<input class="font-mono" bind:value={button.href} />
+						</label>
+
+						<label>
+							Icon
+							<input class="font-mono" bind:value={button.icon} />
+						</label>
+
 						<label class="h-8 flex-row! items-center gap-2! text-fg!">
-							<input type="checkbox" class="accent-spark" bind:checked={button.primary}> Primary
+							<input
+								type="checkbox"
+								class="accent-spark"
+								bind:checked={button.primary}
+							/>
+
+							Primary
 						</label>
 						<button
 							class="grid size-8 place-items-center text-dim hover:text-hot"
@@ -270,8 +338,10 @@
 					class="flex w-full items-center gap-2 px-3 py-2.5 text-[.8125rem] text-dim hover:bg-fg/3 hover:text-fg"
 					type="button"
 					onclick={() => buttons.push({ label: "", href: "", icon: "link", primary: false })}
-					><Plus class="size-3.5" aria-hidden="true" /> Add a button</button
 				>
+					<Plus class="size-3.5" aria-hidden="true" />
+					Add a button
+				</button>
 			</div>
 		</section>
 
@@ -293,16 +363,22 @@
 					<Link class="size-3.5" aria-hidden="true" /> Link
 				</button>
 				{#if !data.linkable.length}
-					<a class="text-dim hover:text-fg" href={resolve("/admin/github")}
-						>Install the GitHub App on more repos to pick another</a
-					>
+					<a
+						class="text-dim hover:text-fg"
+						href={resolve('admin/github')}
+					>Install the GitHub App on more repos to pick another</a>
 				{/if}
 			</div>
 			{#if data.project.githubRepo && !data.readable}
-				<p class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot" role="alert">
-					The GitHub App can't read <code>{data.project.githubRepo}</code>: the repo moved, was renamed,
-					or isn't in the app's installation. Link the repo it is now, or
-					<a class="underline" href={resolve("/admin/github")}>install the app on it</a>.
+				<p
+					class="mb-4 border border-hot/40 bg-hot/8 px-3 py-2 text-sm text-hot"
+					role="alert"
+				>
+					The GitHub App can't read
+					<code>{data.project.githubRepo}</code>
+					: the repo moved, was renamed, or isn't in the app's installation. Link the repo it is now, or
+					<a class="underline" href={resolve('admin/github')}>install the app on it</a>
+					.
 				</p>
 			{/if}
 			{#if data.project.githubRepo}
@@ -317,9 +393,21 @@
 							nothing yet
 						{/each}.
 					</p>
-					<button class="abtn ml-auto" type="button" onclick={resync} disabled={asking || busy}>
-						<RefreshCw class={["size-3.5", busy && "animate-spin"]} aria-hidden="true" />
-						{busy ? (sync.job?.status === "running" ? "Syncing…" : "Queued…") : "Resync now"}
+
+					<button
+						class="abtn ml-auto"
+						type="button"
+						onclick={resync}
+						disabled={asking || busy}
+					>
+						<RefreshCw
+							class={["size-3.5", busy && "animate-spin"]}
+							aria-hidden="true"
+						/>
+
+						{busy
+							? sync.job?.status === "running" ? "Syncing…" : "Queued…"
+							: "Resync now"}
 					</button>
 				</div>
 				{#if syncProblem}

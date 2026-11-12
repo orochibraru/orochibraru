@@ -1,5 +1,5 @@
-import { getSearchConsole, searchStats } from "$lib/server/search-console";
-import { getUmami, umamiReport } from "$lib/server/umami";
+import { getSearchConsole, searchStats } from "#lib/server/search-console.ts";
+import { getUmami, umamiReport } from "#lib/server/umami.ts";
 
 const RANGES = [7, 28, 90, 365];
 

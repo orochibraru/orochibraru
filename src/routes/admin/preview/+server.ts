@@ -1,9 +1,9 @@
-import { error, json } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
 import { z } from "zod";
-import { requireAdmin } from "$lib/server/admin";
-import { getProject } from "$lib/server/editor";
-import { renderPost } from "$lib/server/posts";
-import { renderProjectPage } from "$lib/server/project-pages";
+import { requireAdmin } from "#lib/server/admin.ts";
+import { getProject } from "#lib/server/editor.ts";
+import { renderPost } from "#lib/server/posts.ts";
+import { renderProjectPage } from "#lib/server/project-pages.ts";
 
 const Body = z.object({
 	kind: z.enum(["post", "project"]),
@@ -26,12 +26,12 @@ export const POST = async (event) => {
 			description: "",
 			body: markdown,
 		});
-		return json({ html: post.html });
+		return Response.json({ html: post.html });
 	}
 	const row = repo ? getProject(repo) : undefined;
 	if (!row) {
 		throw error(404, "No such project");
 	}
 	const page = await renderProjectPage({ ...row, body: markdown });
-	return json({ html: page.html, lede: page.lede });
+	return Response.json({ html: page.html, lede: page.lede });
 };

@@ -1,13 +1,13 @@
 <script lang="ts">
+	import Meta from "#lib/components/Meta.svelte";
+	import PageActions from "#lib/components/PageActions.svelte";
+	import { anchorLinks, copyButtons } from "#lib/copy.ts";
+	import { lightbox } from "#lib/lightbox.ts";
+	import { mermaidDiagrams } from "#lib/mermaid.ts";
+	import { docsUrl } from "#lib/projects.ts";
+	import { clip, PERSON, SITE } from "#lib/seo.ts";
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
-	import Meta from "$lib/components/Meta.svelte";
-	import PageActions from "$lib/components/PageActions.svelte";
-	import { anchorLinks, copyButtons } from "$lib/copy";
-	import { lightbox } from "$lib/lightbox";
-	import { mermaidDiagrams } from "$lib/mermaid";
-	import { docsUrl } from "$lib/projects";
-	import { clip, PERSON, SITE } from "$lib/seo";
 
 	let { data } = $props();
 	const project = $derived(data.project);

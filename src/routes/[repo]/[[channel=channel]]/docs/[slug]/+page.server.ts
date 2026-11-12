@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit";
-import { loadGuides } from "$lib/server/guides";
+import { loadGuides } from "#lib/server/guides.ts";
 
 export const load = async ({ params }) => {
 	const guide = (await loadGuides(params.channel)).find(

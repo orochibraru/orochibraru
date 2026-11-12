@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
-import { requireAdmin } from "$lib/server/admin";
-import { getProject, recentSyncRuns } from "$lib/server/editor";
-import { latestJob, queueSync } from "$lib/server/github/worker";
+import { requireAdmin } from "#lib/server/admin.ts";
+import { getProject, recentSyncRuns } from "#lib/server/editor.ts";
+import { latestJob, queueSync } from "#lib/server/github/worker.ts";
 
 const state = (repo: string) =>
 	Response.json({ job: latestJob(repo) ?? null, runs: recentSyncRuns(10, repo) });

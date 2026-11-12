@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit";
-import { screenshotWebp } from "$lib/server/images";
+import { screenshotWebp } from "#lib/server/images.ts";
 
 export const GET = async ({ params }) => {
 	const webp = await screenshotWebp(params.sha);

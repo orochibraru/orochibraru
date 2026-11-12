@@ -1,5 +1,5 @@
-import { requireAdmin } from "$lib/server/admin";
-import { listAllPosts, listAllProjects } from "$lib/server/editor";
+import { requireAdmin } from "#lib/server/admin.ts";
+import { listAllPosts, listAllProjects } from "#lib/server/editor.ts";
 
 // posts and projects feed the ⌘K palette on every admin page
 export const load = async (event) => ({

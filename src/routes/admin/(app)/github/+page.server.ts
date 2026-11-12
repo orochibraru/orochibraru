@@ -1,6 +1,6 @@
 import { fail } from "@sveltejs/kit";
-import { lastSyncs, listAddableRepos, syncHistory } from "$lib/server/editor";
-import { env } from "$lib/server/env";
+import { lastSyncs, listAddableRepos, syncHistory } from "#lib/server/editor.ts";
+import { env } from "#lib/server/env.ts";
 import {
 	forgetGithubApp,
 	getGithubApp,
@@ -8,7 +8,7 @@ import {
 	manifestTarget,
 	recordInstallation,
 	refreshInstalledRepos,
-} from "$lib/server/github/app";
+} from "#lib/server/github/app.ts";
 
 const reason = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 

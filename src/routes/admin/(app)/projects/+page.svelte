@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { ChevronDown, ChevronUp, Ellipsis, ExternalLink } from "@lucide/svelte";
+	import { ago, statusClass } from "#lib/admin.ts";
+	import Confirm from "#lib/components/admin/Confirm.svelte";
+	import ContextMenu from "#lib/components/admin/ContextMenu.svelte";
 	import { enhance } from "$app/forms";
 	import { resolve } from "$app/paths";
-	import { ago, statusClass } from "$lib/admin";
-	import Confirm from "$lib/components/admin/Confirm.svelte";
-	import ContextMenu from "$lib/components/admin/ContextMenu.svelte";
 
 	let { data, form } = $props();
 
@@ -48,9 +48,10 @@
 			<button class="abtn abtn-primary" type="submit">Add project</button>
 		</form>
 	{:else}
-		<a class="ml-auto text-[.8125rem] text-dim hover:text-fg" href={resolve("/admin/github")}
-			>Install the GitHub App on more repos to add projects</a
-		>
+		<a
+			class="ml-auto text-[.8125rem] text-dim hover:text-fg"
+			href={resolve('admin/github')}
+		>Install the GitHub App on more repos to add projects</a>
 	{/if}
 </div>
 {#if form?.message}
@@ -88,8 +89,14 @@
 					}}
 				>
 					<td class="py-1">
-						<form class="relative z-10 flex flex-col" method="POST" action="?/move" use:enhance>
-							<input type="hidden" name="repo" value={project.repo}>
+						<form
+							class="relative z-10 flex flex-col"
+							method="POST"
+							action="?/move"
+							use:enhance
+						>
+							<input type="hidden" name="repo" value={project.repo} />
+
 							<button
 								class="grid size-9 place-items-center text-dim hover:text-fg disabled:opacity-25 md:size-6"
 								name="direction"
@@ -110,8 +117,19 @@
 						<div class="flex items-center gap-3">
 							<div class="grid aspect-video w-16 shrink-0 md:w-24 place-items-center overflow-hidden rounded-md border border-line bg-bg">
 								{#if project.shot}
-									<img class="on-light size-full object-cover object-top" src={project.shot.light} alt="" loading="lazy">
-									<img class="on-dark size-full object-cover object-top" src={project.shot.dark} alt="" loading="lazy">
+									<img
+										class="on-light size-full object-cover object-top"
+										src={project.shot.light}
+										alt=""
+										loading="lazy"
+									/>
+
+									<img
+										class="on-dark size-full object-cover object-top"
+										src={project.shot.dark}
+										alt=""
+										loading="lazy"
+									/>
 								{:else}
 									<span class="text-lg font-semibold text-dim" aria-hidden="true">{project.name.slice(0, 1)}</span>
 								{/if}
@@ -133,8 +151,11 @@
 										class="relative z-1 mt-0.5 inline-flex items-center gap-1 font-mono text-xs text-dim hover:text-fg"
 										href="https://github.com/{project.githubRepo}"
 										target="_blank"
-										rel="noopener">{project.githubRepo}<ExternalLink class="size-3" aria-hidden="true" /></a
+										rel="noopener"
 									>
+										{project.githubRepo}
+										<ExternalLink class="size-3" aria-hidden="true" />
+									</a>
 								{:else}
 									<span class="font-mono text-xs text-dim">no repo</span>
 								{/if}
@@ -166,12 +187,12 @@
 					{#if data.views}
 						<td class="wide text-right font-mono text-xs whitespace-nowrap">
 							{#await data.views}
-								<span class="text-dim">&hellip;</span>
+								<span class="text-dim">…</span>
 							{:then views}
 								{#if views && project.published}
 									{number.format(views[project.repo] ?? 0)}
 								{:else}
-									<span class="text-dim">&ndash;</span>
+									<span class="text-dim">–</span>
 								{/if}
 							{/await}
 						</td>
@@ -204,11 +225,16 @@
 		<form
 			method="POST"
 			use:enhance={() => {
-				menu?.close();
-			}}
-		>
-			<input type="hidden" name="repo" value={project.repo}>
-			<a class="menu-item" role="menuitem" href={resolve("/admin/(app)/projects/[repo]", { repo: project.repo })}>Edit</a>
+			menu?.close();
+		}}>
+			<input type="hidden" name="repo" value={project.repo} />
+
+			<a
+				class="menu-item"
+				role="menuitem"
+				href={resolve("/admin/(app)/projects/[repo]", { repo: project.repo })}
+			>Edit</a>
+
 			{#if project.published}
 				<a class="menu-item" role="menuitem" href={resolve("/[repo]", { repo: project.repo })} target="_blank" rel="noreferrer">View on site</a>
 				<button class="menu-item" role="menuitem" formaction="?/unpublish">Unpublish</button>
@@ -248,10 +274,23 @@
 >
 	<header>
 		The /projects page
-		<a class="inline-flex items-center gap-1 text-xs font-normal text-dim hover:text-fg" href={resolve("/projects")} target="_blank"
-			>View<ExternalLink class="size-3" aria-hidden="true" /></a
+
+		<a
+			class="inline-flex items-center gap-1 text-xs font-normal text-dim hover:text-fg"
+			href={resolve('projects')}
+			target="_blank"
 		>
-		<button class="abtn abtn-primary ml-auto h-7" type="submit">Save<span class="kbd border-onspark/30 text-onspark/70">⌘S</span></button>
+			View
+			<ExternalLink class="size-3" aria-hidden="true" />
+		</a>
+
+		<button
+			class="abtn abtn-primary ml-auto h-7"
+			type="submit"
+		>
+			Save
+			<span class="kbd border-onspark/30 text-onspark/70">⌘S</span>
+		</button>
 	</header>
 	<div class="admin-form grid gap-5 p-4 lg:grid-cols-2">
 		<div class="grid content-start gap-5">
@@ -261,21 +300,42 @@
 			</p>
 			<label>
 				Tag, after the project count
-				<input name="tag" value={data.copy.tag} placeholder="MIT & AGPL">
+
+				<input
+					name="tag"
+					value={data.copy.tag}
+					placeholder="MIT & AGPL"
+				/>
 			</label>
 			<div class="grid gap-5 sm:grid-cols-2">
-				<label>Heading <input name="heading" value={data.copy.heading} required></label>
-				<label>Its highlighted second line <input name="accent" value={data.copy.accent}></label>
+				<label>
+					Heading
+					<input name="heading" value={data.copy.heading} required />
+				</label>
+
+				<label>
+					Its highlighted second line
+					<input name="accent" value={data.copy.accent} />
+				</label>
 			</div>
 			<label>
 				Intro
 				<textarea class="field-sizing-content min-h-24" name="intro">{data.copy.intro}</textarea>
 			</label>
-			<label>Heading over the other projects <input name="others" value={data.copy.others} required></label>
+
+			<label>
+				Heading over the other projects
+				<input name="others" value={data.copy.others} required />
+			</label>
 		</div>
 		<div class="grid content-start gap-5">
 			<p class="text-[13px] text-dim">What search engines and link previews see.</p>
-			<label>Page title <input name="title" value={data.copy.title} required></label>
+
+			<label>
+				Page title
+				<input name="title" value={data.copy.title} required />
+			</label>
+
 			<label>
 				Description
 				<textarea class="field-sizing-content min-h-24" name="description" required>{data.copy.description}</textarea>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Asterisk, Check, ChevronDown, Copy, FileText } from "@lucide/svelte";
-	import { mdPath, SITE } from "$lib/seo";
+	import { mdPath, SITE } from "#lib/seo.ts";
 
 	// What a docs page offers an LLM: its Markdown twin, copied, opened, or handed to Claude.
 	let { path }: { path: string } = $props();

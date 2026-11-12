@@ -1,11 +1,11 @@
 <script lang="ts">
+	import BrandIcon from "#lib/components/BrandIcon.svelte";
+	import LucideIcon from "#lib/components/LucideIcon.svelte";
+	import Meta from "#lib/components/Meta.svelte";
+	import { copyButtons } from "#lib/copy.ts";
+	import { lightbox } from "#lib/lightbox.ts";
+	import { mermaidDiagrams } from "#lib/mermaid.ts";
 	import { resolve } from "$app/paths";
-	import BrandIcon from "$lib/components/BrandIcon.svelte";
-	import LucideIcon from "$lib/components/LucideIcon.svelte";
-	import Meta from "$lib/components/Meta.svelte";
-	import { copyButtons } from "$lib/copy";
-	import { lightbox } from "$lib/lightbox";
-	import { mermaidDiagrams } from "$lib/mermaid";
 
 	let { data } = $props();
 </script>
@@ -24,9 +24,9 @@
 		<div class="pt-10 pb-5">
 			<a
 				class="text-sm font-medium text-dim hover:text-accent"
-				href={resolve("/projects")}
-				>&larr; All projects</a
-			>
+				href={resolve('projects')}
+			>← All projects</a>
+
 			<span class="tag ml-3.5">{data.tag}</span>
 			<h1 class="mt-4.5 text-[clamp(2.4rem,6.5vw,4rem)]/none animate-rise stereo font-extrabold tracking-[-.045em]">
 				{data.name}

@@ -1,6 +1,6 @@
 <script lang="ts">
+	import Meta from "#lib/components/Meta.svelte";
 	import { resolve } from "$app/paths";
-	import Meta from "$lib/components/Meta.svelte";
 
 	const EMAIL = "contact@zedensix.com";
 	const UPDATED = "26 October 2026";
@@ -17,9 +17,11 @@
 <main class="mx-auto max-w-page px-6">
 	<article class="prose">
 		<div class="pt-10 pb-5">
-			<a class="text-sm font-medium text-dim hover:text-accent" href={resolve("/privacy")}
-				>&larr; Privacy</a
-			>
+			<a
+				class="text-sm font-medium text-dim hover:text-accent"
+				href={resolve('privacy')}
+			>← Privacy</a>
+
 			<span class="tag ml-3.5">Updated {UPDATED}</span>
 			<h1 class="mt-4.5 text-[clamp(2.4rem,6.5vw,4rem)]/none animate-rise stereo font-extrabold tracking-[-.045em]">
 				OpenCount privacy.
@@ -58,9 +60,8 @@
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">What is stored, and why</h2>
 			<ul class="list-disc pl-6">
 				<li>
-					<strong>Your account:</strong> name, email address, a hash of your password, and if you set them
-					up, your passkeys, authenticator app secret and backup codes. If you sign in with single sign-on,
-					the provider&rsquo;s ID for you and the tokens it hands back.
+					<strong>Your account:</strong>
+					name, email address, a hash of your password, and if you set them up, your passkeys, authenticator app secret and backup codes. If you sign in with single sign-on, the provider’s ID for you and the tokens it hands back.
 				</li>
 				<li>
 					<strong>Sessions:</strong> one per signed-in device, with the IP address and browser it was opened
@@ -81,11 +82,7 @@
 				<li><strong>Appearance:</strong> your theme, accent colour, font and corners.</li>
 			</ul>
 			<p class="mt-5">
-				All of it exists to run the service you signed up for: splitting expenses with your groups
-				and keeping your account secure. The legal basis is the performance of that service (GDPR Art.
-				6(1)(b)). Names of people added without an account, and the expenses they are part of, are
-				held on the basis of the group&rsquo;s legitimate interest in keeping its accounts straight (Art.
-				6(1)(f)).
+				All of it exists to run the service you signed up for: splitting expenses with your groups and keeping your account secure. The legal basis is the performance of that service (GDPR Art. 6(1)(b)). Names of people added without an account, and the expenses they are part of, are held on the basis of the group’s legitimate interest in keeping its accounts straight (Art. 6(1)(f)).
 			</p>
 		</section>
 
@@ -93,8 +90,8 @@
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Who sees what</h2>
 			<ul class="list-disc pl-6">
 				<li>
-					<strong>Members of a group</strong> see its members, including each member&rsquo;s account email,
-					every expense in it and everyone&rsquo;s balance. Nobody outside the group can open it.
+					<strong>Members of a group</strong>
+					see its members, including each member’s account email, every expense in it and everyone’s balance. Nobody outside the group can open it.
 				</li>
 				<li>
 					<strong>The instance admin</strong> sees the list of accounts (name, email, role, whether two-factor
@@ -111,13 +108,16 @@
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Receipts</h2>
 			<p>
-				If the admin turns on receipt reading, you can scan a photo or PDF of a receipt to fill in an
-				expense. The file is read in the server&rsquo;s memory by
-				<a class="text-accent" href="https://tesseract-ocr.github.io/" target="_blank" rel="noopener"
-					>Tesseract</a
-				>, an open-source text recogniser running on the same server, and dropped as soon as the
-				reading is done. It is never saved, and never sent to any outside service. Only the amount,
-				date and merchant it found go back to your form.
+				If the admin turns on receipt reading, you can scan a photo or PDF of a receipt to fill in an expense. The file is read in the server’s memory by
+
+				<a
+					class="text-accent"
+					href="https://tesseract-ocr.github.io/"
+					target="_blank"
+					rel="noopener"
+				>Tesseract</a>
+
+				, an open-source text recogniser running on the same server, and dropped as soon as the reading is done. It is never saved, and never sent to any outside service. Only the amount, date and merchant it found go back to your form.
 			</p>
 		</section>
 
@@ -133,23 +133,20 @@
 				<li>
 					<strong>Sessions:</strong> until you sign out or they expire.
 				</li>
+
+				<li><strong>Sign-up codes:</strong> 15 minutes.</li>
+
 				<li>
-					<strong>Sign-up codes:</strong> 15 minutes.
+					<strong>Emails waiting to be sent</strong>
+					(and so their recipient and contents): deleted 7 days after they go out.
 				</li>
 				<li>
-					<strong>Emails waiting to be sent</strong> (and so their recipient and contents): deleted 7 days
-					after they go out.
-				</li>
-				<li>
-					<strong>Server logs:</strong> each request&rsquo;s method, path, status and duration, with no IP
-					address, browser or account attached. They stay on the server.
+					<strong>Server logs:</strong>
+					each request’s method, path, status and duration, with no IP address, browser or account attached. They stay on the server.
 				</li>
 			</ul>
 			<p class="mt-5">
-				Deleting an account deletes its sign-in details, sessions, passkeys, two-factor secrets and
-				appearance. It does not delete your share of a group&rsquo;s history: the other members still
-				need their balances to add up, so the expenses you paid or owed stay in the group under the
-				name you had in it. Ask the group to delete it if you want those gone too.
+				Deleting an account deletes its sign-in details, sessions, passkeys, two-factor secrets and appearance. It does not delete your share of a group’s history: the other members still need their balances to add up, so the expenses you paid or owed stay in the group under the name you had in it. Ask the group to delete it if you want those gone too.
 			</p>
 		</section>
 
@@ -181,9 +178,7 @@
 				asking about them.
 			</p>
 			<p class="mt-5">
-				Your browser&rsquo;s local storage keeps your light or dark theme so a reload doesn&rsquo;t
-				flash. Installed as an app, it caches the app&rsquo;s own code and icons for speed, never your
-				groups or expenses.
+				Your browser’s local storage keeps your light or dark theme so a reload doesn’t flash. Installed as an app, it caches the app’s own code and icons for speed, never your groups or expenses.
 			</p>
 		</section>
 
@@ -197,11 +192,11 @@
 				<li>object to it being processed at all</li>
 			</ul>
 			<p class="mt-5">
-				On <code>app.opencount.eu</code>, email
-				<a class="text-accent" href="mailto:{EMAIL}">{EMAIL}</a> from the address on your account and
-				you&rsquo;ll get an answer within a month. That includes deleting your account, which the app
-				doesn&rsquo;t let you do yourself yet. On another instance, ask whoever runs it: they hold the
-				data.
+				On
+				<code>app.opencount.eu</code>
+				, email
+				<a class="text-accent" href="mailto:{EMAIL}">{EMAIL}</a>
+				from the address on your account and you’ll get an answer within a month. That includes deleting your account, which the app doesn’t let you do yourself yet. On another instance, ask whoever runs it: they hold the data.
 			</p>
 			<p class="mt-5">
 				If you think your data is being mishandled, you can complain to the French data protection

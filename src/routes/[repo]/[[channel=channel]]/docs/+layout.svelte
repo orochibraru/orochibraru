@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { ArrowUpRight, Menu } from "@lucide/svelte";
+	import Drawer from "#lib/components/Drawer.svelte";
+	import Logo from "#lib/components/Logo.svelte";
+	import LucideIcon from "#lib/components/LucideIcon.svelte";
+	import type { Channel } from "#lib/projects.ts";
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
-	import Drawer from "$lib/components/Drawer.svelte";
-	import Logo from "$lib/components/Logo.svelte";
-	import LucideIcon from "$lib/components/LucideIcon.svelte";
-	import type { Channel } from "$lib/projects";
 
 	let { data, children } = $props();
 	const project = $derived(data.project);
@@ -91,7 +91,7 @@
 	<div class="px-3.5 pt-5 pb-2">
 		<a
 			class="group flex items-center justify-between rounded-2xl border border-line bg-bg px-3 py-2.5 transition hover:border-edge"
-			href={resolve(`/${project.key}`)}
+			href={resolve("/[repo]", { repo: project.key })}
 		>
 			<span>
 				<span class="block label">Documentation</span>
