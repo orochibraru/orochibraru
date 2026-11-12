@@ -73,24 +73,15 @@
 		};
 	});
 
-	// Pages slide like a navigation stack: deeper comes in from the right, back goes
-	// out to it, a tab switch only fades. The root layout starts the transition; this
-	// only says which way it goes, for app.css to pick the animation.
-	const depth = (path: string) => path.split("/").filter(Boolean).length;
+	// Pages crossfade. The root layout starts the transition; this only tells app.css
+	// when the page stays the same (a form post, a query change), which doesn't animate.
 	onNavigate((navigation) => {
 		const from = navigation.from?.url.pathname;
 		const to = navigation.to?.url.pathname;
 		if (!from || !to) {
 			return;
 		}
-		document.documentElement.dataset.nav =
-			from === to
-				? "same"
-				: depth(to) > depth(from)
-					? "forward"
-					: depth(to) < depth(from)
-						? "back"
-						: "tab";
+		document.documentElement.dataset.nav = from === to ? "same" : "page";
 	});
 
 	let palette = $state<Palette>();
@@ -145,7 +136,6 @@
 	<meta name="robots" content="noindex">
 	<!-- added to a home screen, the admin opens as its own app, without the browser around it -->
 	<link rel="manifest" href={asset("/admin/manifest.webmanifest")}>
-	<link rel="apple-touch-icon" href={asset("/admin/icon-180.png")}>
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-title" content="Admin">
@@ -168,9 +158,7 @@
 				class="grid size-11 place-items-center active:opacity-50"
 				href={resolve("/admin")}
 				aria-label="Overview"
-				><span class="grid size-7 place-items-center rounded-lg bg-spark text-onspark"
-					><Logo mono class="size-4.5" /></span
-				></a
+				><Logo class="size-7 rounded-lg" /></a
 			>
 			<p
 				class="truncate text-center text-[1.0625rem] font-semibold transition-opacity duration-200"
@@ -193,10 +181,8 @@
 		class="fixed inset-y-0 left-0 z-20 hidden w-56 flex-col border-r border-line bg-surface md:flex"
 	>
 		<a class="flex h-14 shrink-0 items-center gap-2.5 px-4" href={resolve("/admin")}>
-			<span class="grid size-7 place-items-center rounded-md bg-spark text-onspark" aria-hidden="true"
-				><Logo mono class="size-4.5" /></span
-			>
-			<span class="text-sm font-semibold">orochibraru</span>
+			<Logo class="size-7 rounded-md" />
+			<span class="text-sm font-semibold">zedensix</span>
 		</a>
 		<div class="px-3 pb-3">
 			<button

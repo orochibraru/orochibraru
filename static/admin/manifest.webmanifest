@@ -1,8 +1,8 @@
 {
 	"id": "/admin",
-	"name": "orochibraru admin",
+	"name": "zedensix admin",
 	"short_name": "Admin",
-	"description": "Posts, projects, docs sync and analytics for orochibraru.com.",
+	"description": "Posts, projects, docs sync and analytics for zedensix.com.",
 	"start_url": "/admin",
 	"scope": "/admin",
 	"display": "standalone",
@@ -21,7 +21,6 @@
 			"sizes": "512x512",
 			"type": "image/png",
 			"purpose": "any maskable"
-		},
-		{ "src": "/admin/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+		}
 	]
 }

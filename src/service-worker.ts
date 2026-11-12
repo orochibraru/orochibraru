@@ -18,7 +18,7 @@ sw.addEventListener("activate", (event) => {
 sw.addEventListener("push", (event) => {
 	const message = (event.data?.json() ?? {}) as Partial<Message>;
 	event.waitUntil(
-		sw.registration.showNotification(message.title ?? "orochibraru", {
+		sw.registration.showNotification(message.title ?? "zedensix", {
 			body: message.body,
 			tag: message.tag,
 			icon: "/admin/icon-192.png",

@@ -19,7 +19,7 @@
 </script>
 
 <svelte:head>
-	<title>Settings | orochibraru admin</title>
+	<title>Settings | zedensix admin</title>
 </svelte:head>
 
 {#snippet status(saved: boolean, problem: Promise<string | null> | undefined)}

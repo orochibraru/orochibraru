@@ -35,7 +35,7 @@
 </script>
 
 <svelte:head>
-	<title>Analytics | orochibraru admin</title>
+	<title>Analytics | zedensix admin</title>
 </svelte:head>
 
 {#snippet tiles(items: [string, string, string?, Change?][])}

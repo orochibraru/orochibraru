@@ -30,7 +30,7 @@ const serviceAccount = JSON.stringify({
 	client_email: "stats@project.iam.gserviceaccount.com",
 	private_key: `-----BEGIN PRIVATE KEY-----\n${pem.match(/.{1,64}/g)?.join("\n")}\n-----END PRIVATE KEY-----\n`,
 });
-const config = { site: "sc-domain:orochibraru.test", serviceAccount };
+const config = { site: "sc-domain:zedensix.test", serviceAccount };
 
 const realFetch = globalThis.fetch;
 const bodies: Record<string, unknown>[] = [];
@@ -82,8 +82,8 @@ globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) =>
 	const rows: Record<string, unknown[]> = {
 		"": [row()],
 		date: [row(["1970-01-11"])],
-		query: [row(["orochibraru"])],
-		page: [row(["https://orochibraru.test/blog/hello"])],
+		query: [row(["zedensix"])],
+		page: [row(["https://zedensix.test/blog/hello"])],
 	};
 	return Response.json({ rows: rows[body.dimensions.join()] });
 }) as typeof fetch;
@@ -146,8 +146,8 @@ describe("searchStats", () => {
 		expect(stats.series.filter((point) => point.clicks)).toEqual([
 			{ t: Date.parse("1970-01-11"), clicks: 3, impressions: 40 },
 		]);
-		expect(stats.queries[0]).toMatchObject({ key: "orochibraru", clicks: 3 });
-		expect(stats.pages[0]?.key).toBe("https://orochibraru.test/blog/hello");
+		expect(stats.queries[0]).toMatchObject({ key: "zedensix", clicks: 3 });
+		expect(stats.pages[0]?.key).toBe("https://zedensix.test/blog/hello");
 		expect(bodies[0]).toMatchObject({ startDate: "1969-12-16", endDate: "1970-01-12" });
 		// the last day with data is Jan 11, the range's 27th: the 27 days before it
 		expect(bodies.at(-1)).toMatchObject({

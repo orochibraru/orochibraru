@@ -16,7 +16,7 @@
 </svelte:head>
 
 <Meta
-	title="{post.title} | orochibraru"
+	title="{post.title} | zedensix"
 	description={post.description}
 	{path}
 	ogType="article"

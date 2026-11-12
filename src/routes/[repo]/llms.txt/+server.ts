@@ -13,7 +13,7 @@ export const GET = async ({ params }) => {
 
 	return new Response(`# ${project.name}
 
-> ${project.blurb} Free, open source and self-hosted, by orochibraru.
+> ${project.blurb} Free, open source and self-hosted, by zedensix.
 
 - Project page: ${SITE}${mdPath(`/${project.key}`)}
 - Documentation index: ${SITE}${mdPath(docsUrl(project))}
@@ -26,6 +26,6 @@ ${guides.map((guide) => `- [${guide.title}](${SITE}${mdPath(guide.url)}): ${clip
 
 ## Optional
 
-- [Everything on orochibraru.com](${SITE}/llms.txt): the other projects and the blog.
+- [Everything on zedensix.com](${SITE}/llms.txt): the other projects and the blog.
 `);
 };

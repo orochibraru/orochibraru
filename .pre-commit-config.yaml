@@ -14,9 +14,6 @@ repos:
       - id: check-yaml
         name: Validate Yaml
 
-      - id: check-added-large-files
-        name: Look for large files
-
       - id: mixed-line-ending
         name: Fix line endings
         args: [--fix=lf]
@@ -72,7 +69,8 @@ repos:
         entry: pinact run
         language: golang
         language_version: 1.27.1
-        additional_dependencies: [github.com/suzuki-shunsuke/pinact/v5/cmd/pinact@v5.0.0]
+        additional_dependencies:
+          [github.com/suzuki-shunsuke/pinact/v5/cmd/pinact@v5.0.0]
         files: ^\.github/workflows/.*\.ya?ml$
 
   - repo: https://github.com/hadolint/hadolint

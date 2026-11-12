@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { tick } from "svelte";
 	import { afterNavigate, goto } from "$app/navigation";
+	import { page } from "$app/state";
 
-	type Entry = { u: string; t: string; g: string; p: string; x: string };
+	type Entry = { u: string; t: string; g: string; p: string; r: string; x: string };
 
 	let dialog = $state<HTMLDialogElement>();
 	let field = $state<HTMLInputElement>();
@@ -9,14 +11,38 @@
 	let index = $state<Entry[]>();
 	let active = $state(0);
 
-	const results = $derived.by(() => {
-		const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-		if (!index || !terms.length) {
+	// "@repo rest" searches only that project; "@" alone, still being typed, picks one
+	const projects = $derived(
+		new Map((index ?? []).filter((entry) => entry.r).map((entry) => [entry.r, entry.p])),
+	);
+	const picking = $derived(/^@\S*$/.test(query));
+	const scope = $derived(query.match(/^@(\S+)\s/)?.[1]?.toLowerCase());
+	const terms = $derived(
+		(scope ? query.replace(/^@\S+\s/, "") : query).toLowerCase().split(/\s+/).filter(Boolean),
+	);
+
+	const choices = $derived.by(() => {
+		if (!picking) {
 			return [];
+		}
+		const typed = query.slice(1).toLowerCase();
+		return [...projects].filter(
+			([repo, name]) => repo.includes(typed) || name.toLowerCase().includes(typed),
+		);
+	});
+
+	const results = $derived.by(() => {
+		if (!index || picking || (scope && !projects.has(scope))) {
+			return [];
+		}
+		const pool = scope ? index.filter((entry) => entry.r === scope) : index;
+		if (!terms.length) {
+			// a bare scope lists the project's pages, so there is something to start from
+			return scope ? pool.filter((entry) => !entry.u.includes("#")).slice(0, 24) : [];
 		}
 
 		const scored: { entry: Entry; score: number }[] = [];
-		for (const entry of index) {
+		for (const entry of pool) {
 			const heading = entry.t.toLowerCase();
 			const context = entry.g.toLowerCase();
 			const body = entry.x.toLowerCase();
@@ -52,6 +78,11 @@
 		}
 		dialog.showModal();
 		field?.select();
+		// on a project's pages the search starts scoped to it, unless the query was already widened
+		const here = page.params.repo;
+		if (here && (!query || query.startsWith("@"))) {
+			choose(here, query.replace(/^@\S*\s?/, ""));
+		}
 		if (!index) {
 			try {
 				index = await (await fetch("/search.json")).json();
@@ -59,6 +90,17 @@
 				index = [];
 			}
 		}
+		// a [repo] route that turned out not to be a project (its 404) leaves the search site-wide
+		if (here && !projects.has(here) && query.startsWith(`@${here} `)) {
+			query = query.slice(here.length + 2);
+		}
+	}
+
+	async function choose(repo: string, rest = "") {
+		query = `@${repo} ${rest}`;
+		await tick();
+		field?.focus();
+		field?.setSelectionRange(query.length, query.length);
 	}
 
 	afterNavigate(() => dialog?.close());
@@ -71,7 +113,7 @@
 	}
 
 	function onDialogKeydown(event: KeyboardEvent) {
-		const count = results.length;
+		const count = picking ? choices.length : results.length;
 		if (event.key === "ArrowDown" && count) {
 			event.preventDefault();
 			active = (active + 1) % count;
@@ -79,12 +121,17 @@
 			event.preventDefault();
 			active = (active - 1 + count) % count;
 		} else if (event.key === "Enter") {
-			const result = results[active];
-			if (!result) {
+			const choice = picking ? choices[active] : undefined;
+			const result = picking ? undefined : results[active];
+			if (!choice && !result) {
 				return;
 			}
 			event.preventDefault();
-			goto(result.u);
+			if (choice) {
+				choose(choice[0]);
+			} else if (result) {
+				goto(result.u);
+			}
 		}
 	}
 
@@ -94,7 +141,7 @@
 	});
 
 	$effect(() => {
-		dialog?.querySelectorAll("a")[active]?.scrollIntoView({ block: "nearest" });
+		dialog?.querySelectorAll("li > :first-child")[active]?.scrollIntoView({ block: "nearest" });
 	});
 </script>
 
@@ -125,12 +172,24 @@
 			bind:value={query}
 			type="search"
 			autocomplete="off"
-			placeholder="Search the guides"
+			placeholder="Search, or @project to search one"
 			class="w-full bg-transparent py-1 text-[.95rem] outline-none placeholder:text-dim"
 		>
 		<kbd class="kbd hidden px-1.5 sm:inline-grid">esc</kbd>
 	</div>
 	<ul class="max-h-[52vh] overflow-y-auto p-2">
+		{#each choices as [repo, name], position (repo)}
+			<li>
+				<button
+					type="button"
+					class={["block w-full rounded-2xl px-4 py-3 text-left transition-colors", position === active && "bg-fg/6 text-accent"]}
+					onclick={() => choose(repo)}
+				>
+					<span class="block text-[.95rem] font-bold tracking-[-.01em]">{name}</span>
+					<span class="mt-0.5 block label">Search only @{repo}</span>
+				</button>
+			</li>
+		{/each}
 		{#each results as entry, position (entry.u)}
 			<li>
 				<a
@@ -138,9 +197,10 @@
 					href={entry.u}
 				>
 					<span class="block text-[.95rem] font-bold tracking-[-.01em]">{entry.t}</span>
-					<span class="mt-0.5 block label"
-						>{entry.g || entry.p}</span
-					>
+					<span class="mt-0.5 flex min-w-0 items-baseline gap-2">
+						<span class="label shrink-0">{entry.g || entry.p}</span>
+						<span class="truncate font-mono text-[.75rem] text-dim">{entry.u}</span>
+					</span>
 					{#if entry.x}
 						<span class="mt-1.5 block truncate text-[.85rem] text-dim"
 							>{entry.x.slice(0, 120)}</span
@@ -150,9 +210,13 @@
 			</li>
 		{/each}
 	</ul>
-	{#if query && index && !results.length}
+	{#if index && scope && !projects.has(scope)}
 		<p class="px-4 py-8 text-center text-[.9rem] text-dim">
-			Nothing matches &ldquo;{query}&rdquo;.
+			No project is called &ldquo;{scope}&rdquo;. Type @ to pick one.
+		</p>
+	{:else if query && index && !results.length && !choices.length}
+		<p class="px-4 py-8 text-center text-[.9rem] text-dim">
+			Nothing matches &ldquo;{terms.join(" ")}&rdquo;{scope ? ` in ${projects.get(scope)}` : ""}.
 		</p>
 	{/if}
 </dialog>

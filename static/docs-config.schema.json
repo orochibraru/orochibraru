@@ -58,7 +58,7 @@
 	},
 	"required": ["categories"],
 	"additionalProperties": false,
-	"description": "Order, titles, icons and categories for a project's docs on orochibraru.com",
+	"description": "Order, titles, icons and categories for a project's docs on zedensix.com",
 	"$defs": {
 		"Icon": {
 			"type": "string",
@@ -1905,6 +1905,6 @@
 			]
 		}
 	},
-	"$id": "https://orochibraru.com/docs-config.schema.json",
+	"$id": "https://zedensix.com/docs-config.schema.json",
 	"title": "Docs config"
 }

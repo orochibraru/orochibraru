@@ -2,7 +2,7 @@
 	import { resolve } from "$app/paths";
 	import Meta from "$lib/components/Meta.svelte";
 
-	const EMAIL = "orochibraru@gmail.com";
+	const EMAIL = "contact@zedensix.com";
 	const UPDATED = "26 October 2026";
 </script>
 
@@ -44,7 +44,7 @@
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Who is responsible</h2>
 			<p>
-				For <code>app.opencount.eu</code>, the data controller under the GDPR is orochibraru, a
+				For <code>app.opencount.eu</code>, the data controller under the GDPR is zedensix, a
 				private individual running a non-commercial service. For anything about your data, email
 				<a class="text-accent" href="mailto:{EMAIL}">{EMAIL}</a>.
 			</p>

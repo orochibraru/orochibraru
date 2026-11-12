@@ -53,7 +53,7 @@ describe("posts over MCP", () => {
 		await call("update_post", { slug: "hello-from-claude", body: "Edited." });
 		const published = (await call("publish_post", { slug: "hello-from-claude" })).json();
 		expect(published.status).toBe("published");
-		expect(published.url).toBe("https://orochibraru.com/blog/hello-from-claude");
+		expect(published.url).toBe("https://zedensix.com/blog/hello-from-claude");
 		const read = (await call("get_post", { slug: "hello-from-claude" })).json();
 		expect(read.body).toBe("Edited.");
 		expect(read.description).toBe("Written over MCP.");

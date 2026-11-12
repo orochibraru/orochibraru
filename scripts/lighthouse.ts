@@ -88,7 +88,7 @@ const server = Bun.serve({
 
 /** Every page the sitemap lists: the routes production serves. */
 const sitemap = await (await fetch(`http://localhost:${PORT}/sitemap.xml`)).text();
-const built = [...sitemap.matchAll(/<loc>https:\/\/orochibraru\.com([^<]*)<\/loc>/g)]
+const built = [...sitemap.matchAll(/<loc>https:\/\/zedensix\.com([^<]*)<\/loc>/g)]
 	.map((match) => match[1] || "/")
 	.sort();
 

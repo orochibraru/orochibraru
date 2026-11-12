@@ -114,7 +114,7 @@
 </script>
 
 <svelte:head>
-	<title>Reports | orochibraru admin</title>
+	<title>Reports | zedensix admin</title>
 </svelte:head>
 
 <div class="mb-5 flex min-h-8 flex-wrap items-center gap-x-4 gap-y-2">

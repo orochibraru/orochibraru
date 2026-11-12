@@ -1,4 +1,4 @@
-export const SITE = "https://orochibraru.com";
+export const SITE = "https://zedensix.com";
 
 export const PERSON = { "@id": `${SITE}/#person` };
 export const WEBSITE = { "@id": `${SITE}/#website` };

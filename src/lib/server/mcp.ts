@@ -70,7 +70,7 @@ const summary = (row: PostRow) => ({
 });
 
 export function createMcpServer(): McpServer {
-	const server = new McpServer({ name: "orochibraru.com", version: "1.0.0" });
+	const server = new McpServer({ name: "zedensix.com", version: "1.0.0" });
 
 	server.registerTool(
 		"list_posts",

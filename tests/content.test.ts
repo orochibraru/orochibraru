@@ -109,7 +109,7 @@ describe("project pages", () => {
 		expect(page?.html).toContain(`<img src="${served("c")}"`);
 		expect(page?.html).toContain('<section id="alternatives" class="ruled">');
 		expect(page?.html).toContain('<div class="tiles"><div class="feat">');
-		expect(page?.image?.url).toBe(`https://orochibraru.com${served("b")}`);
+		expect(page?.image?.url).toBe(`https://zedensix.com${served("b")}`);
 	});
 
 	test("an unpublished project is not there, and invalidate() makes that true at once", () => {
@@ -123,9 +123,9 @@ describe("project pages", () => {
 	test("the Markdown twin has absolute image URLs and no anchor syntax", () => {
 		const twin = projectMarkdown({ repo: "demo", name: "Demo", body: BODY });
 		expect(twin).toStartWith("# Demo\n");
-		expect(twin).toContain(`](https://orochibraru.com${served("a")})`);
-		expect(twin).toContain(`](https://orochibraru.com${served("c")})`);
-		expect(twin).toContain("](https://orochibraru.com/demo/docs/showcase)");
+		expect(twin).toContain(`](https://zedensix.com${served("a")})`);
+		expect(twin).toContain(`](https://zedensix.com${served("c")})`);
+		expect(twin).toContain("](https://zedensix.com/demo/docs/showcase)");
 		expect(twin).not.toContain("{#alternatives}");
 	});
 });

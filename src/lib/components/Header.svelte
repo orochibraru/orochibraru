@@ -50,7 +50,7 @@
 	<a class={style} href={resolve("/projects")}>Projects</a>
 	<a class={style} href={resolve("/blog")}>Blog</a>
 	<a class={style} href={resolve("/about")}>About</a>
-	<a class={style} href={source ?? "https://github.com/orochibraru?tab=repositories"} target="_blank" rel="noopener"
+	<a class={style} href={source ?? "https://github.com/zedensix?tab=repositories"} target="_blank" rel="noopener"
 		>{source ? "Source" : "GitHub"}</a
 	>
 	{#if page.data.signedIn}
@@ -76,8 +76,8 @@
 		<a
 			class="group flex items-center gap-2.5 font-display text-[17px] font-semibold tracking-[-.02em] {docs ? "lg:hidden" : ""}"
 			href={resolve("/")}
-			><Logo class="size-7 transition-transform duration-700 ease-out-expo group-hover:-rotate-360" /><span
-				>orochi<span class="text-accent">braru</span></span
+			><Logo class="size-7 rounded-md" /><span
+				>zeden<span class="text-accent">six</span></span
 			></a
 		>
 		<div class="ml-auto flex items-center gap-3 text-[15px] font-medium whitespace-nowrap text-fg/80 md:gap-6">

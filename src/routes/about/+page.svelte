@@ -6,16 +6,16 @@
 		{
 			"@context": "https://schema.org",
 			"@type": "AboutPage",
-			url: "https://orochibraru.com/about",
-			isPartOf: { "@id": "https://orochibraru.com/#website" },
+			url: "https://zedensix.com/about",
+			isPartOf: { "@id": "https://zedensix.com/#website" },
 			mainEntity: {
 				"@type": "Person",
-				"@id": "https://orochibraru.com/#person",
-				name: "orochibraru",
+				"@id": "https://zedensix.com/#person",
+				name: "zedensix",
 				description:
 					"Self-taught software engineer with ten years of experience, building free self-hosted tools for homelabs.",
-				url: "https://orochibraru.com/about",
-				sameAs: ["https://github.com/orochibraru", "https://hub.docker.com/u/orochibraru"],
+				url: "https://zedensix.com/about",
+				sameAs: ["https://github.com/zedensix", "https://hub.docker.com/u/orochibraru"],
 				knowsAbout: ["self-hosting", "homelab", "Docker", "SvelteKit", "Bun", "TypeScript"],
 			},
 		},
@@ -24,7 +24,7 @@
 
 <Meta
 	title="About: a self-taught engineer who is done paying rent on software"
-	description="Ten years self-taught, building free self-hosted tools under a weeb handle. How these projects get built, what AI actually does here, and why a pricing page makes me angry enough to rewrite the thing."
+	description="Ten years self-taught, building free self-hosted tools. How these projects get built, what AI actually does here, and why a pricing page makes me angry enough to rewrite the thing."
 	path="/about"
 	ogType="profile"
 	trail={[["About", "/about"]]}
@@ -41,7 +41,7 @@
 			<div class="mt-4.5 flex flex-wrap items-center gap-7">
 				<enhanced:img
 					src="$lib/assets/avatar.jpg"
-					alt="orochibraru&rsquo;s avatar"
+					alt="zedensix&rsquo;s avatar"
 					class="block size-28 shrink-0 rounded-4xl border border-line object-cover shadow-[0_0_40px_-8px_var(--color-accent)]"
 					loading="eager"
 				/>
@@ -59,17 +59,12 @@
 		</div>
 
 		<section class="mb-22.5">
-			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">The name</h2>
+			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Overview</h2>
 			<p>
-				The handle is a weeb name and the picture is a cartoon, and both are deliberate. I&rsquo;d
-				rather what I ship got judged than who shipped it. My legal name adds nothing to a
-				Dockerfile. It also means none of this is a personal brand play. There&rsquo;s no
-				newsletter, no course, no consulting funnel at the end of the page.
-			</p>
-			<p class="mt-5">
-				And I&rsquo;ll admit the irony is most of the appeal: infrastructure that people run in
-				front of their actual data, signed off by a guy named after an anime snake. If that makes
-				you check the source before you trust it, good. You should have done that anyway.
+				Everything here is free, open source and self-hosted: tools I run on my own hardware every
+				day, built on evenings around a day job, and given away. AI does the chores, the design
+				and the decisions are mine, and there will never be a pricing page. The rest of this page
+				is the long version.
 			</p>
 		</section>
 
@@ -225,7 +220,7 @@
 			</div>
 			<div class="flex flex-wrap gap-2.5">
 				<a class="btn btn-primary" href={resolve("/projects")}>See the projects</a>
-				<a class="btn" href="https://github.com/orochibraru?tab=repositories" target="_blank" rel="noopener"
+				<a class="btn" href="https://github.com/zedensix?tab=repositories" target="_blank" rel="noopener"
 					>GitHub &rarr;</a
 				>
 				<a class="btn" href="https://hub.docker.com/u/orochibraru" target="_blank" rel="noopener"

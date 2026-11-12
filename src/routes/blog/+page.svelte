@@ -19,7 +19,7 @@
 		"@context": "https://schema.org",
 		"@type": "Blog",
 		"@id": `${SITE}/blog#blog`,
-		name: "orochibraru",
+		name: "zedensix",
 		url: `${SITE}/blog`,
 		description,
 		inLanguage: "en",

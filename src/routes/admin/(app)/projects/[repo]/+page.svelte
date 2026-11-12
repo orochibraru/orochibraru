@@ -79,7 +79,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.project.name} | orochibraru admin</title>
+	<title>{data.project.name} | zedensix admin</title>
 </svelte:head>
 
 <form

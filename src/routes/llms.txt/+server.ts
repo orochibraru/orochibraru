@@ -10,7 +10,7 @@ export const GET = async ({ fetch }) => {
 			.map((doc) => `- [${doc.title}](${SITE}${mdPath(doc.path)}): ${doc.description}`)
 			.join("\n");
 
-	return new Response(`# orochibraru
+	return new Response(`# zedensix
 
 > Free, open-source, self-hosted software for homelabs, written by one person and given away:
 > a cloud drive (Penombre), a single-host PaaS (Homerun), a server monitor (Baba), a media web
@@ -49,6 +49,6 @@ ${group(`${project.name} docs`)}
 
 - [RSS feed](${SITE}/feed.xml): new posts, as they are written.
 - [Sitemap](${SITE}/sitemap.xml): every canonical URL on the site.
-- [GitHub](https://github.com/orochibraru?tab=repositories): the source for all of it.
+- [GitHub](https://github.com/zedensix?tab=repositories): the source for all of it.
 `);
 };

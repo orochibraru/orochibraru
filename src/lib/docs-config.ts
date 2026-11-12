@@ -77,7 +77,7 @@ export const DocsConfig = z
 		},
 		{ message: "a slug is listed more than once" },
 	)
-	.describe("Order, titles, icons and categories for a project's docs on orochibraru.com");
+	.describe("Order, titles, icons and categories for a project's docs on zedensix.com");
 
 export type DocsConfig = z.infer<typeof DocsConfig>;
 

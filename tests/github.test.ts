@@ -483,4 +483,48 @@ describe("the sync worker", () => {
 			error: "interrupted by a restart",
 		});
 	});
+
+	test("a restart with a newer request already queued runs only that one", async () => {
+		await settled();
+		head = "w4";
+		const interrupted = site.db
+			.insert(syncJob)
+			.values({ repo: "tool", reason: "push", status: "running", attempts: 1 })
+			.returning()
+			.get();
+		const queued = site.db
+			.insert(syncJob)
+			.values({ repo: "tool", reason: "push", status: "queued" })
+			.returning()
+			.get();
+		startSyncWorker();
+		await settled();
+		expect(latestJob("tool")).toMatchObject({ id: queued.id, status: "ok" });
+		expect(
+			site.db.select().from(syncJob).where(eq(syncJob.id, interrupted.id)).get(),
+		).toMatchObject({ status: "failed", error: "interrupted by a restart" });
+	});
+
+	test("a restart with several jobs running for one repo runs only the newest", async () => {
+		await settled();
+		head = "w5";
+		const [older, newest] = [1, 2].map(
+			() =>
+				site.db
+					.insert(syncJob)
+					.values({ repo: "tool", reason: "push", status: "running", attempts: 1 })
+					.returning()
+					.get().id,
+		);
+		startSyncWorker();
+		await settled();
+		expect(latestJob("tool")).toMatchObject({ id: newest, status: "ok" });
+		expect(
+			site.db
+				.select()
+				.from(syncJob)
+				.where(eq(syncJob.id, older as number))
+				.get(),
+		).toMatchObject({ status: "failed", error: "interrupted by a restart" });
+	});
 });

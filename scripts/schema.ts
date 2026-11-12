@@ -1,5 +1,5 @@
 // `bun run schema`: publish the docs/config.json schema as JSON Schema, served
-// at https://orochibraru.com/docs-config.schema.json for the project repos to link.
+// at https://zedensix.com/docs-config.schema.json for the project repos to link.
 import { Glob } from "bun";
 import { z } from "zod";
 import { DocsConfig, SCHEMA_URL } from "../src/lib/docs-config";

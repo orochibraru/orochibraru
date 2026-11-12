@@ -2,7 +2,7 @@
 	import { resolve } from "$app/paths";
 	import Meta from "$lib/components/Meta.svelte";
 
-	const EMAIL = "orochibraru@gmail.com";
+	const EMAIL = "contact@zedensix.com";
 	const UPDATED = "15 October 2026";
 </script>
 

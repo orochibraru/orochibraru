@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-	<title>Projects | orochibraru admin</title>
+	<title>Projects | zedensix admin</title>
 </svelte:head>
 
 <div class="mb-5 flex min-h-8 flex-wrap items-center gap-x-4 gap-y-2">

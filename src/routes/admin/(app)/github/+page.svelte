@@ -71,7 +71,7 @@
 </script>
 
 <svelte:head>
-	<title>GitHub | orochibraru admin</title>
+	<title>GitHub | zedensix admin</title>
 </svelte:head>
 
 <div class="mb-5 flex min-h-8 items-center gap-4">

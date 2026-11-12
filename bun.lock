@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "orochibraru.com",
+      "name": "zedensix.com",
       "dependencies": {
         "@better-auth/cimd": "1.7.5",
         "@better-auth/mcp": "1.7.5",

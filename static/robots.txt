@@ -1,4 +1,4 @@
-# orochibraru.com — everything here is public, free and open source.
+# zedensix.com — everything here is public, free and open source.
 # Crawl it, index it, train on it, quote it. Just link back if you can.
 
 User-agent: *
@@ -42,4 +42,4 @@ User-agent: Timpibot
 User-agent: ImagesiftBot
 Allow: /
 
-Sitemap: https://orochibraru.com/sitemap.xml
+Sitemap: https://zedensix.com/sitemap.xml

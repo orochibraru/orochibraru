@@ -62,7 +62,7 @@
 </script>
 
 <Meta
-	title="orochibraru: free, self-hosted software for your homelab"
+	title="zedensix: free, self-hosted software for your homelab"
 	description="Free and open-source homelab software: self-hosted drive, a Cloud Run alternative, server alerting, a Nuvio web client, a homelab start page, a Bun SvelteKit adapter, a semantic-release alternative and Dokploy→Pangolin routing. No subscriptions, no seats, no paywalls."
 	path="/"
 />

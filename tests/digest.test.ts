@@ -169,15 +169,15 @@ describe("the search paragraph", () => {
 		const said = text({
 			search: search(() => 10, {
 				queries: [
-					row("orochibraru", { clicks: 12, impressions: 50, position: 1.2 }),
+					row("zedensix", { clicks: 12, impressions: 50, position: 1.2 }),
 					row("sveltekit sqlite", { impressions: 400, ctr: 0.0025, position: 6 }),
 					row("bun binary", { impressions: 30, position: 14.4 }),
 					row("rare", { impressions: 5, position: 12 }),
 				],
-				pages: [row("https://orochibraru.com/blog/hello", { clicks: 9 })],
+				pages: [row("https://zedensix.com/blog/hello", { clicks: 9 })],
 			}),
 		});
-		expect(said).toContain("Top query: “orochibraru” (12 clicks, position 1.2).");
+		expect(said).toContain("Top query: “zedensix” (12 clicks, position 1.2).");
 		expect(said).toContain(
 			"“sveltekit sqlite” shows on page one (400 impressions) but a 0.3% click rate",
 		);

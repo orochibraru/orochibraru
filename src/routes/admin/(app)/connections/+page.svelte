@@ -6,7 +6,7 @@
 </script>
 
 <svelte:head>
-	<title>Connections | orochibraru admin</title>
+	<title>Connections | zedensix admin</title>
 </svelte:head>
 
 <div class="mb-5 flex min-h-8 items-center gap-4">
@@ -18,7 +18,7 @@
 	<p>Add this as a custom connector in claude.ai or the desktop app. Claude sends you through SSO once, then shows up below.</p>
 	<code class="block overflow-x-auto border border-line bg-bg px-3 py-2 font-mono text-fg select-all">{data.endpoint}</code>
 	<p>Or from a terminal:</p>
-	<code class="block overflow-x-auto border border-line bg-bg px-3 py-2 font-mono whitespace-nowrap text-fg select-all">claude mcp add --transport http orochibraru {data.endpoint}</code>
+	<code class="block overflow-x-auto border border-line bg-bg px-3 py-2 font-mono whitespace-nowrap text-fg select-all">claude mcp add --transport http zedensix {data.endpoint}</code>
 </div>
 
 <div class="apanel overflow-x-auto">

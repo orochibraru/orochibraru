@@ -28,7 +28,7 @@
 
 	// A page without a real wide screenshot gets the square avatar, and the small card is the honest one for it.
 	const card = $derived(
-		image ?? { url: `${SITE}${avatar}`, width: 320, height: 320, alt: "orochibraru" },
+		image ?? { url: `${SITE}${avatar}`, width: 320, height: 320, alt: "zedensix" },
 	);
 	const nodes = $derived(trail ? [...structuredData, breadcrumbs(trail)] : structuredData);
 </script>

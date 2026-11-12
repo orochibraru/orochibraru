@@ -17,7 +17,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.post.title} | orochibraru admin</title>
+	<title>{data.post.title} | zedensix admin</title>
 </svelte:head>
 
 <form

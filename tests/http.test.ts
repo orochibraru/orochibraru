@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { canonical, isCrossSiteForm, withHeaders } from "../src/lib/server/http";
 
-const at = (path: string) => canonical(new URL(path, "https://orochibraru.com"));
+const at = (path: string) => canonical(new URL(path, "https://zedensix.com"));
 
 describe("canonical", () => {
 	test("redirects the forms nginx used to", () => {
@@ -46,7 +46,7 @@ describe("withHeaders", () => {
 
 describe("isCrossSiteForm", () => {
 	const post = (path: string, headers: Record<string, string>) => {
-		const url = new URL(path, "https://orochibraru.com");
+		const url = new URL(path, "https://zedensix.com");
 		return isCrossSiteForm(new Request(url, { method: "POST", headers }), url);
 	};
 	const form = { "content-type": "application/x-www-form-urlencoded" };
@@ -57,9 +57,7 @@ describe("isCrossSiteForm", () => {
 	});
 
 	test("lets same-origin forms and JSON through", () => {
-		expect(post("/admin/posts/1?/save", { ...form, origin: "https://orochibraru.com" })).toBe(
-			false,
-		);
+		expect(post("/admin/posts/1?/save", { ...form, origin: "https://zedensix.com" })).toBe(false);
 		expect(post("/mcp", { "content-type": "application/json" })).toBe(false);
 	});
 

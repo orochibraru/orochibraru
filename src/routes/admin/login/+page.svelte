@@ -34,14 +34,14 @@
 </script>
 
 <svelte:head>
-	<title>Sign in | orochibraru admin</title>
+	<title>Sign in | zedensix admin</title>
 	<meta name="robots" content="noindex">
 </svelte:head>
 
 <main data-admin class="grid min-h-dvh place-items-center px-4">
 	<div class="w-full max-w-sm">
 		<div class="mb-6 flex items-center gap-3">
-			<span class="grid size-8 place-items-center rounded-lg bg-spark text-onspark" aria-hidden="true"><Logo mono class="size-5" /></span>
+			<Logo class="size-8 rounded-lg" />
 			<h1 class="text-lg font-semibold">Sign in to the admin</h1>
 		</div>
 		<div class="apanel p-5">

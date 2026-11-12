@@ -151,7 +151,7 @@
 	<a
 		class="flex h-22 shrink-0 items-center gap-2.5 border-b border-line px-6 font-display text-[17px] font-semibold tracking-[-.02em]"
 		href={resolve("/")}
-		><Logo class="size-7" /><span>orochi<span class="text-accent">braru</span></span></a
+		><Logo class="size-7 rounded-md" /><span>zeden<span class="text-accent">six</span></span></a
 	>
 	{@render navigation()}
 </aside>

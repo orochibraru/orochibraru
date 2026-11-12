@@ -2,13 +2,13 @@
 	import { resolve } from "$app/paths";
 	import Meta from "$lib/components/Meta.svelte";
 
-	const EMAIL = "orochibraru@gmail.com";
+	const EMAIL = "contact@zedensix.com";
 	const UPDATED = "17 September 2026";
 </script>
 
 <Meta
 	title="Privacy: what this site collects, which is almost nothing"
-	description="GDPR privacy notice for orochibraru.com: self-hosted, cookie-free Umami analytics and server access logs, kept in the EU and never shared. What is collected, why, for how long, and your rights."
+	description="GDPR privacy notice for zedensix.com: self-hosted, cookie-free Umami analytics and server access logs, kept in the EU and never shared. What is collected, why, for how long, and your rights."
 	path="/privacy"
 	trail={[["Privacy", "/privacy"]]}
 />
@@ -32,8 +32,8 @@
 		<section class="mb-22.5">
 			<h2 class="mb-5 text-2xl font-bold tracking-[-.02em]">Who is responsible</h2>
 			<p>
-				The data controller for orochibraru.com, under the EU General Data Protection Regulation
-				(GDPR), is orochibraru, a private individual running a non-commercial site. For anything
+				The data controller for zedensix.com, under the EU General Data Protection Regulation
+				(GDPR), is zedensix, a private individual running a non-commercial site. For anything
 				about your data, email <a class="text-accent" href="mailto:{EMAIL}">{EMAIL}</a>.
 			</p>
 		</section>
@@ -43,7 +43,7 @@
 			<p>
 				This site uses <a class="text-accent" href="https://umami.is" target="_blank" rel="noopener"
 					>Umami</a
-				>, open-source analytics, self-hosted at <code>anal.orochibraru.com</code>. On each page view
+				>, open-source analytics, self-hosted at <code>anal.zedensix.com</code>. On each page view
 				it records:
 			</p>
 			<ul class="mt-5 list-disc pl-6">
@@ -116,7 +116,7 @@
 				the approximate time of your visit to find your data.
 			</p>
 			<p class="mt-5">
-				To object without asking: block <code>anal.orochibraru.com</code> with any content blocker.
+				To object without asking: block <code>anal.zedensix.com</code> with any content blocker.
 				No statistics are collected and the site works exactly the same.
 			</p>
 			<p class="mt-5">

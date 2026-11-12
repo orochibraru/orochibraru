@@ -176,13 +176,39 @@ async function drain() {
 
 /**
  * At boot: a job the last process was running when it stopped runs again (its
- * transaction never committed, so nothing was half-written), finished jobs a
- * month old are dropped, and the queue starts draining.
+ * transaction never committed, so nothing was half-written). A repo only ever
+ * has one job queued, so only its newest interrupted job is, and none at all
+ * when a newer request already waits. Finished jobs a month old are dropped,
+ * and the queue starts draining.
  */
 export function startSyncWorker() {
 	const db = getDb();
 	const interrupted = "interrupted by a restart";
-	db.update(syncJob).set({ status: "queued" }).where(eq(syncJob.status, "running")).run();
+	const queued = new Set(
+		db
+			.select({ repo: syncJob.repo })
+			.from(syncJob)
+			.where(eq(syncJob.status, "queued"))
+			.all()
+			.map((job) => job.repo),
+	);
+	const running = db
+		.select({ id: syncJob.id, repo: syncJob.repo })
+		.from(syncJob)
+		.where(eq(syncJob.status, "running"))
+		.orderBy(desc(syncJob.id))
+		.all();
+	for (const job of running) {
+		if (queued.has(job.repo)) {
+			db.update(syncJob)
+				.set({ status: "failed", error: interrupted, finishedAt: new Date() })
+				.where(eq(syncJob.id, job.id))
+				.run();
+		} else {
+			db.update(syncJob).set({ status: "queued" }).where(eq(syncJob.id, job.id)).run();
+			queued.add(job.repo);
+		}
+	}
 	db.update(syncRun)
 		.set({ status: "failed", error: interrupted, finishedAt: new Date() })
 		.where(eq(syncRun.status, "running"))
